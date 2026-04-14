@@ -1,0 +1,966 @@
+{
+    "scan_info": {
+        "target": "pentest-ground.com",
+        "scan_time": "2026-04-14T09:04:44.975444Z",
+        "scanner": "ReconX",
+        "profile": "full_scan",
+        "duration_seconds": 921
+    },
+    "assets": [
+        {
+            "host": "pentest-ground.com",
+            "ip": "178.79.134.182",
+            "ports": [
+                {
+                    "port": 21,
+                    "protocol": "tcp",
+                    "service": "ftp",
+                    "version": ""
+                },
+                {
+                    "port": 80,
+                    "protocol": "tcp",
+                    "service": "http",
+                    "version": ""
+                },
+                {
+                    "port": 81,
+                    "protocol": "tcp",
+                    "service": "https",
+                    "version": ""
+                },
+                {
+                    "port": 443,
+                    "protocol": "tcp",
+                    "service": "https",
+                    "version": ""
+                },
+                {
+                    "port": 4280,
+                    "protocol": "tcp",
+                    "service": "https",
+                    "version": ""
+                },
+                {
+                    "port": 5013,
+                    "protocol": "tcp",
+                    "service": "https",
+                    "version": ""
+                },
+                {
+                    "port": 6379,
+                    "protocol": "tcp",
+                    "service": "redis",
+                    "version": ""
+                },
+                {
+                    "port": 7001,
+                    "protocol": "tcp",
+                    "service": "https",
+                    "version": ""
+                },
+                {
+                    "port": 9000,
+                    "protocol": "tcp",
+                    "service": "https",
+                    "version": ""
+                }
+            ],
+            "technologies": [
+                "Google Tag Manager",
+                "nginx/1.29.8",
+                "Nginx:1.29.8"
+            ],
+            "endpoints": [
+                "https://pentest-ground.com",
+                "https://pentest-ground.com/alpine-data.js",
+                "https://pentest-ground.com/documents/company/Q4_preview.pptx",
+                "https://pentest-ground.com/documents/company/Q4_report.csv",
+                "https://pentest-ground.com/documents/company/business_plan.docx",
+                "https://pentest-ground.com/documents/company/company_sales_data.docx",
+                "https://pentest-ground.com/documents/company/compliance_audit.docx",
+                "https://pentest-ground.com/documents/company/full_backup_2025_11_10.csv",
+                "https://pentest-ground.com/documents/company/full_backup_2026_01_27.csv",
+                "https://pentest-ground.com/documents/company/interal_report_1.csv",
+                "https://pentest-ground.com/documents/company/pentest.pptx",
+                "https://pentest-ground.com/documents/company/pentest_results.pptx",
+                "https://pentest-ground.com/documents/company/q2_draft.pptx",
+                "https://pentest-ground.com/documents/company/report.docx",
+                "https://pentest-ground.com/documents/company/sales.pptx",
+                "https://pentest-ground.com/documents/company/upcoming_final.pptx",
+                "https://pentest-ground.com/documents/employees/contract.docx",
+                "https://pentest-ground.com/documents/employees/draft.docx",
+                "https://pentest-ground.com/documents/employees/employees.csv",
+                "https://pentest-ground.com/documents/employees/export.csv",
+                "https://pentest-ground.com/documents/employees/full_backup_2025_02_17.csv",
+                "https://pentest-ground.com/documents/employees/full_backup_2025_07_17.csv",
+                "https://pentest-ground.com/documents/employees/internal_sales.docx",
+                "https://pentest-ground.com/documents/employees/it_setup.pptx",
+                "https://pentest-ground.com/documents/employees/meeting_notes.docx",
+                "https://pentest-ground.com/documents/employees/password_policy.docx",
+                "https://pentest-ground.com/documents/employees/prod.csv",
+                "https://pentest-ground.com/documents/employees/ssh_keys.csv",
+                "https://pentest-ground.com/documents/employees/transactions_1.csv",
+                "https://pentest-ground.com/documents/employees/transactions_backup.csv",
+                "https://pentest-ground.com/documents/employees/user_data.csv",
+                "https://pentest-ground.com/documents/employees/vpn_logins.csv",
+                "https://pentest-ground.com/documents/employees/vpn_setup.docx",
+                "https://pentest-ground.com/documents/employees/vpn_setup_guide.docx",
+                "https://pentest-ground.com/documents/internal/all.csv",
+                "https://pentest-ground.com/documents/internal/api_keys.csv",
+                "https://pentest-ground.com/documents/internal/archive.csv",
+                "https://pentest-ground.com/documents/internal/aws_secrets.docx",
+                "https://pentest-ground.com/documents/internal/azure_credentials.csv",
+                "https://pentest-ground.com/documents/internal/backup.csv",
+                "https://pentest-ground.com/documents/internal/backup2.csv",
+                "https://pentest-ground.com/documents/internal/backup_1.csv",
+                "https://pentest-ground.com/documents/internal/config_backup.docx",
+                "https://pentest-ground.com/documents/internal/credentials.csv",
+                "https://pentest-ground.com/documents/internal/db_export.csv",
+                "https://pentest-ground.com/documents/internal/firewall.docx",
+                "https://pentest-ground.com/documents/internal/firewall_rules.docx",
+                "https://pentest-ground.com/documents/internal/internal_training.pptx",
+                "https://pentest-ground.com/documents/internal/ip_config.docx",
+                "https://pentest-ground.com/documents/internal/network.pptx",
+                "https://pentest-ground.com/documents/internal/private_keys.csv",
+                "https://pentest-ground.com/documents/internal/prod_credentials.csv",
+                "https://pentest-ground.com/documents/internal/service_accounts.csv",
+                "https://pentest-ground.com/img/PentestGroundFavicon.png",
+                "https://pentest-ground.com:4280/",
+                "https://pentest-ground.com:5013/",
+                "https://pentest-ground.com:7001/console/login/LoginForm.jsp",
+                "https://pentest-ground.com:81/",
+                "https://pentest-ground.com:9000/"
+            ]
+        }
+    ],
+    "findings": [
+        {
+            "id": "VULN-001",
+            "title": "Redis < 8.2.1 lua script - Integer Overflow",
+            "description": "Redis is an open source, in-memory database that persists on disk. Versions 8.2.1 and below allow an authenticated user to use a specially crafted Lua script to cause an integer overflow and potentially lead to remote code execution The problem exists in all versions of Redis with Lua scripting. This issue is fixed in version 8.2.2.\n",
+            "severity": "critical",
+            "cvss_score": 9.8,
+            "cwe": "",
+            "cve": [
+                "CVE-2025-46817"
+            ],
+            "asset": "pentest-ground.com",
+            "port": 6379,
+            "protocol": "tcp",
+            "evidence": {
+                "source": "nuclei",
+                "template": "CVE-2025-46817",
+                "name": "Redis < 8.2.1 lua script - Integer Overflow",
+                "matched_url": "pentest-ground.com:6379",
+                "type": "javascript",
+                "request": "const redis = require('nuclei/redis');\nconst info = redis.GetServerInfo(Host, Port);\nExport(info);",
+                "response": "# Server\r\nredis_version:5.0.7\r\nredis_git_sha1:00000000\r\nredis_git_dirty:0\r\nredis_build_id:636cde3b5c7a3923\r\nredis_mode:standalone\r\nos:Linux 5.10.0-36-amd64 x86_64\r\narch_bits:64\r\nmultiplexing_api:epoll\r\natomicvar_api:atomic-builtin\r\ngcc_version:9.2.1\r\nprocess_id:1\r\nrun_id:263e85082f00423c401ec3795f8606a66b04ba33\r\ntcp_port:6379\r\nuptime_in_seconds:574\r\nuptime_in_days:0\r\nhz:10\r\nconfigured_hz:10\r\nlru_clock:14550518\r\nexecutable:/redis-server\r\nconfig_file:/etc/redis/redis.conf\r\n\r\n# Clients\r\nconnected_clients:1\r\nclient_recent_max_input_buffer:2\r\nclient_recent_max_output_buffer:0\r\nblocked_clients:0\r\n\r\n# Memory\r\nused_memory:1907712\r\nused_memory_human:1.82M\r\nused_memory_rss:6635520\r\nused_memory_rss_human:6.33M\r\nused_memory_peak:1927744\r\nused_memory_peak_human:1.84M\r\nused_memory_peak_perc:98.96%\r\nused_memory_overhead:1894454\r\nused_memory_startup:796184\r\nused_memory_dataset:13258\r\nused_memory_dataset_perc:1.19%\r\nallocator_allocated:2220912\r\nallocator_active:2420736\r\nallocator_resident:5505024\r\ntotal_system_memory:8330829824\r\ntotal_system_memory_human:7.76G\r\nused_memory_lua:41984\r\nused_memory_lua_human:41.00K\r\nused_memory_scripts:0\r\nused_memory_scripts_human:0B\r\nnumber_of_cached_scripts:0\r\nmaxmemory:0\r\nmaxmemory_human:0B\r\nmaxmemory_policy:noeviction\r\nallocator_frag_ratio:1.09\r\nallocator_frag_bytes:199824\r\nallocator_rss_ratio:2.27\r\nallocator_rss_bytes:3084288\r\nrss_overhead_ratio:1.21\r\nrss_overhead_bytes:1130496\r\nmem_fragmentation_ratio:3.56\r\nmem_fragmentation_bytes:4769816\r\nmem_not_counted_for_evict:0\r\nmem_replication_backlog:1048576\r\nmem_clients_slaves:0\r\nmem_clients_normal:49694\r\nmem_aof_buffer:0\r\nmem_allocator:jemalloc-5.2.1\r\nactive_defrag_running:0\r\nlazyfree_pending_objects:0\r\n\r\n# Persistence\r\nloading:0\r\nrdb_changes_since_last_save:1\r\nrdb_bgsave_in_progress:0\r\nrdb_last_save_time:1776157839\r\nrdb_last_bgsave_status:ok\r\nrdb_last_bgsave_time_sec:0\r\nrdb_current_bgsave_time_sec:-1\r\nrdb_last_cow_size:434176\r\naof_enabled:0\r\naof_rewrite_in_progress:0\r\naof_rewrite_scheduled:0\r\naof_last_rewrite_time_sec:-1\r\naof_current_rewrite_time_sec:-1\r\naof_last_bgrewrite_status:ok\r\naof_last_write_status:ok\r\naof_last_cow_size:0\r\n\r\n# Stats\r\ntotal_connections_received:27\r\ntotal_commands_processed:163\r\ninstantaneous_ops_per_sec:0\r\ntotal_net_input_bytes:6934\r\ntotal_net_output_bytes:2429\r\ninstantaneous_input_kbps:0.02\r\ninstantaneous_output_kbps:0.04\r\nrejected_connections:0\r\nsync_full:1\r\nsync_partial_ok:0\r\nsync_partial_err:0\r\nexpired_keys:0\r\nexpired_stale_perc:0.00\r\nexpired_time_cap_reached_count:0\r\nevicted_keys:0\r\nkeyspace_hits:0\r\nkeyspace_misses:0\r\npubsub_channels:0\r\npubsub_patterns:0\r\nlatest_fork_usec:796\r\nmigrate_cached_sockets:0\r\nslave_expires_tracked_keys:0\r\nactive_defrag_hits:0\r\nactive_defrag_misses:0\r\nactive_defrag_key_hits:0\r\nactive_defrag_key_misses:0\r\n\r\n# Replication\r\nrole:master\r\nconnected_slaves:0\r\nmaster_replid:2523a15097dbc396750af0285e0932ab161eb565\r\nmaster_replid2:0000000000000000000000000000000000000000\r\nmaster_repl_offset:257\r\nsecond_repl_offset:-1\r\nrepl_backlog_active:1\r\nrepl_backlog_size:1048576\r\nrepl_backlog_first_byte_offset:1\r\nrepl_backlog_histlen:257\r\n\r\n# CPU\r\nused_cpu_sys:0.510452\r\nused_cpu_user:0.493605\r\nused_cpu_sys_children:0.003126\r\nused_cpu_user_children:0.000000\r\n\r\n# Cluster\r\ncluster_enabled:0\r\n\r\n# Keyspace\r\n",
+                "extracted_results": [
+                    "5.0.7"
+                ]
+            },
+            "impact": "Authenticated users can execute arbitrary code remotely, potentially compromising the entire system.\n",
+            "remediation": "Update to version 8.2.2 or later.\n",
+            "references": [
+                "https://github.com/dwisiswant0/cve-2025-46817/blob/master/readme.md",
+                "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-46817"
+            ],
+            "tags": [
+                "cve",
+                "cve2025",
+                "js",
+                "redis",
+                "network",
+                "passive",
+                "authenticated",
+                "vuln",
+                "CVE-2025-46817"
+            ]
+        },
+        {
+            "id": "VULN-002",
+            "title": "Redis Lua Parser < 8.2.2 - Use After Free",
+            "description": "Redis is an open source, in-memory database that persists on disk. Versions 8.2.1 and below allow an authenticated user to use a specially crafted Lua script to manipulate the garbage collector, trigger a use-after-free and potentially lead to remote code execution. The problem exists in all versions of Redis with Lua scripting. This issue is fixed in version 8.2.2. To workaround this issue without patching the redis-server executable is to prevent users from executing Lua scripts. This can be done using ACL to restrict EVAL and EVALSHA commands.\n",
+            "severity": "critical",
+            "cvss_score": 9.8,
+            "cwe": "",
+            "cve": [
+                "CVE-2025-49844"
+            ],
+            "asset": "pentest-ground.com",
+            "port": 6379,
+            "protocol": "tcp",
+            "evidence": {
+                "source": "nuclei",
+                "template": "CVE-2025-49844",
+                "name": "Redis Lua Parser < 8.2.2 - Use After Free",
+                "matched_url": "pentest-ground.com:6379",
+                "type": "javascript",
+                "request": "const redis = require('nuclei/redis');\nconst info = redis.GetServerInfo(Host, Port);\nExport(info);",
+                "response": "# Server\r\nredis_version:5.0.7\r\nredis_git_sha1:00000000\r\nredis_git_dirty:0\r\nredis_build_id:636cde3b5c7a3923\r\nredis_mode:standalone\r\nos:Linux 5.10.0-36-amd64 x86_64\r\narch_bits:64\r\nmultiplexing_api:epoll\r\natomicvar_api:atomic-builtin\r\ngcc_version:9.2.1\r\nprocess_id:1\r\nrun_id:263e85082f00423c401ec3795f8606a66b04ba33\r\ntcp_port:6379\r\nuptime_in_seconds:574\r\nuptime_in_days:0\r\nhz:10\r\nconfigured_hz:10\r\nlru_clock:14550518\r\nexecutable:/redis-server\r\nconfig_file:/etc/redis/redis.conf\r\n\r\n# Clients\r\nconnected_clients:1\r\nclient_recent_max_input_buffer:2\r\nclient_recent_max_output_buffer:0\r\nblocked_clients:0\r\n\r\n# Memory\r\nused_memory:1907712\r\nused_memory_human:1.82M\r\nused_memory_rss:6635520\r\nused_memory_rss_human:6.33M\r\nused_memory_peak:1927744\r\nused_memory_peak_human:1.84M\r\nused_memory_peak_perc:98.96%\r\nused_memory_overhead:1894454\r\nused_memory_startup:796184\r\nused_memory_dataset:13258\r\nused_memory_dataset_perc:1.19%\r\nallocator_allocated:2220912\r\nallocator_active:2420736\r\nallocator_resident:5505024\r\ntotal_system_memory:8330829824\r\ntotal_system_memory_human:7.76G\r\nused_memory_lua:41984\r\nused_memory_lua_human:41.00K\r\nused_memory_scripts:0\r\nused_memory_scripts_human:0B\r\nnumber_of_cached_scripts:0\r\nmaxmemory:0\r\nmaxmemory_human:0B\r\nmaxmemory_policy:noeviction\r\nallocator_frag_ratio:1.09\r\nallocator_frag_bytes:199824\r\nallocator_rss_ratio:2.27\r\nallocator_rss_bytes:3084288\r\nrss_overhead_ratio:1.21\r\nrss_overhead_bytes:1130496\r\nmem_fragmentation_ratio:3.56\r\nmem_fragmentation_bytes:4769816\r\nmem_not_counted_for_evict:0\r\nmem_replication_backlog:1048576\r\nmem_clients_slaves:0\r\nmem_clients_normal:49694\r\nmem_aof_buffer:0\r\nmem_allocator:jemalloc-5.2.1\r\nactive_defrag_running:0\r\nlazyfree_pending_objects:0\r\n\r\n# Persistence\r\nloading:0\r\nrdb_changes_since_last_save:1\r\nrdb_bgsave_in_progress:0\r\nrdb_last_save_time:1776157839\r\nrdb_last_bgsave_status:ok\r\nrdb_last_bgsave_time_sec:0\r\nrdb_current_bgsave_time_sec:-1\r\nrdb_last_cow_size:434176\r\naof_enabled:0\r\naof_rewrite_in_progress:0\r\naof_rewrite_scheduled:0\r\naof_last_rewrite_time_sec:-1\r\naof_current_rewrite_time_sec:-1\r\naof_last_bgrewrite_status:ok\r\naof_last_write_status:ok\r\naof_last_cow_size:0\r\n\r\n# Stats\r\ntotal_connections_received:27\r\ntotal_commands_processed:163\r\ninstantaneous_ops_per_sec:0\r\ntotal_net_input_bytes:6934\r\ntotal_net_output_bytes:2429\r\ninstantaneous_input_kbps:0.02\r\ninstantaneous_output_kbps:0.04\r\nrejected_connections:0\r\nsync_full:1\r\nsync_partial_ok:0\r\nsync_partial_err:0\r\nexpired_keys:0\r\nexpired_stale_perc:0.00\r\nexpired_time_cap_reached_count:0\r\nevicted_keys:0\r\nkeyspace_hits:0\r\nkeyspace_misses:0\r\npubsub_channels:0\r\npubsub_patterns:0\r\nlatest_fork_usec:796\r\nmigrate_cached_sockets:0\r\nslave_expires_tracked_keys:0\r\nactive_defrag_hits:0\r\nactive_defrag_misses:0\r\nactive_defrag_key_hits:0\r\nactive_defrag_key_misses:0\r\n\r\n# Replication\r\nrole:master\r\nconnected_slaves:0\r\nmaster_replid:2523a15097dbc396750af0285e0932ab161eb565\r\nmaster_replid2:0000000000000000000000000000000000000000\r\nmaster_repl_offset:257\r\nsecond_repl_offset:-1\r\nrepl_backlog_active:1\r\nrepl_backlog_size:1048576\r\nrepl_backlog_first_byte_offset:1\r\nrepl_backlog_histlen:257\r\n\r\n# CPU\r\nused_cpu_sys:0.510452\r\nused_cpu_user:0.493605\r\nused_cpu_sys_children:0.003126\r\nused_cpu_user_children:0.000000\r\n\r\n# Cluster\r\ncluster_enabled:0\r\n\r\n# Keyspace\r\n",
+                "extracted_results": [
+                    "5.0.7"
+                ]
+            },
+            "impact": "Authenticated attackers can manipulate the garbage collector through crafted Lua scripts to trigger use-after-free conditions, potentially achieving remote code execution on Redis servers.\n",
+            "remediation": "Upgrade to version 8.2.2 or later.\n",
+            "references": [
+                "https://www.wiz.io/blog/wiz-research-redis-rce-cve-2025-49844",
+                "https://github.com/dwisiswant0/cve-2025-49844",
+                "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-49844"
+            ],
+            "tags": [
+                "cve",
+                "cve2025",
+                "js",
+                "redis",
+                "network",
+                "passive",
+                "authenticated",
+                "vuln",
+                "vkev",
+                "CVE-2025-49844"
+            ]
+        },
+        {
+            "id": "VULN-003",
+            "title": "Redis  < 8.2.1 Lua Long-String Delimiter - Out-of-Bounds Read",
+            "description": "Redis is an open source, in-memory database that persists on disk. Versions 8.2.1 and below allow an authenticated user to use a specially crafted LUA script to read out-of-bound data or crash the server and subsequent denial of service. The problem exists in all versions of Redis with Lua scripting. This issue is fixed in version 8.2.2. To workaround this issue without patching the redis-server executable is to prevent users from executing Lua scripts. This can be done using ACL to block a script by restricting both the EVAL and FUNCTION command families.\n",
+            "severity": "high",
+            "cvss_score": 8.1,
+            "cwe": "",
+            "cve": [
+                "CVE-2025-46819"
+            ],
+            "asset": "pentest-ground.com",
+            "port": 6379,
+            "protocol": "tcp",
+            "evidence": {
+                "source": "nuclei",
+                "template": "CVE-2025-46819",
+                "name": "Redis  < 8.2.1 Lua Long-String Delimiter - Out-of-Bounds Read",
+                "matched_url": "pentest-ground.com:6379",
+                "type": "javascript",
+                "request": "const redis = require('nuclei/redis');\nconst info = redis.GetServerInfo(Host, Port);\nExport(info);",
+                "response": "# Server\r\nredis_version:5.0.7\r\nredis_git_sha1:00000000\r\nredis_git_dirty:0\r\nredis_build_id:636cde3b5c7a3923\r\nredis_mode:standalone\r\nos:Linux 5.10.0-36-amd64 x86_64\r\narch_bits:64\r\nmultiplexing_api:epoll\r\natomicvar_api:atomic-builtin\r\ngcc_version:9.2.1\r\nprocess_id:1\r\nrun_id:263e85082f00423c401ec3795f8606a66b04ba33\r\ntcp_port:6379\r\nuptime_in_seconds:574\r\nuptime_in_days:0\r\nhz:10\r\nconfigured_hz:10\r\nlru_clock:14550518\r\nexecutable:/redis-server\r\nconfig_file:/etc/redis/redis.conf\r\n\r\n# Clients\r\nconnected_clients:1\r\nclient_recent_max_input_buffer:2\r\nclient_recent_max_output_buffer:0\r\nblocked_clients:0\r\n\r\n# Memory\r\nused_memory:1907712\r\nused_memory_human:1.82M\r\nused_memory_rss:6635520\r\nused_memory_rss_human:6.33M\r\nused_memory_peak:1927744\r\nused_memory_peak_human:1.84M\r\nused_memory_peak_perc:98.96%\r\nused_memory_overhead:1894454\r\nused_memory_startup:796184\r\nused_memory_dataset:13258\r\nused_memory_dataset_perc:1.19%\r\nallocator_allocated:2220912\r\nallocator_active:2420736\r\nallocator_resident:5505024\r\ntotal_system_memory:8330829824\r\ntotal_system_memory_human:7.76G\r\nused_memory_lua:41984\r\nused_memory_lua_human:41.00K\r\nused_memory_scripts:0\r\nused_memory_scripts_human:0B\r\nnumber_of_cached_scripts:0\r\nmaxmemory:0\r\nmaxmemory_human:0B\r\nmaxmemory_policy:noeviction\r\nallocator_frag_ratio:1.09\r\nallocator_frag_bytes:199824\r\nallocator_rss_ratio:2.27\r\nallocator_rss_bytes:3084288\r\nrss_overhead_ratio:1.21\r\nrss_overhead_bytes:1130496\r\nmem_fragmentation_ratio:3.56\r\nmem_fragmentation_bytes:4769816\r\nmem_not_counted_for_evict:0\r\nmem_replication_backlog:1048576\r\nmem_clients_slaves:0\r\nmem_clients_normal:49694\r\nmem_aof_buffer:0\r\nmem_allocator:jemalloc-5.2.1\r\nactive_defrag_running:0\r\nlazyfree_pending_objects:0\r\n\r\n# Persistence\r\nloading:0\r\nrdb_changes_since_last_save:1\r\nrdb_bgsave_in_progress:0\r\nrdb_last_save_time:1776157839\r\nrdb_last_bgsave_status:ok\r\nrdb_last_bgsave_time_sec:0\r\nrdb_current_bgsave_time_sec:-1\r\nrdb_last_cow_size:434176\r\naof_enabled:0\r\naof_rewrite_in_progress:0\r\naof_rewrite_scheduled:0\r\naof_last_rewrite_time_sec:-1\r\naof_current_rewrite_time_sec:-1\r\naof_last_bgrewrite_status:ok\r\naof_last_write_status:ok\r\naof_last_cow_size:0\r\n\r\n# Stats\r\ntotal_connections_received:27\r\ntotal_commands_processed:163\r\ninstantaneous_ops_per_sec:0\r\ntotal_net_input_bytes:6934\r\ntotal_net_output_bytes:2429\r\ninstantaneous_input_kbps:0.02\r\ninstantaneous_output_kbps:0.04\r\nrejected_connections:0\r\nsync_full:1\r\nsync_partial_ok:0\r\nsync_partial_err:0\r\nexpired_keys:0\r\nexpired_stale_perc:0.00\r\nexpired_time_cap_reached_count:0\r\nevicted_keys:0\r\nkeyspace_hits:0\r\nkeyspace_misses:0\r\npubsub_channels:0\r\npubsub_patterns:0\r\nlatest_fork_usec:796\r\nmigrate_cached_sockets:0\r\nslave_expires_tracked_keys:0\r\nactive_defrag_hits:0\r\nactive_defrag_misses:0\r\nactive_defrag_key_hits:0\r\nactive_defrag_key_misses:0\r\n\r\n# Replication\r\nrole:master\r\nconnected_slaves:0\r\nmaster_replid:2523a15097dbc396750af0285e0932ab161eb565\r\nmaster_replid2:0000000000000000000000000000000000000000\r\nmaster_repl_offset:257\r\nsecond_repl_offset:-1\r\nrepl_backlog_active:1\r\nrepl_backlog_size:1048576\r\nrepl_backlog_first_byte_offset:1\r\nrepl_backlog_histlen:257\r\n\r\n# CPU\r\nused_cpu_sys:0.510452\r\nused_cpu_user:0.493605\r\nused_cpu_sys_children:0.003126\r\nused_cpu_user_children:0.000000\r\n\r\n# Cluster\r\ncluster_enabled:0\r\n\r\n# Keyspace\r\n",
+                "extracted_results": [
+                    "5.0.7"
+                ]
+            },
+            "impact": "Authenticated attackers can use specially crafted Lua scripts to read out-of-bound data or crash the Redis server, causing denial of service.\n",
+            "remediation": "Update to version 8.2.2 or later.\n",
+            "references": [
+                "https://github.com/dwisiswant0/cve-2025-46819",
+                "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-46819"
+            ],
+            "tags": [
+                "cve",
+                "cve2025",
+                "js",
+                "redis",
+                "network",
+                "passive",
+                "authenticated",
+                "vuln",
+                "CVE-2025-46819"
+            ]
+        },
+        {
+            "id": "VULN-004",
+            "title": "Redis - Default Logins",
+            "description": "Redis service was accessed with easily guessed credentials.\n",
+            "severity": "high",
+            "cvss_score": 8.1,
+            "cwe": "",
+            "cve": [],
+            "asset": "pentest-ground.com",
+            "port": 6379,
+            "protocol": "tcp",
+            "evidence": {
+                "source": "nuclei",
+                "template": "redis-default-logins",
+                "name": "Redis - Default Logins",
+                "matched_url": "pentest-ground.com:6379",
+                "type": "javascript",
+                "request": "var m = require(\"nuclei/redis\");\nm.GetServerInfoAuth(Host, Port, Password);",
+                "response": "# Server\r\nredis_version:5.0.7\r\nredis_git_sha1:00000000\r\nredis_git_dirty:0\r\nredis_build_id:636cde3b5c7a3923\r\nredis_mode:standalone\r\nos:Linux 5.10.0-36-amd64 x86_64\r\narch_bits:64\r\nmultiplexing_api:epoll\r\natomicvar_api:atomic-builtin\r\ngcc_version:9.2.1\r\nprocess_id:1\r\nrun_id:263e85082f00423c401ec3795f8606a66b04ba33\r\ntcp_port:6379\r\nuptime_in_seconds:574\r\nuptime_in_days:0\r\nhz:10\r\nconfigured_hz:10\r\nlru_clock:14550518\r\nexecutable:/redis-server\r\nconfig_file:/etc/redis/redis.conf\r\n\r\n# Clients\r\nconnected_clients:4\r\nclient_recent_max_input_buffer:4\r\nclient_recent_max_output_buffer:0\r\nblocked_clients:0\r\n\r\n# Memory\r\nused_memory:2052336\r\nused_memory_human:1.96M\r\nused_memory_rss:6635520\r\nused_memory_rss_human:6.33M\r\nused_memory_peak:2072248\r\nused_memory_peak_human:1.98M\r\nused_memory_peak_perc:99.04%\r\nused_memory_overhead:2010764\r\nused_memory_startup:796184\r\nused_memory_dataset:41572\r\nused_memory_dataset_perc:3.31%\r\nallocator_allocated:2397872\r\nallocator_active:2641920\r\nallocator_resident:5763072\r\ntotal_system_memory:8330829824\r\ntotal_system_memory_human:7.76G\r\nused_memory_lua:41984\r\nused_memory_lua_human:41.00K\r\nused_memory_scripts:0\r\nused_memory_scripts_human:0B\r\nnumber_of_cached_scripts:0\r\nmaxmemory:0\r\nmaxmemory_human:0B\r\nmaxmemory_policy:noeviction\r\nallocator_frag_ratio:1.10\r\nallocator_frag_bytes:244048\r\nallocator_rss_ratio:2.18\r\nallocator_rss_bytes:3121152\r\nrss_overhead_ratio:1.15\r\nrss_overhead_bytes:872448\r\nmem_fragmentation_ratio:3.27\r\nmem_fragmentation_bytes:4604264\r\nmem_not_counted_for_evict:0\r\nmem_replication_backlog:1048576\r\nmem_clients_slaves:0\r\nmem_clients_normal:166004\r\nmem_aof_buffer:0\r\nmem_allocator:jemalloc-5.2.1\r\nactive_defrag_running:0\r\nlazyfree_pending_objects:0\r\n\r\n# Persistence\r\nloading:0\r\nrdb_changes_since_last_save:1\r\nrdb_bgsave_in_progress:0\r\nrdb_last_save_time:1776157839\r\nrdb_last_bgsave_status:ok\r\nrdb_last_bgsave_time_sec:0\r\nrdb_current_bgsave_time_sec:-1\r\nrdb_last_cow_size:434176\r\naof_enabled:0\r\naof_rewrite_in_progress:0\r\naof_rewrite_scheduled:0\r\naof_last_rewrite_time_sec:-1\r\naof_current_rewrite_time_sec:-1\r\naof_last_bgrewrite_status:ok\r\naof_last_write_status:ok\r\naof_last_cow_size:0\r\n\r\n# Stats\r\ntotal_connections_received:32\r\ntotal_commands_processed:169\r\ninstantaneous_ops_per_sec:3\r\ntotal_net_input_bytes:7224\r\ntotal_net_output_bytes:6185\r\ninstantaneous_input_kbps:0.18\r\ninstantaneous_output_kbps:2.33\r\nrejected_connections:0\r\nsync_full:1\r\nsync_partial_ok:0\r\nsync_partial_err:0\r\nexpired_keys:0\r\nexpired_stale_perc:0.00\r\nexpired_time_cap_reached_count:0\r\nevicted_keys:0\r\nkeyspace_hits:0\r\nkeyspace_misses:0\r\npubsub_channels:0\r\npubsub_patterns:0\r\nlatest_fork_usec:796\r\nmigrate_cached_sockets:0\r\nslave_expires_tracked_keys:0\r\nactive_defrag_hits:0\r\nactive_defrag_misses:0\r\nactive_defrag_key_hits:0\r\nactive_defrag_key_misses:0\r\n\r\n# Replication\r\nrole:master\r\nconnected_slaves:0\r\nmaster_replid:2523a15097dbc396750af0285e0932ab161eb565\r\nmaster_replid2:0000000000000000000000000000000000000000\r\nmaster_repl_offset:257\r\nsecond_repl_offset:-1\r\nrepl_backlog_active:1\r\nrepl_backlog_size:1048576\r\nrepl_backlog_first_byte_offset:1\r\nrepl_backlog_histlen:257\r\n\r\n# CPU\r\nused_cpu_sys:0.512795\r\nused_cpu_user:0.494827\r\nused_cpu_sys_children:0.003126\r\nused_cpu_user_children:0.000000\r\n\r\n# Cluster\r\ncluster_enabled:0\r\n\r\n# Keyspace\r\n"
+            },
+            "impact": "Attackers may read/write database contents and potentially achieve remote code execution depending on configuration.",
+            "remediation": "Restrict Redis to trusted networks (firewall/VPC rules), bind to localhost or a private interface, and require authentication (ACLs). Disable dangerous commands if not needed.",
+            "references": [],
+            "tags": [
+                "js",
+                "redis",
+                "default-login",
+                "network",
+                "vuln",
+                "redis-default-logins"
+            ]
+        },
+        {
+            "id": "VULN-005",
+            "title": "Redis Lua Sandbox < 8.2.2 - Cross-User Escape",
+            "description": "Redis is an open source, in-memory database that persists on disk. Versions 8.2.1 and below allow an authenticated user to use a specially crafted Lua script to manipulate different LUA objects and potentially run their own code in the context of another user. The problem exists in all versions of Redis with LUA scripting. This issue is fixed in version 8.2.2. A workaround to mitigate the problem without patching the redis-server executable is to prevent users from executing LUA scripts. This can be done using ACL to block a script by restricting both the EVAL and FUNCTION command families.\n",
+            "severity": "high",
+            "cvss_score": 8.1,
+            "cwe": "",
+            "cve": [
+                "CVE-2025-46818"
+            ],
+            "asset": "pentest-ground.com",
+            "port": 6379,
+            "protocol": "tcp",
+            "evidence": {
+                "source": "nuclei",
+                "template": "CVE-2025-46818",
+                "name": "Redis Lua Sandbox < 8.2.2 - Cross-User Escape",
+                "matched_url": "pentest-ground.com:6379",
+                "type": "javascript",
+                "request": "const redis = require('nuclei/redis');\nconst info = redis.GetServerInfo(Host, Port);\nExport(info);",
+                "response": "# Server\r\nredis_version:5.0.7\r\nredis_git_sha1:00000000\r\nredis_git_dirty:0\r\nredis_build_id:636cde3b5c7a3923\r\nredis_mode:standalone\r\nos:Linux 5.10.0-36-amd64 x86_64\r\narch_bits:64\r\nmultiplexing_api:epoll\r\natomicvar_api:atomic-builtin\r\ngcc_version:9.2.1\r\nprocess_id:1\r\nrun_id:263e85082f00423c401ec3795f8606a66b04ba33\r\ntcp_port:6379\r\nuptime_in_seconds:574\r\nuptime_in_days:0\r\nhz:10\r\nconfigured_hz:10\r\nlru_clock:14550518\r\nexecutable:/redis-server\r\nconfig_file:/etc/redis/redis.conf\r\n\r\n# Clients\r\nconnected_clients:1\r\nclient_recent_max_input_buffer:2\r\nclient_recent_max_output_buffer:0\r\nblocked_clients:0\r\n\r\n# Memory\r\nused_memory:1907712\r\nused_memory_human:1.82M\r\nused_memory_rss:6635520\r\nused_memory_rss_human:6.33M\r\nused_memory_peak:1927744\r\nused_memory_peak_human:1.84M\r\nused_memory_peak_perc:98.96%\r\nused_memory_overhead:1894454\r\nused_memory_startup:796184\r\nused_memory_dataset:13258\r\nused_memory_dataset_perc:1.19%\r\nallocator_allocated:2220912\r\nallocator_active:2420736\r\nallocator_resident:5505024\r\ntotal_system_memory:8330829824\r\ntotal_system_memory_human:7.76G\r\nused_memory_lua:41984\r\nused_memory_lua_human:41.00K\r\nused_memory_scripts:0\r\nused_memory_scripts_human:0B\r\nnumber_of_cached_scripts:0\r\nmaxmemory:0\r\nmaxmemory_human:0B\r\nmaxmemory_policy:noeviction\r\nallocator_frag_ratio:1.09\r\nallocator_frag_bytes:199824\r\nallocator_rss_ratio:2.27\r\nallocator_rss_bytes:3084288\r\nrss_overhead_ratio:1.21\r\nrss_overhead_bytes:1130496\r\nmem_fragmentation_ratio:3.56\r\nmem_fragmentation_bytes:4769816\r\nmem_not_counted_for_evict:0\r\nmem_replication_backlog:1048576\r\nmem_clients_slaves:0\r\nmem_clients_normal:49694\r\nmem_aof_buffer:0\r\nmem_allocator:jemalloc-5.2.1\r\nactive_defrag_running:0\r\nlazyfree_pending_objects:0\r\n\r\n# Persistence\r\nloading:0\r\nrdb_changes_since_last_save:1\r\nrdb_bgsave_in_progress:0\r\nrdb_last_save_time:1776157839\r\nrdb_last_bgsave_status:ok\r\nrdb_last_bgsave_time_sec:0\r\nrdb_current_bgsave_time_sec:-1\r\nrdb_last_cow_size:434176\r\naof_enabled:0\r\naof_rewrite_in_progress:0\r\naof_rewrite_scheduled:0\r\naof_last_rewrite_time_sec:-1\r\naof_current_rewrite_time_sec:-1\r\naof_last_bgrewrite_status:ok\r\naof_last_write_status:ok\r\naof_last_cow_size:0\r\n\r\n# Stats\r\ntotal_connections_received:27\r\ntotal_commands_processed:163\r\ninstantaneous_ops_per_sec:0\r\ntotal_net_input_bytes:6934\r\ntotal_net_output_bytes:2429\r\ninstantaneous_input_kbps:0.02\r\ninstantaneous_output_kbps:0.04\r\nrejected_connections:0\r\nsync_full:1\r\nsync_partial_ok:0\r\nsync_partial_err:0\r\nexpired_keys:0\r\nexpired_stale_perc:0.00\r\nexpired_time_cap_reached_count:0\r\nevicted_keys:0\r\nkeyspace_hits:0\r\nkeyspace_misses:0\r\npubsub_channels:0\r\npubsub_patterns:0\r\nlatest_fork_usec:796\r\nmigrate_cached_sockets:0\r\nslave_expires_tracked_keys:0\r\nactive_defrag_hits:0\r\nactive_defrag_misses:0\r\nactive_defrag_key_hits:0\r\nactive_defrag_key_misses:0\r\n\r\n# Replication\r\nrole:master\r\nconnected_slaves:0\r\nmaster_replid:2523a15097dbc396750af0285e0932ab161eb565\r\nmaster_replid2:0000000000000000000000000000000000000000\r\nmaster_repl_offset:257\r\nsecond_repl_offset:-1\r\nrepl_backlog_active:1\r\nrepl_backlog_size:1048576\r\nrepl_backlog_first_byte_offset:1\r\nrepl_backlog_histlen:257\r\n\r\n# CPU\r\nused_cpu_sys:0.510452\r\nused_cpu_user:0.493605\r\nused_cpu_sys_children:0.003126\r\nused_cpu_user_children:0.000000\r\n\r\n# Cluster\r\ncluster_enabled:0\r\n\r\n# Keyspace\r\n",
+                "extracted_results": [
+                    "5.0.7"
+                ]
+            },
+            "impact": "Authenticated users can execute arbitrary code in the context of other users, potentially leading to full system compromise.\n",
+            "remediation": "Upgrade to version 8.2.2 or later.\n",
+            "references": [
+                "https://github.com/dwisiswant0/cve-2025-46818",
+                "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-46818"
+            ],
+            "tags": [
+                "cve",
+                "cve2025",
+                "js",
+                "redis",
+                "network",
+                "passive",
+                "authenticated",
+                "vuln",
+                "CVE-2025-46818"
+            ]
+        },
+        {
+            "id": "VULN-006",
+            "title": "Redis Server - Unauthenticated Access",
+            "description": "Redis server without any required authentication was discovered.",
+            "severity": "high",
+            "cvss_score": 7.2,
+            "cwe": "cwe-306",
+            "cve": [],
+            "asset": "pentest-ground.com",
+            "port": 6379,
+            "protocol": "tcp",
+            "evidence": {
+                "source": "nuclei",
+                "template": "exposed-redis",
+                "name": "Redis Server - Unauthenticated Access",
+                "matched_url": "pentest-ground.com:6379",
+                "type": "tcp",
+                "request": "info\r\nquit\r\n",
+                "response": "$3247\r\n# Server\r\nredis_version:5.0.7\r\nredis_git_sha1:00000000\r\nredis_git_dirty:0\r\nredis_build_id:636cde3b5c7a3923\r\nredis_mode:standalone\r\nos:Linux 5.10.0-36-amd64 x86_64\r\narch_bits:64\r\nmultiplexing_api:epoll\r\natomicvar_api:atomic-builtin\r\ngcc_version:9.2.1\r\nprocess_id:1\r\nrun_id:6ab0887521a130484172f46af34edd759b623cee\r\ntcp_port:6379\r\nuptime_in_seconds:223\r\nuptime_in_days:0\r\nhz:10\r\nconfigured_hz:10\r\nlru_clock:14550648\r\nexecutable:/redis-server\r\nconfig_file:/etc/redis/redis.conf\r\n\r\n# Clients\r\nconnected_clients:1\r\nclient_recent_max_input_buffer:4\r\nclient_recent_max_output_buffer:0\r\nblocked_clients:0\r\n\r\n# Memory\r\nused_memory:860552\r\nused_memory_human:840.38K\r\nused_memory_rss:6434816\r\nused_memory_rss_human:6.14M\r\nused_memory_peak:1044968\r\nused_memory_peak_human:1020.48K\r\nused_memory_peak_perc:82.35%\r\nused_memory_overhead:846726\r\nused_memory_startup:796184\r\nused_memory_dataset:13826\r\nused_memory_dataset_perc:21.48%\r\nallocator_allocated:1239304\r\nallocator_active:1433600\r\nallocator_resident:4608000\r\ntotal_system_memory:8330829824\r\ntotal_system_memory_human:7.76G\r\nused_memory_lua:54272\r\nused_memory_lua_human:53.00K\r\nused_memory_scripts:848\r\nused_memory_scripts_human:848B\r\nnumber_of_cached_scripts:2\r\nmaxmemory:0\r\nmaxme"
+            },
+            "impact": "Attackers may read/write database contents and potentially achieve remote code execution depending on configuration.",
+            "remediation": "Restrict Redis to trusted networks (firewall/VPC rules), bind to localhost or a private interface, and require authentication (ACLs). Disable dangerous commands if not needed.",
+            "references": [
+                "https://redis.io/topics/security"
+            ],
+            "tags": [
+                "network",
+                "redis",
+                "unauth",
+                "exposure",
+                "tcp",
+                "discovery",
+                "exposed-redis"
+            ]
+        },
+        {
+            "id": "VULN-007",
+            "title": "CAA Record",
+            "description": "A CAA record was discovered. A CAA record is used to specify which certificate authorities (CAs) are allowed to issue certificates for a domain.",
+            "severity": "info",
+            "cvss_score": 0.0,
+            "cwe": "cwe-200",
+            "cve": [],
+            "asset": "pentest-ground.com",
+            "port": null,
+            "protocol": "",
+            "evidence": {
+                "source": "nuclei",
+                "template": "caa-fingerprint",
+                "name": "CAA Record",
+                "matched_url": "pentest-ground.com",
+                "type": "dns",
+                "request": ";; opcode: QUERY, status: NOERROR, id: 54010\n;; flags: rd; QUERY: 1, ANSWER: 0, AUTHORITY: 0, ADDITIONAL: 1\n\n;; OPT PSEUDOSECTION:\n; EDNS: version 0; flags:; udp: 4096\n\n;; QUESTION SECTION:\n;pentest-ground.com.\tIN\t CAA\n",
+                "response": ";; opcode: QUERY, status: NOERROR, id: 54010\n;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1\n\n;; OPT PSEUDOSECTION:\n; EDNS: version 0; flags:; udp: 512\n\n;; QUESTION SECTION:\n;pentest-ground.com.\tIN\t CAA\n\n;; ANSWER SECTION:\npentest-ground.com.\t21600\tIN\tCAA\t0 issue \"letsencrypt.org\"\n",
+                "extracted_results": [
+                    "letsencrypt.org"
+                ]
+            },
+            "impact": "",
+            "remediation": "",
+            "references": [
+                "https://support.dnsimple.com/articles/caa-record/#whats-a-caa-record"
+            ],
+            "tags": [
+                "dns",
+                "caa",
+                "discovery",
+                "caa-fingerprint"
+            ]
+        },
+        {
+            "id": "VULN-008",
+            "title": "Detect SSL Certificate Issuer",
+            "description": "Extract the issuer's organization from the target's certificate. Issuers are entities which sign and distribute certificates.\n",
+            "severity": "info",
+            "cvss_score": 0.0,
+            "cwe": "",
+            "cve": [],
+            "asset": "pentest-ground.com",
+            "port": 443,
+            "protocol": "tcp",
+            "evidence": {
+                "source": "nuclei",
+                "template": "ssl-issuer",
+                "name": "Detect SSL Certificate Issuer",
+                "matched_url": "pentest-ground.com:443",
+                "type": "ssl",
+                "extracted_results": [
+                    "Let's Encrypt"
+                ]
+            },
+            "impact": "",
+            "remediation": "",
+            "references": [],
+            "tags": [
+                "ssl",
+                "tls",
+                "discovery",
+                "https",
+                "ssl-issuer"
+            ]
+        },
+        {
+            "id": "VULN-009",
+            "title": "DNS TXT Record Detected",
+            "description": "A DNS TXT record was detected. The TXT record lets a domain admin leave notes on a DNS server.",
+            "severity": "info",
+            "cvss_score": 0.0,
+            "cwe": "cwe-200",
+            "cve": [],
+            "asset": "pentest-ground.com",
+            "port": null,
+            "protocol": "",
+            "evidence": {
+                "source": "nuclei",
+                "template": "txt-fingerprint",
+                "name": "DNS TXT Record Detected",
+                "matched_url": "pentest-ground.com",
+                "type": "dns",
+                "request": ";; opcode: QUERY, status: NOERROR, id: 3166\n;; flags: rd ad; QUERY: 1, ANSWER: 0, AUTHORITY: 0, ADDITIONAL: 1\n\n;; OPT PSEUDOSECTION:\n; EDNS: version 0; flags:; udp: 4096\n\n;; QUESTION SECTION:\n;pentest-ground.com.\tIN\t TXT\n",
+                "response": ";; opcode: QUERY, status: NOERROR, id: 3166\n;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1\n\n;; OPT PSEUDOSECTION:\n; EDNS: version 0; flags:; udp: 1232\n\n;; QUESTION SECTION:\n;pentest-ground.com.\tIN\t TXT\n\n;; ANSWER SECTION:\npentest-ground.com.\t86400\tIN\tTXT\t\"google-site-verification=ZLVQ3p8ELtF-rDUOx1MkUHsZDQyEngBnxMFGC7CK6NE\"\n",
+                "extracted_results": [
+                    "\"google-site-verification=ZLVQ3p8ELtF-rDUOx1MkUHsZDQyEngBnxMFGC7CK6NE\""
+                ]
+            },
+            "impact": "",
+            "remediation": "",
+            "references": [
+                "https://www.netspi.com/blog/technical/network-penetration-testing/analyzing-dns-txt-records-to-fingerprint-service-providers/"
+            ],
+            "tags": [
+                "dns",
+                "txt",
+                "discovery",
+                "txt-fingerprint"
+            ]
+        },
+        {
+            "id": "VULN-010",
+            "title": "FingerprintHub Technology Fingerprint",
+            "description": "FingerprintHub Technology Fingerprint tests run in nuclei.",
+            "severity": "info",
+            "cvss_score": 0.0,
+            "cwe": "cwe-200",
+            "cve": [],
+            "asset": "pentest-ground.com",
+            "port": 443,
+            "protocol": "tcp",
+            "evidence": {
+                "source": "nuclei",
+                "template": "fingerprinthub-web-fingerprints",
+                "name": "FingerprintHub Technology Fingerprint",
+                "matched_url": "https://pentest-ground.com",
+                "type": "http",
+                "matcher": "weblogic",
+                "curl_command": "curl -X 'GET' -H 'Accept: */*' -H 'Accept-Language: en' -H 'User-Agent: Mozilla/5.0 (X11; CrOS x86_64 0.3.3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36' 'https://pentest-ground.com'",
+                "request": "GET / HTTP/1.1\r\nHost: pentest-ground.com\r\nUser-Agent: Mozilla/5.0 (X11; CrOS x86_64 0.3.3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36\r\nConnection: close\r\nAccept: */*\r\nAccept-Language: en\r\nAccept-Encoding: gzip\r\n\r\n",
+                "response": "HTTP/1.1 200 OK\r\nConnection: close\r\nTransfer-Encoding: chunked\r\nContent-Type: text/html\r\nDate: Tue, 14 Apr 2026 09:06:46 GMT\r\nEtag: W/\"698600f8-475d\"\r\nLast-Modified: Fri, 06 Feb 2026 14:55:52 GMT\r\nServer: nginx/1.29.8\r\n\r\n<!DOCTYPE html>\n<html>\n\n<head>\n\t<meta charset=\"utf-8\">\n\n\t<!-- HTML Meta Tags -->\n\t<title>Pentest-Ground</title>\n\t<meta name=\"description\" content=\"Vulnerable apps to benchmark your scanners and your skills\">\n\n\t<!-- DevicePixelRatio Meta tag-->\n\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n\n\t<!-- Facebook Meta Tags -->\n\t<meta property=\"og:url\" content=\"https://pentest-ground.com\">\n\t<meta property=\"og:type\" content=\"image/png\">\n\t<meta property=\"og:title\" content=\"Pentest-Ground\">\n\t<meta property=\"og:description\" content=\"Vulnerable apps to benchmark your scanners and your skills\">\n\t<meta property=\"og:image\" content=\"https://pentest-ground.com/img/PentestGroundOG.png\">\n\t<meta property=\"og:image:width\" content=\"1200\">\n\t<meta property=\"og:image:height\" content=\"630\">\n\n\t<!-- Twitter Meta Tags -->\n\t<meta name=\"twitter:card\" content=\"summary_large_image\">\n\t<meta property=\"twitter:domain\" content=\"pentest-ground.com\">\n\t<meta property=\"twitter:url\" content=\"https://pentest-ground.com\">\n\t<meta name=\"twitter:title\" content=\"Pentest-Ground\">\n\t<meta name=\"twitter:description\" content=\"Vulnerable apps to benchmark your scanners and your skills\">\n\t<meta name=\"twitter:image\" content=\"https://pentest-ground.com/img/PentestGroundOG.png\">\n\n\t<title>Welcome to pentest-ground.com!</title>\n\t<!-- CDNs -->\n\t<script src=\"https://cdn.tailwindcss.com\"></script>\n\n\t<script src=\"https://unpkg.com/@popperjs/core@2\"></script>\n\t<script src=\"https://unpkg.com/tippy.js@6\"></script>\n\n\t<script src=\"alpine-data.js\"></script>\n\t<script src=\"https://cdn.jsdelivr.net/npm/alpinejs@3.13.0/dist/cdn.min.js\"></script>\n\t<script src=\"https://cdn.usefathom.com/script.js\" data-site=\"OSTOGEQF\" defer></script>\n\n\t<script>\n\t\ttailwind.config = {\n\t\t\ttheme: {\n\t\t\t\tscreens: {\n\t\t\t\t\t'xs': '320px',\n\t\t\t\t\t'sm': '640px',\n\t\t\t\t\t'md': '768px',\n\t\t\t\t\t'lg': '1024px',\n\t\t\t\t\t'xl': '1280px',\n\t\t\t\t\t'2xl': '1512px',\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t</script>\n\t<link rel=\"icon\" href=\"img/PentestGroundFavicon.png\" type=\"image/x-icon\">\n\t<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n\t<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n\t<link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap\" rel=\"stylesheet\">\n\n\t<!-- Google Tag Manager -->\n\t<script>(function (w, d, s, l, i) {\n\t\t\t\tw[l] = w[l] || []; w[l].push({\n\t\t\t\t\t'gtm.start':\n\t\t\t\t\t\tnew Date().getTime(), event: 'gtm.js'\n\t\t\t\t}); var f = d.getElementsByTagName(s)[0],\n\t\t\t\t\tj = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =\n\t\t\t\t\t\t'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);\n\t\t\t})(window, document, 'script', 'dataLayer', 'GTM-5R4Z3P6');</script>\n\t<!-- End Google Tag Manager -->\n</head>\n\n<body class=\"bg-[#171717]\">\n\t<!--Main margins div -->\n\t<div class=\"flex relative min-h-screen w-full justify-center font-[inter]\">\n\t\t<!-- Content container -->\n\t\t<div class=\"w-full max-w-7xl\">\n\t\t\t<!-- Header container -->\n\t\t\t<div class=\"px-3 py-3 sm:py-3 sm:px-5 lg:px-10 lg:py-3 2xl:px-[60px] 2xl:py-15 gap-2.5\">\n\t\t\t\t<img src=\"img/PentestGroundLogo.svg\" alt=\"Pentest Ground Logo\" class=\"logo\">\n\t\t\t</div>\n\t\t\t<!-- First container -->\n\t\t\t<div\n\t\t\t\tclass=\"flex flex-row px-[12px] pt-[48px] pb-[20px] sm:px-5 sm:py-12 lg:pb-5 lg:px-10 lg:py-[60px] xl:pt-[100px] xl:pb-10 2xl:px-[60px] 2xl:py-15 gap-10\">\n\t\t\t\t<!-- Left side - text -->\n\t\t\t\t<div class=\"flex flex-col gap-5 w-full lg:w-2.5/5\">\n\t\t\t\t\t<h1\n\t\t\t\t\t\tclass=\"font-bold md:font-extrabold text-4xl md:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-[#FFF1EF] to-[#FFC3BC] tracking-[-0.96px]\">\n\t\t\t\t\t\tVulnerable apps\n\t\t\t\t\t\tto benchmark\n\t\t\t\t\t\tyour scanners and\n\t\t\t\t\t\tyour skills</h1>\n\t\t\t\t\t<h2 class=\"text-[#FDCCC7] leading-[24px] tracking-[-0.32px] text-ellipsis\">\n\t\t\t\t\t\t...(truncated)"
+            },
+            "impact": "",
+            "remediation": "",
+            "references": [
+                "https://github.com/0x727/fingerprinthub"
+            ],
+            "tags": [
+                "tech",
+                "discovery",
+                "https",
+                "fingerprinthub-web-fingerprints"
+            ]
+        },
+        {
+            "id": "VULN-011",
+            "title": "HTTP Missing Security Headers",
+            "description": "This template searches for missing HTTP security headers. The impact of these missing headers can vary.\n",
+            "severity": "info",
+            "cvss_score": 0.0,
+            "cwe": "",
+            "cve": [],
+            "asset": "pentest-ground.com",
+            "port": 443,
+            "protocol": "tcp",
+            "evidence": {
+                "source": "nuclei",
+                "template": "http-missing-security-headers",
+                "name": "HTTP Missing Security Headers",
+                "matched_url": "https://pentest-ground.com",
+                "type": "http",
+                "matcher": "content-security-policy",
+                "curl_command": "curl -X 'GET' -H 'Accept: */*' -H 'Accept-Language: en' -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36' 'https://pentest-ground.com'",
+                "request": "GET / HTTP/1.1\r\nHost: pentest-ground.com\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36\r\nConnection: close\r\nAccept: */*\r\nAccept-Language: en\r\nAccept-Encoding: gzip\r\n\r\n",
+                "response": "HTTP/1.1 200 OK\r\nConnection: close\r\nTransfer-Encoding: chunked\r\nContent-Type: text/html\r\nDate: Tue, 14 Apr 2026 09:08:26 GMT\r\nEtag: W/\"698600f8-475d\"\r\nLast-Modified: Fri, 06 Feb 2026 14:55:52 GMT\r\nServer: nginx/1.29.8\r\n\r\n<!DOCTYPE html>\n<html>\n\n<head>\n\t<meta charset=\"utf-8\">\n\n\t<!-- HTML Meta Tags -->\n\t<title>Pentest-Ground</title>\n\t<meta name=\"description\" content=\"Vulnerable apps to benchmark your scanners and your skills\">\n\n\t<!-- DevicePixelRatio Meta tag-->\n\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n\n\t<!-- Facebook Meta Tags -->\n\t<meta property=\"og:url\" content=\"https://pentest-ground.com\">\n\t<meta property=\"og:type\" content=\"image/png\">\n\t<meta property=\"og:title\" content=\"Pentest-Ground\">\n\t<meta property=\"og:description\" content=\"Vulnerable apps to benchmark your scanners and your skills\">\n\t<meta property=\"og:image\" content=\"https://pentest-ground.com/img/PentestGroundOG.png\">\n\t<meta property=\"og:image:width\" content=\"1200\">\n\t<meta property=\"og:image:height\" content=\"630\">\n\n\t<!-- Twitter Meta Tags -->\n\t<meta name=\"twitter:card\" content=\"summary_large_image\">\n\t<meta property=\"twitter:domain\" content=\"pentest-ground.com\">\n\t<meta property=\"twitter:url\" content=\"https://pentest-ground.com\">\n\t<meta name=\"twitter:title\" content=\"Pentest-Ground\">\n\t<meta name=\"twitter:description\" content=\"Vulnerable apps to benchmark your scanners and your skills\">\n\t<meta name=\"twitter:image\" content=\"https://pentest-ground.com/img/PentestGroundOG.png\">\n\n\t<title>Welcome to pentest-ground.com!</title>\n\t<!-- CDNs -->\n\t<script src=\"https://cdn.tailwindcss.com\"></script>\n\n\t<script src=\"https://unpkg.com/@popperjs/core@2\"></script>\n\t<script src=\"https://unpkg.com/tippy.js@6\"></script>\n\n\t<script src=\"alpine-data.js\"></script>\n\t<script src=\"https://cdn.jsdelivr.net/npm/alpinejs@3.13.0/dist/cdn.min.js\"></script>\n\t<script src=\"https://cdn.usefathom.com/script.js\" data-site=\"OSTOGEQF\" defer></script>\n\n\t<script>\n\t\ttailwind.config = {\n\t\t\ttheme: {\n\t\t\t\tscreens: {\n\t\t\t\t\t'xs': '320px',\n\t\t\t\t\t'sm': '640px',\n\t\t\t\t\t'md': '768px',\n\t\t\t\t\t'lg': '1024px',\n\t\t\t\t\t'xl': '1280px',\n\t\t\t\t\t'2xl': '1512px',\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t</script>\n\t<link rel=\"icon\" href=\"img/PentestGroundFavicon.png\" type=\"image/x-icon\">\n\t<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n\t<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n\t<link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap\" rel=\"stylesheet\">\n\n\t<!-- Google Tag Manager -->\n\t<script>(function (w, d, s, l, i) {\n\t\t\t\tw[l] = w[l] || []; w[l].push({\n\t\t\t\t\t'gtm.start':\n\t\t\t\t\t\tnew Date().getTime(), event: 'gtm.js'\n\t\t\t\t}); var f = d.getElementsByTagName(s)[0],\n\t\t\t\t\tj = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =\n\t\t\t\t\t\t'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);\n\t\t\t})(window, document, 'script', 'dataLayer', 'GTM-5R4Z3P6');</script>\n\t<!-- End Google Tag Manager -->\n</head>\n\n<body class=\"bg-[#171717]\">\n\t<!--Main margins div -->\n\t<div class=\"flex relative min-h-screen w-full justify-center font-[inter]\">\n\t\t<!-- Content container -->\n\t\t<div class=\"w-full max-w-7xl\">\n\t\t\t<!-- Header container -->\n\t\t\t<div class=\"px-3 py-3 sm:py-3 sm:px-5 lg:px-10 lg:py-3 2xl:px-[60px] 2xl:py-15 gap-2.5\">\n\t\t\t\t<img src=\"img/PentestGroundLogo.svg\" alt=\"Pentest Ground Logo\" class=\"logo\">\n\t\t\t</div>\n\t\t\t<!-- First container -->\n\t\t\t<div\n\t\t\t\tclass=\"flex flex-row px-[12px] pt-[48px] pb-[20px] sm:px-5 sm:py-12 lg:pb-5 lg:px-10 lg:py-[60px] xl:pt-[100px] xl:pb-10 2xl:px-[60px] 2xl:py-15 gap-10\">\n\t\t\t\t<!-- Left side - text -->\n\t\t\t\t<div class=\"flex flex-col gap-5 w-full lg:w-2.5/5\">\n\t\t\t\t\t<h1\n\t\t\t\t\t\tclass=\"font-bold md:font-extrabold text-4xl md:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-[#FFF1EF] to-[#FFC3BC] tracking-[-0.96px]\">\n\t\t\t\t\t\tVulnerable apps\n\t\t\t\t\t\tto benchmark\n\t\t\t\t\t\tyour scanners and\n\t\t\t\t\t\tyour skills</h1>\n\t\t\t\t\t<h2 class=\"text-[#FDCCC7] leading-[24px] tracking-[-0.32px] text-ellipsis\">\n\t\t\t\t\t\t...(truncated)"
+            },
+            "impact": "Missing browser-side mitigations can increase the impact of XSS, clickjacking, and related attacks.",
+            "remediation": "Add recommended security headers (e.g., CSP, HSTS, X-Frame-Options/Frame-Options, X-Content-Type-Options) at the web server or application layer.",
+            "references": [],
+            "tags": [
+                "misconfig",
+                "headers",
+                "https",
+                "vuln",
+                "generic",
+                "http-missing-security-headers"
+            ]
+        },
+        {
+            "id": "VULN-012",
+            "title": "Magento End-of-life Detect",
+            "description": "Magento end of life detection.\n",
+            "severity": "info",
+            "cvss_score": 0.0,
+            "cwe": "cwe-200",
+            "cve": [],
+            "asset": "pentest-ground.com",
+            "port": 443,
+            "protocol": "tcp",
+            "evidence": {
+                "source": "nuclei",
+                "template": "eol-magento",
+                "name": "Magento End-of-life Detect",
+                "matched_url": "https://pentest-ground.com",
+                "type": "http",
+                "curl_command": "curl -X 'GET' -H 'Accept: */*' -H 'Accept-Language: en' -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36 Edg/109.0.1518.61' 'https://pentest-ground.com'",
+                "request": "GET / HTTP/1.1\r\nHost: pentest-ground.com\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36 Edg/109.0.1518.61\r\nConnection: close\r\nAccept: */*\r\nAccept-Language: en\r\nAccept-Encoding: gzip\r\n\r\n",
+                "response": "HTTP/1.1 200 OK\r\nConnection: close\r\nTransfer-Encoding: chunked\r\nContent-Type: text/html\r\nDate: Tue, 14 Apr 2026 09:06:06 GMT\r\nEtag: W/\"698600f8-475d\"\r\nLast-Modified: Fri, 06 Feb 2026 14:55:52 GMT\r\nServer: nginx/1.29.8\r\n\r\n<!DOCTYPE html>\n<html>\n\n<head>\n\t<meta charset=\"utf-8\">\n\n\t<!-- HTML Meta Tags -->\n\t<title>Pentest-Ground</title>\n\t<meta name=\"description\" content=\"Vulnerable apps to benchmark your scanners and your skills\">\n\n\t<!-- DevicePixelRatio Meta tag-->\n\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n\n\t<!-- Facebook Meta Tags -->\n\t<meta property=\"og:url\" content=\"https://pentest-ground.com\">\n\t<meta property=\"og:type\" content=\"image/png\">\n\t<meta property=\"og:title\" content=\"Pentest-Ground\">\n\t<meta property=\"og:description\" content=\"Vulnerable apps to benchmark your scanners and your skills\">\n\t<meta property=\"og:image\" content=\"https://pentest-ground.com/img/PentestGroundOG.png\">\n\t<meta property=\"og:image:width\" content=\"1200\">\n\t<meta property=\"og:image:height\" content=\"630\">\n\n\t<!-- Twitter Meta Tags -->\n\t<meta name=\"twitter:card\" content=\"summary_large_image\">\n\t<meta property=\"twitter:domain\" content=\"pentest-ground.com\">\n\t<meta property=\"twitter:url\" content=\"https://pentest-ground.com\">\n\t<meta name=\"twitter:title\" content=\"Pentest-Ground\">\n\t<meta name=\"twitter:description\" content=\"Vulnerable apps to benchmark your scanners and your skills\">\n\t<meta name=\"twitter:image\" content=\"https://pentest-ground.com/img/PentestGroundOG.png\">\n\n\t<title>Welcome to pentest-ground.com!</title>\n\t<!-- CDNs -->\n\t<script src=\"https://cdn.tailwindcss.com\"></script>\n\n\t<script src=\"https://unpkg.com/@popperjs/core@2\"></script>\n\t<script src=\"https://unpkg.com/tippy.js@6\"></script>\n\n\t<script src=\"alpine-data.js\"></script>\n\t<script src=\"https://cdn.jsdelivr.net/npm/alpinejs@3.13.0/dist/cdn.min.js\"></script>\n\t<script src=\"https://cdn.usefathom.com/script.js\" data-site=\"OSTOGEQF\" defer></script>\n\n\t<script>\n\t\ttailwind.config = {\n\t\t\ttheme: {\n\t\t\t\tscreens: {\n\t\t\t\t\t'xs': '320px',\n\t\t\t\t\t'sm': '640px',\n\t\t\t\t\t'md': '768px',\n\t\t\t\t\t'lg': '1024px',\n\t\t\t\t\t'xl': '1280px',\n\t\t\t\t\t'2xl': '1512px',\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t</script>\n\t<link rel=\"icon\" href=\"img/PentestGroundFavicon.png\" type=\"image/x-icon\">\n\t<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n\t<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n\t<link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap\" rel=\"stylesheet\">\n\n\t<!-- Google Tag Manager -->\n\t<script>(function (w, d, s, l, i) {\n\t\t\t\tw[l] = w[l] || []; w[l].push({\n\t\t\t\t\t'gtm.start':\n\t\t\t\t\t\tnew Date().getTime(), event: 'gtm.js'\n\t\t\t\t}); var f = d.getElementsByTagName(s)[0],\n\t\t\t\t\tj = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =\n\t\t\t\t\t\t'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);\n\t\t\t})(window, document, 'script', 'dataLayer', 'GTM-5R4Z3P6');</script>\n\t<!-- End Google Tag Manager -->\n</head>\n\n<body class=\"bg-[#171717]\">\n\t<!--Main margins div -->\n\t<div class=\"flex relative min-h-screen w-full justify-center font-[inter]\">\n\t\t<!-- Content container -->\n\t\t<div class=\"w-full max-w-7xl\">\n\t\t\t<!-- Header container -->\n\t\t\t<div class=\"px-3 py-3 sm:py-3 sm:px-5 lg:px-10 lg:py-3 2xl:px-[60px] 2xl:py-15 gap-2.5\">\n\t\t\t\t<img src=\"img/PentestGroundLogo.svg\" alt=\"Pentest Ground Logo\" class=\"logo\">\n\t\t\t</div>\n\t\t\t<!-- First container -->\n\t\t\t<div\n\t\t\t\tclass=\"flex flex-row px-[12px] pt-[48px] pb-[20px] sm:px-5 sm:py-12 lg:pb-5 lg:px-10 lg:py-[60px] xl:pt-[100px] xl:pb-10 2xl:px-[60px] 2xl:py-15 gap-10\">\n\t\t\t\t<!-- Left side - text -->\n\t\t\t\t<div class=\"flex flex-col gap-5 w-full lg:w-2.5/5\">\n\t\t\t\t\t<h1\n\t\t\t\t\t\tclass=\"font-bold md:font-extrabold text-4xl md:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-[#FFF1EF] to-[#FFC3BC] tracking-[-0.96px]\">\n\t\t\t\t\t\tVulnerable apps\n\t\t\t\t\t\tto benchmark\n\t\t\t\t\t\tyour scanners and\n\t\t\t\t\t\tyour skills</h1>\n\t\t\t\t\t<h2 class=\"text-[#FDCCC7] leading-[24px] tracking-[-0.32px] text-ellipsis\">\n\t\t\t\t\t\t...(truncated)"
+            },
+            "impact": "End-of-life software may contain unpatched vulnerabilities, increasing the likelihood and impact of exploitation.",
+            "remediation": "Upgrade the affected platform to a supported (non-EOL) version and apply the latest security patches.",
+            "references": [
+                "https://www.magento.com/"
+            ],
+            "tags": [
+                "magento",
+                "tech",
+                "cms",
+                "discovery",
+                "https",
+                "eol-magento"
+            ]
+        },
+        {
+            "id": "VULN-013",
+            "title": "Missing Subresource Integrity",
+            "description": "Checks if external script and stylesheet tags in the HTML response are missing the Subresource Integrity (SRI) attribute.\n",
+            "severity": "info",
+            "cvss_score": 0.0,
+            "cwe": "",
+            "cve": [],
+            "asset": "pentest-ground.com",
+            "port": 443,
+            "protocol": "tcp",
+            "evidence": {
+                "source": "nuclei",
+                "template": "missing-sri",
+                "name": "Missing Subresource Integrity",
+                "matched_url": "https://pentest-ground.com/",
+                "type": "http",
+                "curl_command": "curl -X 'GET' -H 'Accept: */*' -H 'Accept-Language: en' -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Safari/605.8.17' 'https://pentest-ground.com/'",
+                "request": "GET / HTTP/1.1\r\nHost: pentest-ground.com\r\nUser-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Safari/605.8.17\r\nConnection: close\r\nAccept: */*\r\nAccept-Language: en\r\nAccept-Encoding: gzip\r\n\r\n",
+                "response": "HTTP/1.1 200 OK\r\nConnection: close\r\nTransfer-Encoding: chunked\r\nContent-Type: text/html\r\nDate: Tue, 14 Apr 2026 09:14:33 GMT\r\nEtag: W/\"698600f8-475d\"\r\nLast-Modified: Fri, 06 Feb 2026 14:55:52 GMT\r\nServer: nginx/1.29.8\r\n\r\n<!DOCTYPE html>\n<html>\n\n<head>\n\t<meta charset=\"utf-8\">\n\n\t<!-- HTML Meta Tags -->\n\t<title>Pentest-Ground</title>\n\t<meta name=\"description\" content=\"Vulnerable apps to benchmark your scanners and your skills\">\n\n\t<!-- DevicePixelRatio Meta tag-->\n\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n\n\t<!-- Facebook Meta Tags -->\n\t<meta property=\"og:url\" content=\"https://pentest-ground.com\">\n\t<meta property=\"og:type\" content=\"image/png\">\n\t<meta property=\"og:title\" content=\"Pentest-Ground\">\n\t<meta property=\"og:description\" content=\"Vulnerable apps to benchmark your scanners and your skills\">\n\t<meta property=\"og:image\" content=\"https://pentest-ground.com/img/PentestGroundOG.png\">\n\t<meta property=\"og:image:width\" content=\"1200\">\n\t<meta property=\"og:image:height\" content=\"630\">\n\n\t<!-- Twitter Meta Tags -->\n\t<meta name=\"twitter:card\" content=\"summary_large_image\">\n\t<meta property=\"twitter:domain\" content=\"pentest-ground.com\">\n\t<meta property=\"twitter:url\" content=\"https://pentest-ground.com\">\n\t<meta name=\"twitter:title\" content=\"Pentest-Ground\">\n\t<meta name=\"twitter:description\" content=\"Vulnerable apps to benchmark your scanners and your skills\">\n\t<meta name=\"twitter:image\" content=\"https://pentest-ground.com/img/PentestGroundOG.png\">\n\n\t<title>Welcome to pentest-ground.com!</title>\n\t<!-- CDNs -->\n\t<script src=\"https://cdn.tailwindcss.com\"></script>\n\n\t<script src=\"https://unpkg.com/@popperjs/core@2\"></script>\n\t<script src=\"https://unpkg.com/tippy.js@6\"></script>\n\n\t<script src=\"alpine-data.js\"></script>\n\t<script src=\"https://cdn.jsdelivr.net/npm/alpinejs@3.13.0/dist/cdn.min.js\"></script>\n\t<script src=\"https://cdn.usefathom.com/script.js\" data-site=\"OSTOGEQF\" defer></script>\n\n\t<script>\n\t\ttailwind.config = {\n\t\t\ttheme: {\n\t\t\t\tscreens: {\n\t\t\t\t\t'xs': '320px',\n\t\t\t\t\t'sm': '640px',\n\t\t\t\t\t'md': '768px',\n\t\t\t\t\t'lg': '1024px',\n\t\t\t\t\t'xl': '1280px',\n\t\t\t\t\t'2xl': '1512px',\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t</script>\n\t<link rel=\"icon\" href=\"img/PentestGroundFavicon.png\" type=\"image/x-icon\">\n\t<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n\t<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n\t<link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap\" rel=\"stylesheet\">\n\n\t<!-- Google Tag Manager -->\n\t<script>(function (w, d, s, l, i) {\n\t\t\t\tw[l] = w[l] || []; w[l].push({\n\t\t\t\t\t'gtm.start':\n\t\t\t\t\t\tnew Date().getTime(), event: 'gtm.js'\n\t\t\t\t}); var f = d.getElementsByTagName(s)[0],\n\t\t\t\t\tj = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =\n\t\t\t\t\t\t'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);\n\t\t\t})(window, document, 'script', 'dataLayer', 'GTM-5R4Z3P6');</script>\n\t<!-- End Google Tag Manager -->\n</head>\n\n<body class=\"bg-[#171717]\">\n\t<!--Main margins div -->\n\t<div class=\"flex relative min-h-screen w-full justify-center font-[inter]\">\n\t\t<!-- Content container -->\n\t\t<div class=\"w-full max-w-7xl\">\n\t\t\t<!-- Header container -->\n\t\t\t<div class=\"px-3 py-3 sm:py-3 sm:px-5 lg:px-10 lg:py-3 2xl:px-[60px] 2xl:py-15 gap-2.5\">\n\t\t\t\t<img src=\"img/PentestGroundLogo.svg\" alt=\"Pentest Ground Logo\" class=\"logo\">\n\t\t\t</div>\n\t\t\t<!-- First container -->\n\t\t\t<div\n\t\t\t\tclass=\"flex flex-row px-[12px] pt-[48px] pb-[20px] sm:px-5 sm:py-12 lg:pb-5 lg:px-10 lg:py-[60px] xl:pt-[100px] xl:pb-10 2xl:px-[60px] 2xl:py-15 gap-10\">\n\t\t\t\t<!-- Left side - text -->\n\t\t\t\t<div class=\"flex flex-col gap-5 w-full lg:w-2.5/5\">\n\t\t\t\t\t<h1\n\t\t\t\t\t\tclass=\"font-bold md:font-extrabold text-4xl md:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-[#FFF1EF] to-[#FFC3BC] tracking-[-0.96px]\">\n\t\t\t\t\t\tVulnerable apps\n\t\t\t\t\t\tto benchmark\n\t\t\t\t\t\tyour scanners and\n\t\t\t\t\t\tyour skills</h1>\n\t\t\t\t\t<h2 class=\"text-[#FDCCC7] leading-[24px] tracking-[-0.32px] text-ellipsis\">\n\t\t\t\t\t\t...(truncated)",
+                "extracted_results": [
+                    "https://cdn.tailwindcss.com",
+                    "https://unpkg.com/@popperjs/core@2",
+                    "https://unpkg.com/tippy.js@6",
+                    "https://cdn.jsdelivr.net/npm/alpinejs@3.13.0/dist/cdn.min.js",
+                    "https://cdn.usefathom.com/script.js",
+                    "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
+                ]
+            },
+            "impact": "If a third-party asset is compromised, attackers can inject malicious code into users' browsers.",
+            "remediation": "Add Subresource Integrity (SRI) hashes to externally loaded scripts/styles, or self-host critical third-party assets.",
+            "references": [
+                "https://cheatsheetseries.owasp.org/cheatsheets/third_party_javascript_management_cheat_sheet.html#subresource-integrity",
+                "https://developer.mozilla.org/en-us/docs/web/security/subresource_integrity"
+            ],
+            "tags": [
+                "compliance",
+                "js",
+                "css",
+                "sri",
+                "misconfig",
+                "vuln",
+                "https",
+                "missing-sri"
+            ]
+        },
+        {
+            "id": "VULN-014",
+            "title": "MX Record Detection",
+            "description": "An MX record was detected. MX records direct emails to a mail exchange server.",
+            "severity": "info",
+            "cvss_score": 0.0,
+            "cwe": "cwe-200",
+            "cve": [],
+            "asset": "pentest-ground.com",
+            "port": null,
+            "protocol": "",
+            "evidence": {
+                "source": "nuclei",
+                "template": "mx-fingerprint",
+                "name": "MX Record Detection",
+                "matched_url": "pentest-ground.com",
+                "type": "dns",
+                "request": ";; opcode: QUERY, status: NOERROR, id: 4504\n;; flags: rd; QUERY: 1, ANSWER: 0, AUTHORITY: 0, ADDITIONAL: 1\n\n;; OPT PSEUDOSECTION:\n; EDNS: version 0; flags:; udp: 4096\n\n;; QUESTION SECTION:\n;pentest-ground.com.\tIN\t MX\n",
+                "response": ";; opcode: QUERY, status: NOERROR, id: 4504\n;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1\n\n;; OPT PSEUDOSECTION:\n; EDNS: version 0; flags:; udp: 1232\n\n;; QUESTION SECTION:\n;pentest-ground.com.\tIN\t MX\n\n;; ANSWER SECTION:\npentest-ground.com.\t75692\tIN\tMX\t10 mail.pentest-ground.com.\n",
+                "extracted_results": [
+                    "10 mail.pentest-ground.com."
+                ]
+            },
+            "impact": "",
+            "remediation": "",
+            "references": [
+                "https://www.cloudflare.com/learning/dns/dns-records/dns-mx-record/",
+                "https://mxtoolbox.com/"
+            ],
+            "tags": [
+                "dns",
+                "mx",
+                "discovery",
+                "mx-fingerprint"
+            ]
+        },
+        {
+            "id": "VULN-015",
+            "title": "Nginx version detect",
+            "description": "Some nginx servers have the version on the response header. Useful when you need to find specific CVEs on your targets.",
+            "severity": "info",
+            "cvss_score": 0.0,
+            "cwe": "",
+            "cve": [],
+            "asset": "pentest-ground.com",
+            "port": 443,
+            "protocol": "tcp",
+            "evidence": {
+                "source": "nuclei",
+                "template": "nginx-version",
+                "name": "Nginx version detect",
+                "matched_url": "https://pentest-ground.com",
+                "type": "http",
+                "curl_command": "curl -X 'GET' -H 'Accept: */*' -H 'Accept-Language: en' -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36 Edg/109.0.1518.61' 'https://pentest-ground.com'",
+                "request": "GET / HTTP/1.1\r\nHost: pentest-ground.com\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36 Edg/109.0.1518.61\r\nConnection: close\r\nAccept: */*\r\nAccept-Language: en\r\nAccept-Encoding: gzip\r\n\r\n",
+                "response": "HTTP/1.1 200 OK\r\nConnection: close\r\nTransfer-Encoding: chunked\r\nContent-Type: text/html\r\nDate: Tue, 14 Apr 2026 09:06:06 GMT\r\nEtag: W/\"698600f8-475d\"\r\nLast-Modified: Fri, 06 Feb 2026 14:55:52 GMT\r\nServer: nginx/1.29.8\r\n\r\n<!DOCTYPE html>\n<html>\n\n<head>\n\t<meta charset=\"utf-8\">\n\n\t<!-- HTML Meta Tags -->\n\t<title>Pentest-Ground</title>\n\t<meta name=\"description\" content=\"Vulnerable apps to benchmark your scanners and your skills\">\n\n\t<!-- DevicePixelRatio Meta tag-->\n\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n\n\t<!-- Facebook Meta Tags -->\n\t<meta property=\"og:url\" content=\"https://pentest-ground.com\">\n\t<meta property=\"og:type\" content=\"image/png\">\n\t<meta property=\"og:title\" content=\"Pentest-Ground\">\n\t<meta property=\"og:description\" content=\"Vulnerable apps to benchmark your scanners and your skills\">\n\t<meta property=\"og:image\" content=\"https://pentest-ground.com/img/PentestGroundOG.png\">\n\t<meta property=\"og:image:width\" content=\"1200\">\n\t<meta property=\"og:image:height\" content=\"630\">\n\n\t<!-- Twitter Meta Tags -->\n\t<meta name=\"twitter:card\" content=\"summary_large_image\">\n\t<meta property=\"twitter:domain\" content=\"pentest-ground.com\">\n\t<meta property=\"twitter:url\" content=\"https://pentest-ground.com\">\n\t<meta name=\"twitter:title\" content=\"Pentest-Ground\">\n\t<meta name=\"twitter:description\" content=\"Vulnerable apps to benchmark your scanners and your skills\">\n\t<meta name=\"twitter:image\" content=\"https://pentest-ground.com/img/PentestGroundOG.png\">\n\n\t<title>Welcome to pentest-ground.com!</title>\n\t<!-- CDNs -->\n\t<script src=\"https://cdn.tailwindcss.com\"></script>\n\n\t<script src=\"https://unpkg.com/@popperjs/core@2\"></script>\n\t<script src=\"https://unpkg.com/tippy.js@6\"></script>\n\n\t<script src=\"alpine-data.js\"></script>\n\t<script src=\"https://cdn.jsdelivr.net/npm/alpinejs@3.13.0/dist/cdn.min.js\"></script>\n\t<script src=\"https://cdn.usefathom.com/script.js\" data-site=\"OSTOGEQF\" defer></script>\n\n\t<script>\n\t\ttailwind.config = {\n\t\t\ttheme: {\n\t\t\t\tscreens: {\n\t\t\t\t\t'xs': '320px',\n\t\t\t\t\t'sm': '640px',\n\t\t\t\t\t'md': '768px',\n\t\t\t\t\t'lg': '1024px',\n\t\t\t\t\t'xl': '1280px',\n\t\t\t\t\t'2xl': '1512px',\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t</script>\n\t<link rel=\"icon\" href=\"img/PentestGroundFavicon.png\" type=\"image/x-icon\">\n\t<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n\t<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n\t<link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap\" rel=\"stylesheet\">\n\n\t<!-- Google Tag Manager -->\n\t<script>(function (w, d, s, l, i) {\n\t\t\t\tw[l] = w[l] || []; w[l].push({\n\t\t\t\t\t'gtm.start':\n\t\t\t\t\t\tnew Date().getTime(), event: 'gtm.js'\n\t\t\t\t}); var f = d.getElementsByTagName(s)[0],\n\t\t\t\t\tj = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =\n\t\t\t\t\t\t'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);\n\t\t\t})(window, document, 'script', 'dataLayer', 'GTM-5R4Z3P6');</script>\n\t<!-- End Google Tag Manager -->\n</head>\n\n<body class=\"bg-[#171717]\">\n\t<!--Main margins div -->\n\t<div class=\"flex relative min-h-screen w-full justify-center font-[inter]\">\n\t\t<!-- Content container -->\n\t\t<div class=\"w-full max-w-7xl\">\n\t\t\t<!-- Header container -->\n\t\t\t<div class=\"px-3 py-3 sm:py-3 sm:px-5 lg:px-10 lg:py-3 2xl:px-[60px] 2xl:py-15 gap-2.5\">\n\t\t\t\t<img src=\"img/PentestGroundLogo.svg\" alt=\"Pentest Ground Logo\" class=\"logo\">\n\t\t\t</div>\n\t\t\t<!-- First container -->\n\t\t\t<div\n\t\t\t\tclass=\"flex flex-row px-[12px] pt-[48px] pb-[20px] sm:px-5 sm:py-12 lg:pb-5 lg:px-10 lg:py-[60px] xl:pt-[100px] xl:pb-10 2xl:px-[60px] 2xl:py-15 gap-10\">\n\t\t\t\t<!-- Left side - text -->\n\t\t\t\t<div class=\"flex flex-col gap-5 w-full lg:w-2.5/5\">\n\t\t\t\t\t<h1\n\t\t\t\t\t\tclass=\"font-bold md:font-extrabold text-4xl md:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-[#FFF1EF] to-[#FFC3BC] tracking-[-0.96px]\">\n\t\t\t\t\t\tVulnerable apps\n\t\t\t\t\t\tto benchmark\n\t\t\t\t\t\tyour scanners and\n\t\t\t\t\t\tyour skills</h1>\n\t\t\t\t\t<h2 class=\"text-[#FDCCC7] leading-[24px] tracking-[-0.32px] text-ellipsis\">\n\t\t\t\t\t\t...(truncated)",
+                "extracted_results": [
+                    "nginx/1.29.8"
+                ]
+            },
+            "impact": "Version disclosure can help attackers tailor exploits and reduce the cost of reconnaissance.",
+            "remediation": "Avoid exposing precise server versions (e.g., disable server tokens) and keep Nginx updated with security patches.",
+            "references": [],
+            "tags": [
+                "tech",
+                "nginx",
+                "discovery",
+                "https",
+                "nginx-version"
+            ]
+        },
+        {
+            "id": "VULN-016",
+            "title": "NS Record Detection",
+            "description": "An NS record was detected. An NS record delegates a subdomain to a set of name servers.",
+            "severity": "info",
+            "cvss_score": 0.0,
+            "cwe": "cwe-200",
+            "cve": [],
+            "asset": "pentest-ground.com",
+            "port": null,
+            "protocol": "",
+            "evidence": {
+                "source": "nuclei",
+                "template": "nameserver-fingerprint",
+                "name": "NS Record Detection",
+                "matched_url": "pentest-ground.com",
+                "type": "dns",
+                "request": ";; opcode: QUERY, status: NOERROR, id: 25918\n;; flags: rd; QUERY: 1, ANSWER: 0, AUTHORITY: 0, ADDITIONAL: 1\n\n;; OPT PSEUDOSECTION:\n; EDNS: version 0; flags:; udp: 4096\n\n;; QUESTION SECTION:\n;pentest-ground.com.\tIN\t NS\n",
+                "response": ";; opcode: QUERY, status: NOERROR, id: 25918\n;; flags: qr rd ra; QUERY: 1, ANSWER: 5, AUTHORITY: 0, ADDITIONAL: 1\n\n;; OPT PSEUDOSECTION:\n; EDNS: version 0; flags:; udp: 512\n\n;; QUESTION SECTION:\n;pentest-ground.com.\tIN\t NS\n\n;; ANSWER SECTION:\npentest-ground.com.\t21600\tIN\tNS\tns2.linode.com.\npentest-ground.com.\t21600\tIN\tNS\tns3.linode.com.\npentest-ground.com.\t21600\tIN\tNS\tns1.linode.com.\npentest-ground.com.\t21600\tIN\tNS\tns5.linode.com.\npentest-ground.com.\t21600\tIN\tNS\tns4.linode.com.\n",
+                "extracted_results": [
+                    "ns3.linode.com.",
+                    "ns1.linode.com.",
+                    "ns5.linode.com.",
+                    "ns4.linode.com.",
+                    "ns2.linode.com."
+                ]
+            },
+            "impact": "",
+            "remediation": "",
+            "references": [],
+            "tags": [
+                "dns",
+                "ns",
+                "discovery",
+                "nameserver-fingerprint"
+            ]
+        },
+        {
+            "id": "VULN-017",
+            "title": "RDAP WHOIS",
+            "description": "RDAP (Registration Data Access Protocol) is a standard defined by the IETF to replace the whois protocol\nin queries for information about Internet resource records such as domain names, IP addresses, and ASNs.\n",
+            "severity": "info",
+            "cvss_score": 0.0,
+            "cwe": "cwe-200",
+            "cve": [],
+            "asset": "pentest-ground.com",
+            "port": null,
+            "protocol": "",
+            "evidence": {
+                "source": "nuclei",
+                "template": "rdap-whois",
+                "name": "RDAP WHOIS",
+                "matched_url": "https://rdap.verisign.com/com/v1/domain/pentest-ground.com",
+                "type": "http",
+                "curl_command": "curl -X 'GET' -H 'Accept: */*' -H 'Accept-Language: en' -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36' 'https://www.rdap.net/domain/pentest-ground.com'",
+                "request": "GET /domain/pentest-ground.com HTTP/1.1\r\nHost: www.rdap.net\r\nUser-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36\r\nConnection: close\r\nAccept: */*\r\nAccept-Language: en\r\nAccept-Encoding: gzip\r\n\r\n",
+                "response": "HTTP/1.1 200 OK\r\nContent-Length: 2583\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/rdap+json\r\nStrict-Transport-Security: max-age=15768000; includeSubDomains; preload\r\n\r\n{\"objectClassName\":\"domain\",\"handle\":\"2451294687_DOMAIN_COM-VRSN\",\"ldhName\":\"PENTEST-GROUND.COM\",\"links\":[{\"value\":\"https:\\/\\/rdap.verisign.com\\/com\\/v1\\/domain\\/PENTEST-GROUND.COM\",\"rel\":\"self\",\"href\":\"https:\\/\\/rdap.verisign.com\\/com\\/v1\\/domain\\/PENTEST-GROUND.COM\",\"type\":\"application\\/rdap+json\"},{\"value\":\"https:\\/\\/rdap.godaddy.com\\/v1\\/domain\\/PENTEST-GROUND.COM\",\"rel\":\"related\",\"href\":\"https:\\/\\/rdap.godaddy.com\\/v1\\/domain\\/PENTEST-GROUND.COM\",\"type\":\"application\\/rdap+json\"}],\"status\":[\"client delete prohibited\",\"client renew prohibited\",\"client transfer prohibited\",\"client update prohibited\"],\"entities\":[{\"objectClassName\":\"entity\",\"handle\":\"146\",\"roles\":[\"registrar\"],\"links\":[{\"href\":\"http:\\/\\/www.godaddy.com\",\"type\":\"text\\/html\",\"value\":\"https:\\/\\/rdap.godaddy.com\\/v1\\/\",\"rel\":\"about\"}],\"publicIds\":[{\"type\":\"IANA Registrar ID\",\"identifier\":\"146\"}],\"vcardArray\":[\"vcard\",[[\"version\",{},\"text\",\"4.0\"],[\"fn\",{},\"text\",\"GoDaddy.com, LLC\"]]],\"entities\":[{\"objectClassName\":\"entity\",\"roles\":[\"abuse\"],\"vcardArray\":[\"vcard\",[[\"version\",{},\"text\",\"4.0\"],[\"fn\",{},\"text\",\"\"],[\"tel\",{\"type\":\"voice\"},\"uri\",\"tel:480-624-2505\"],[\"email\",{},\"text\",\"abuse@godaddy.com\"]]]}]}],\"events\":[{\"eventAction\":\"registration\",\"eventDate\":\"2019-11-04T15:22:35Z\"},{\"eventAction\":\"expiration\",\"eventDate\":\"2027-11-04T15:22:35Z\"},{\"eventAction\":\"last changed\",\"eventDate\":\"2025-11-05T09:59:05Z\"},{\"eventAction\":\"last update of RDAP database\",\"eventDate\":\"2026-04-14T09:15:09Z\"}],\"secureDNS\":{\"delegationSigned\":false},\"nameservers\":[{\"objectClassName\":\"nameserver\",\"ldhName\":\"NS1.LINODE.COM\"},{\"objectClassName\":\"nameserver\",\"ldhName\":\"NS2.LINODE.COM\"}],\"rdapConformance\":[\"rdap_level_0\",\"icann_rdap_technical_implementation_guide_1\",\"icann_rdap_response_profile_1\"],\"notices\":[{\"title\":\"Terms of Service\",\"description\":[\"Service subject to Terms of Use.\"],\"links\":[{\"href\":\"https:\\/\\/www.verisign.com\\/domain-names\\/registration-data-access-protocol\\/terms-service\\/index.xhtml\",\"type\":\"text\\/html\",\"value\":\"https:\\/\\/rdap.verisign.com\\/com\\/v1\\/domain\\/pentest-ground.com\",\"rel\":\"terms-of-service\"}]},{\"title\":\"Status Codes\",\"description\":[\"For more information on domain status codes, please visit https:\\/\\/icann.org\\/epp\"],\"links\":[{\"href\":\"https:\\/\\/icann.org\\/epp\",\"type\":\"text\\/html\"}]},{\"title\":\"RDDS Inaccuracy Complaint Form\",\"description\":[\"URL of the ICANN RDDS Inaccuracy Complaint Form: https:\\/\\/icann.org\\/wicf\"],\"links\":[{\"href\":\"https:\\/\\/icann.org\\/wicf\",\"type\":\"text\\/html\",\"value\":\"https:\\/\\/rdap.verisign.com\\/com\\/v1\\/domain\\/pentest-ground.com\",\"rel\":\"help\"}]}]}",
+                "extracted_results": [
+                    "2019-11-04T15:22:35Z"
+                ]
+            },
+            "impact": "",
+            "remediation": "",
+            "references": [
+                "https://about.rdap.org/"
+            ],
+            "tags": [
+                "miscellaneous",
+                "osint",
+                "whois",
+                "vuln",
+                "misc",
+                "rdap",
+                "rdap-whois"
+            ]
+        },
+        {
+            "id": "VULN-018",
+            "title": "Redis Info - Detect",
+            "description": "Retrieves information (such as version number and architecture) from a Redis key-value store.\n",
+            "severity": "info",
+            "cvss_score": 0.0,
+            "cwe": "",
+            "cve": [],
+            "asset": "pentest-ground.com",
+            "port": 6379,
+            "protocol": "tcp",
+            "evidence": {
+                "source": "nuclei",
+                "template": "redis-info",
+                "name": "Redis Info - Detect",
+                "matched_url": "pentest-ground.com:6379",
+                "type": "javascript",
+                "request": "const redis = require('nuclei/redis');\nconst info = redis.GetServerInfo(Host, Port);\nExport(info);",
+                "response": "# Server\r\nredis_version:5.0.7\r\nredis_git_sha1:00000000\r\nredis_git_dirty:0\r\nredis_build_id:636cde3b5c7a3923\r\nredis_mode:standalone\r\nos:Linux 5.10.0-36-amd64 x86_64\r\narch_bits:64\r\nmultiplexing_api:epoll\r\natomicvar_api:atomic-builtin\r\ngcc_version:9.2.1\r\nprocess_id:1\r\nrun_id:263e85082f00423c401ec3795f8606a66b04ba33\r\ntcp_port:6379\r\nuptime_in_seconds:574\r\nuptime_in_days:0\r\nhz:10\r\nconfigured_hz:10\r\nlru_clock:14550518\r\nexecutable:/redis-server\r\nconfig_file:/etc/redis/redis.conf\r\n\r\n# Clients\r\nconnected_clients:1\r\nclient_recent_max_input_buffer:2\r\nclient_recent_max_output_buffer:0\r\nblocked_clients:0\r\n\r\n# Memory\r\nused_memory:1907712\r\nused_memory_human:1.82M\r\nused_memory_rss:6635520\r\nused_memory_rss_human:6.33M\r\nused_memory_peak:1927744\r\nused_memory_peak_human:1.84M\r\nused_memory_peak_perc:98.96%\r\nused_memory_overhead:1894454\r\nused_memory_startup:796184\r\nused_memory_dataset:13258\r\nused_memory_dataset_perc:1.19%\r\nallocator_allocated:2220912\r\nallocator_active:2420736\r\nallocator_resident:5505024\r\ntotal_system_memory:8330829824\r\ntotal_system_memory_human:7.76G\r\nused_memory_lua:41984\r\nused_memory_lua_human:41.00K\r\nused_memory_scripts:0\r\nused_memory_scripts_human:0B\r\nnumber_of_cached_scripts:0\r\nmaxmemory:0\r\nmaxmemory_human:0B\r\nmaxmemory_policy:noeviction\r\nallocator_frag_ratio:1.09\r\nallocator_frag_bytes:199824\r\nallocator_rss_ratio:2.27\r\nallocator_rss_bytes:3084288\r\nrss_overhead_ratio:1.21\r\nrss_overhead_bytes:1130496\r\nmem_fragmentation_ratio:3.56\r\nmem_fragmentation_bytes:4769816\r\nmem_not_counted_for_evict:0\r\nmem_replication_backlog:1048576\r\nmem_clients_slaves:0\r\nmem_clients_normal:49694\r\nmem_aof_buffer:0\r\nmem_allocator:jemalloc-5.2.1\r\nactive_defrag_running:0\r\nlazyfree_pending_objects:0\r\n\r\n# Persistence\r\nloading:0\r\nrdb_changes_since_last_save:1\r\nrdb_bgsave_in_progress:0\r\nrdb_last_save_time:1776157839\r\nrdb_last_bgsave_status:ok\r\nrdb_last_bgsave_time_sec:0\r\nrdb_current_bgsave_time_sec:-1\r\nrdb_last_cow_size:434176\r\naof_enabled:0\r\naof_rewrite_in_progress:0\r\naof_rewrite_scheduled:0\r\naof_last_rewrite_time_sec:-1\r\naof_current_rewrite_time_sec:-1\r\naof_last_bgrewrite_status:ok\r\naof_last_write_status:ok\r\naof_last_cow_size:0\r\n\r\n# Stats\r\ntotal_connections_received:27\r\ntotal_commands_processed:163\r\ninstantaneous_ops_per_sec:0\r\ntotal_net_input_bytes:6934\r\ntotal_net_output_bytes:2429\r\ninstantaneous_input_kbps:0.02\r\ninstantaneous_output_kbps:0.04\r\nrejected_connections:0\r\nsync_full:1\r\nsync_partial_ok:0\r\nsync_partial_err:0\r\nexpired_keys:0\r\nexpired_stale_perc:0.00\r\nexpired_time_cap_reached_count:0\r\nevicted_keys:0\r\nkeyspace_hits:0\r\nkeyspace_misses:0\r\npubsub_channels:0\r\npubsub_patterns:0\r\nlatest_fork_usec:796\r\nmigrate_cached_sockets:0\r\nslave_expires_tracked_keys:0\r\nactive_defrag_hits:0\r\nactive_defrag_misses:0\r\nactive_defrag_key_hits:0\r\nactive_defrag_key_misses:0\r\n\r\n# Replication\r\nrole:master\r\nconnected_slaves:0\r\nmaster_replid:2523a15097dbc396750af0285e0932ab161eb565\r\nmaster_replid2:0000000000000000000000000000000000000000\r\nmaster_repl_offset:257\r\nsecond_repl_offset:-1\r\nrepl_backlog_active:1\r\nrepl_backlog_size:1048576\r\nrepl_backlog_first_byte_offset:1\r\nrepl_backlog_histlen:257\r\n\r\n# CPU\r\nused_cpu_sys:0.510452\r\nused_cpu_user:0.493605\r\nused_cpu_sys_children:0.003126\r\nused_cpu_user_children:0.000000\r\n\r\n# Cluster\r\ncluster_enabled:0\r\n\r\n# Keyspace\r\n",
+                "extracted_results": [
+                    "connected_slaves:0",
+                    "used_memory_human:1.82M",
+                    "role:master",
+                    "redis_version:5.0.7",
+                    "process_id:1",
+                    "used_cpu_sys:0.510452",
+                    "used_cpu_user:0.493605",
+                    "connected_clients:1"
+                ]
+            },
+            "impact": "Attackers may read/write database contents and potentially achieve remote code execution depending on configuration.",
+            "remediation": "Restrict Redis to trusted networks (firewall/VPC rules), bind to localhost or a private interface, and require authentication (ACLs). Disable dangerous commands if not needed.",
+            "references": [
+                "https://nmap.org/nsedoc/scripts/redis-info.html"
+            ],
+            "tags": [
+                "js",
+                "redis",
+                "network",
+                "enum",
+                "discovery",
+                "redis-info"
+            ]
+        },
+        {
+            "id": "VULN-019",
+            "title": "SSL DNS Names",
+            "description": "Extract the Subject Alternative Name (SAN) from the target's certificate. SAN facilitates the usage of additional hostnames with the same certificate.\n",
+            "severity": "info",
+            "cvss_score": 0.0,
+            "cwe": "",
+            "cve": [],
+            "asset": "pentest-ground.com",
+            "port": 443,
+            "protocol": "tcp",
+            "evidence": {
+                "source": "nuclei",
+                "template": "ssl-dns-names",
+                "name": "SSL DNS Names",
+                "matched_url": "pentest-ground.com:443",
+                "type": "ssl",
+                "extracted_results": [
+                    "pentest-ground.com"
+                ]
+            },
+            "impact": "",
+            "remediation": "",
+            "references": [],
+            "tags": [
+                "ssl",
+                "tls",
+                "vuln",
+                "https",
+                "ssl-dns-names"
+            ]
+        },
+        {
+            "id": "VULN-020",
+            "title": "WAF Detection",
+            "description": "A web application firewall was detected.",
+            "severity": "info",
+            "cvss_score": 0.0,
+            "cwe": "cwe-200",
+            "cve": [],
+            "asset": "pentest-ground.com",
+            "port": 443,
+            "protocol": "tcp",
+            "evidence": {
+                "source": "nuclei",
+                "template": "waf-detect",
+                "name": "WAF Detection",
+                "matched_url": "https://pentest-ground.com/",
+                "type": "http",
+                "matcher": "nginxgeneric",
+                "curl_command": "curl -X 'POST' -d '_=<script>alert(1)</script>' -H 'Content-Type: application/x-www-form-urlencoded' -H 'Host: pentest-ground.com' -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.1517.0 Ddg/17.0' 'https://pentest-ground.com/'",
+                "request": "POST / HTTP/1.1\r\nHost: pentest-ground.com\r\nUser-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.1517.0 Ddg/17.0\r\nConnection: close\r\nContent-Length: 27\r\nContent-Type: application/x-www-form-urlencoded\r\nAccept-Encoding: gzip\r\n\r\n_=<script>alert(1)</script>",
+                "response": "HTTP/1.1 405 Not Allowed\r\nConnection: close\r\nContent-Length: 157\r\nContent-Type: text/html\r\nDate: Tue, 14 Apr 2026 09:16:04 GMT\r\nServer: nginx/1.29.8\r\n\r\n<html>\r\n<head><title>405 Not Allowed</title></head>\r\n<body>\r\n<center><h1>405 Not Allowed</h1></center>\r\n<hr><center>nginx/1.29.8</center>\r\n</body>\r\n</html>\r\n"
+            },
+            "impact": "",
+            "remediation": "",
+            "references": [
+                "https://github.com/ekultek/whatwaf"
+            ],
+            "tags": [
+                "waf",
+                "tech",
+                "misc",
+                "discovery",
+                "https",
+                "waf-detect"
+            ]
+        },
+        {
+            "id": "VULN-021",
+            "title": "Wappalyzer Technology Detection",
+            "description": "Nuclei finding 'tech-detect' matched at 'https://pentest-ground.com'.",
+            "severity": "info",
+            "cvss_score": 0.0,
+            "cwe": "",
+            "cve": [],
+            "asset": "pentest-ground.com",
+            "port": 443,
+            "protocol": "tcp",
+            "evidence": {
+                "source": "nuclei",
+                "template": "tech-detect",
+                "name": "Wappalyzer Technology Detection",
+                "matched_url": "https://pentest-ground.com",
+                "type": "http",
+                "matcher": "nginx",
+                "curl_command": "curl -X 'GET' -H 'Accept: */*' -H 'Accept-Language: en' -H 'User-Agent: Mozilla/5.0 (X11; CrOS x86_64 0.3.3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36' 'https://pentest-ground.com'",
+                "request": "GET / HTTP/1.1\r\nHost: pentest-ground.com\r\nUser-Agent: Mozilla/5.0 (X11; CrOS x86_64 0.3.3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36\r\nConnection: close\r\nAccept: */*\r\nAccept-Language: en\r\nAccept-Encoding: gzip\r\n\r\n",
+                "response": "HTTP/1.1 200 OK\r\nConnection: close\r\nTransfer-Encoding: chunked\r\nContent-Type: text/html\r\nDate: Tue, 14 Apr 2026 09:06:46 GMT\r\nEtag: W/\"698600f8-475d\"\r\nLast-Modified: Fri, 06 Feb 2026 14:55:52 GMT\r\nServer: nginx/1.29.8\r\n\r\n<!DOCTYPE html>\n<html>\n\n<head>\n\t<meta charset=\"utf-8\">\n\n\t<!-- HTML Meta Tags -->\n\t<title>Pentest-Ground</title>\n\t<meta name=\"description\" content=\"Vulnerable apps to benchmark your scanners and your skills\">\n\n\t<!-- DevicePixelRatio Meta tag-->\n\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n\n\t<!-- Facebook Meta Tags -->\n\t<meta property=\"og:url\" content=\"https://pentest-ground.com\">\n\t<meta property=\"og:type\" content=\"image/png\">\n\t<meta property=\"og:title\" content=\"Pentest-Ground\">\n\t<meta property=\"og:description\" content=\"Vulnerable apps to benchmark your scanners and your skills\">\n\t<meta property=\"og:image\" content=\"https://pentest-ground.com/img/PentestGroundOG.png\">\n\t<meta property=\"og:image:width\" content=\"1200\">\n\t<meta property=\"og:image:height\" content=\"630\">\n\n\t<!-- Twitter Meta Tags -->\n\t<meta name=\"twitter:card\" content=\"summary_large_image\">\n\t<meta property=\"twitter:domain\" content=\"pentest-ground.com\">\n\t<meta property=\"twitter:url\" content=\"https://pentest-ground.com\">\n\t<meta name=\"twitter:title\" content=\"Pentest-Ground\">\n\t<meta name=\"twitter:description\" content=\"Vulnerable apps to benchmark your scanners and your skills\">\n\t<meta name=\"twitter:image\" content=\"https://pentest-ground.com/img/PentestGroundOG.png\">\n\n\t<title>Welcome to pentest-ground.com!</title>\n\t<!-- CDNs -->\n\t<script src=\"https://cdn.tailwindcss.com\"></script>\n\n\t<script src=\"https://unpkg.com/@popperjs/core@2\"></script>\n\t<script src=\"https://unpkg.com/tippy.js@6\"></script>\n\n\t<script src=\"alpine-data.js\"></script>\n\t<script src=\"https://cdn.jsdelivr.net/npm/alpinejs@3.13.0/dist/cdn.min.js\"></script>\n\t<script src=\"https://cdn.usefathom.com/script.js\" data-site=\"OSTOGEQF\" defer></script>\n\n\t<script>\n\t\ttailwind.config = {\n\t\t\ttheme: {\n\t\t\t\tscreens: {\n\t\t\t\t\t'xs': '320px',\n\t\t\t\t\t'sm': '640px',\n\t\t\t\t\t'md': '768px',\n\t\t\t\t\t'lg': '1024px',\n\t\t\t\t\t'xl': '1280px',\n\t\t\t\t\t'2xl': '1512px',\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t</script>\n\t<link rel=\"icon\" href=\"img/PentestGroundFavicon.png\" type=\"image/x-icon\">\n\t<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n\t<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n\t<link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap\" rel=\"stylesheet\">\n\n\t<!-- Google Tag Manager -->\n\t<script>(function (w, d, s, l, i) {\n\t\t\t\tw[l] = w[l] || []; w[l].push({\n\t\t\t\t\t'gtm.start':\n\t\t\t\t\t\tnew Date().getTime(), event: 'gtm.js'\n\t\t\t\t}); var f = d.getElementsByTagName(s)[0],\n\t\t\t\t\tj = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =\n\t\t\t\t\t\t'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);\n\t\t\t})(window, document, 'script', 'dataLayer', 'GTM-5R4Z3P6');</script>\n\t<!-- End Google Tag Manager -->\n</head>\n\n<body class=\"bg-[#171717]\">\n\t<!--Main margins div -->\n\t<div class=\"flex relative min-h-screen w-full justify-center font-[inter]\">\n\t\t<!-- Content container -->\n\t\t<div class=\"w-full max-w-7xl\">\n\t\t\t<!-- Header container -->\n\t\t\t<div class=\"px-3 py-3 sm:py-3 sm:px-5 lg:px-10 lg:py-3 2xl:px-[60px] 2xl:py-15 gap-2.5\">\n\t\t\t\t<img src=\"img/PentestGroundLogo.svg\" alt=\"Pentest Ground Logo\" class=\"logo\">\n\t\t\t</div>\n\t\t\t<!-- First container -->\n\t\t\t<div\n\t\t\t\tclass=\"flex flex-row px-[12px] pt-[48px] pb-[20px] sm:px-5 sm:py-12 lg:pb-5 lg:px-10 lg:py-[60px] xl:pt-[100px] xl:pb-10 2xl:px-[60px] 2xl:py-15 gap-10\">\n\t\t\t\t<!-- Left side - text -->\n\t\t\t\t<div class=\"flex flex-col gap-5 w-full lg:w-2.5/5\">\n\t\t\t\t\t<h1\n\t\t\t\t\t\tclass=\"font-bold md:font-extrabold text-4xl md:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-[#FFF1EF] to-[#FFC3BC] tracking-[-0.96px]\">\n\t\t\t\t\t\tVulnerable apps\n\t\t\t\t\t\tto benchmark\n\t\t\t\t\t\tyour scanners and\n\t\t\t\t\t\tyour skills</h1>\n\t\t\t\t\t<h2 class=\"text-[#FDCCC7] leading-[24px] tracking-[-0.32px] text-ellipsis\">\n\t\t\t\t\t\t...(truncated)"
+            },
+            "impact": "",
+            "remediation": "",
+            "references": [],
+            "tags": [
+                "tech-detect",
+                "discovery",
+                "https",
+                "tech"
+            ]
+        },
+        {
+            "id": "VULN-022",
+            "title": "WordPress End-of-Life - Detect",
+            "description": "Detected WordPress versions that have reached End-of-Life (EOL) and no longer receive security updates.\n",
+            "severity": "info",
+            "cvss_score": 0.0,
+            "cwe": "",
+            "cve": [],
+            "asset": "pentest-ground.com",
+            "port": 443,
+            "protocol": "tcp",
+            "evidence": {
+                "source": "nuclei",
+                "template": "wordpress-eol",
+                "name": "WordPress End-of-Life - Detect",
+                "matched_url": "https://pentest-ground.com",
+                "type": "http",
+                "curl_command": "curl -X 'GET' -H 'Accept: */*' -H 'Accept-Language: en' -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36 Edg/109.0.1518.61' 'https://pentest-ground.com'",
+                "request": "GET / HTTP/1.1\r\nHost: pentest-ground.com\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36 Edg/109.0.1518.61\r\nConnection: close\r\nAccept: */*\r\nAccept-Language: en\r\nAccept-Encoding: gzip\r\n\r\n",
+                "response": "HTTP/1.1 200 OK\r\nConnection: close\r\nTransfer-Encoding: chunked\r\nContent-Type: text/html\r\nDate: Tue, 14 Apr 2026 09:06:06 GMT\r\nEtag: W/\"698600f8-475d\"\r\nLast-Modified: Fri, 06 Feb 2026 14:55:52 GMT\r\nServer: nginx/1.29.8\r\n\r\n<!DOCTYPE html>\n<html>\n\n<head>\n\t<meta charset=\"utf-8\">\n\n\t<!-- HTML Meta Tags -->\n\t<title>Pentest-Ground</title>\n\t<meta name=\"description\" content=\"Vulnerable apps to benchmark your scanners and your skills\">\n\n\t<!-- DevicePixelRatio Meta tag-->\n\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n\n\t<!-- Facebook Meta Tags -->\n\t<meta property=\"og:url\" content=\"https://pentest-ground.com\">\n\t<meta property=\"og:type\" content=\"image/png\">\n\t<meta property=\"og:title\" content=\"Pentest-Ground\">\n\t<meta property=\"og:description\" content=\"Vulnerable apps to benchmark your scanners and your skills\">\n\t<meta property=\"og:image\" content=\"https://pentest-ground.com/img/PentestGroundOG.png\">\n\t<meta property=\"og:image:width\" content=\"1200\">\n\t<meta property=\"og:image:height\" content=\"630\">\n\n\t<!-- Twitter Meta Tags -->\n\t<meta name=\"twitter:card\" content=\"summary_large_image\">\n\t<meta property=\"twitter:domain\" content=\"pentest-ground.com\">\n\t<meta property=\"twitter:url\" content=\"https://pentest-ground.com\">\n\t<meta name=\"twitter:title\" content=\"Pentest-Ground\">\n\t<meta name=\"twitter:description\" content=\"Vulnerable apps to benchmark your scanners and your skills\">\n\t<meta name=\"twitter:image\" content=\"https://pentest-ground.com/img/PentestGroundOG.png\">\n\n\t<title>Welcome to pentest-ground.com!</title>\n\t<!-- CDNs -->\n\t<script src=\"https://cdn.tailwindcss.com\"></script>\n\n\t<script src=\"https://unpkg.com/@popperjs/core@2\"></script>\n\t<script src=\"https://unpkg.com/tippy.js@6\"></script>\n\n\t<script src=\"alpine-data.js\"></script>\n\t<script src=\"https://cdn.jsdelivr.net/npm/alpinejs@3.13.0/dist/cdn.min.js\"></script>\n\t<script src=\"https://cdn.usefathom.com/script.js\" data-site=\"OSTOGEQF\" defer></script>\n\n\t<script>\n\t\ttailwind.config = {\n\t\t\ttheme: {\n\t\t\t\tscreens: {\n\t\t\t\t\t'xs': '320px',\n\t\t\t\t\t'sm': '640px',\n\t\t\t\t\t'md': '768px',\n\t\t\t\t\t'lg': '1024px',\n\t\t\t\t\t'xl': '1280px',\n\t\t\t\t\t'2xl': '1512px',\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t</script>\n\t<link rel=\"icon\" href=\"img/PentestGroundFavicon.png\" type=\"image/x-icon\">\n\t<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n\t<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n\t<link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap\" rel=\"stylesheet\">\n\n\t<!-- Google Tag Manager -->\n\t<script>(function (w, d, s, l, i) {\n\t\t\t\tw[l] = w[l] || []; w[l].push({\n\t\t\t\t\t'gtm.start':\n\t\t\t\t\t\tnew Date().getTime(), event: 'gtm.js'\n\t\t\t\t}); var f = d.getElementsByTagName(s)[0],\n\t\t\t\t\tj = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =\n\t\t\t\t\t\t'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);\n\t\t\t})(window, document, 'script', 'dataLayer', 'GTM-5R4Z3P6');</script>\n\t<!-- End Google Tag Manager -->\n</head>\n\n<body class=\"bg-[#171717]\">\n\t<!--Main margins div -->\n\t<div class=\"flex relative min-h-screen w-full justify-center font-[inter]\">\n\t\t<!-- Content container -->\n\t\t<div class=\"w-full max-w-7xl\">\n\t\t\t<!-- Header container -->\n\t\t\t<div class=\"px-3 py-3 sm:py-3 sm:px-5 lg:px-10 lg:py-3 2xl:px-[60px] 2xl:py-15 gap-2.5\">\n\t\t\t\t<img src=\"img/PentestGroundLogo.svg\" alt=\"Pentest Ground Logo\" class=\"logo\">\n\t\t\t</div>\n\t\t\t<!-- First container -->\n\t\t\t<div\n\t\t\t\tclass=\"flex flex-row px-[12px] pt-[48px] pb-[20px] sm:px-5 sm:py-12 lg:pb-5 lg:px-10 lg:py-[60px] xl:pt-[100px] xl:pb-10 2xl:px-[60px] 2xl:py-15 gap-10\">\n\t\t\t\t<!-- Left side - text -->\n\t\t\t\t<div class=\"flex flex-col gap-5 w-full lg:w-2.5/5\">\n\t\t\t\t\t<h1\n\t\t\t\t\t\tclass=\"font-bold md:font-extrabold text-4xl md:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-[#FFF1EF] to-[#FFC3BC] tracking-[-0.96px]\">\n\t\t\t\t\t\tVulnerable apps\n\t\t\t\t\t\tto benchmark\n\t\t\t\t\t\tyour scanners and\n\t\t\t\t\t\tyour skills</h1>\n\t\t\t\t\t<h2 class=\"text-[#FDCCC7] leading-[24px] tracking-[-0.32px] text-ellipsis\">\n\t\t\t\t\t\t...(truncated)"
+            },
+            "impact": "End-of-life software may contain unpatched vulnerabilities, increasing the likelihood and impact of exploitation.",
+            "remediation": "Upgrade the affected platform to a supported (non-EOL) version and apply the latest security patches.",
+            "references": [
+                "https://endoflife.date/wordpress",
+                "https://wordpress.org/documentation/article/wordpress-versions/"
+            ],
+            "tags": [
+                "tech",
+                "wordpress",
+                "eol",
+                "https",
+                "wordpress-eol"
+            ]
+        }
+    ],
+    "summary": {
+        "total_findings": 22,
+        "critical": 2,
+        "high": 4,
+        "medium": 0,
+        "low": 0,
+        "info": 16,
+        "risk_score": 8.8
+    }
+}

@@ -1,0 +1,13 @@
+[
+    {
+        "url": "https://pentest-ground.com",
+        "status_code": 200,
+        "title": "Pentest-Ground",
+        "webserver": "nginx/1.29.8",
+        "tech": [
+            "Google Tag Manager",
+            "Nginx:1.29.8"
+        ],
+        "ip": ""
+    }
+]

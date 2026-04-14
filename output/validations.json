@@ -1,0 +1,45 @@
+[
+    {
+        "vulnerability": "redis-no-auth",
+        "severity": "high",
+        "validation": {
+            "status": "confirmed",
+            "confidence": 0.95
+        },
+        "evidence": {
+            "request": "PING",
+            "response": "+PONG\r\n",
+            "matched": "PONG",
+            "extra": {
+                "port": 6379
+            }
+        },
+        "impact": "Unauthenticated Redis access allows data exposure.",
+        "remediation": "Enable authentication (ACLs/requirepass) and restrict Redis to an internal network (firewall/VPC rules)."
+    },
+    {
+        "vulnerability": "missing-security-headers",
+        "severity": "info",
+        "validation": {
+            "status": "confirmed",
+            "confidence": 0.8
+        },
+        "evidence": {
+            "request": "https://pentest-ground.com",
+            "response": {
+                "Server": "nginx/1.29.8",
+                "Date": "Tue, 14 Apr 2026 09:20:07 GMT",
+                "Content-Type": "text/html",
+                "Content-Length": "18269",
+                "Last-Modified": "Fri, 06 Feb 2026 14:55:52 GMT",
+                "Connection": "close",
+                "ETag": "\"698600f8-475d\"",
+                "Accept-Ranges": "bytes"
+            },
+            "matched": "CSP,X-Frame-Options",
+            "extra": {}
+        },
+        "impact": "Missing headers can increase exposure to clickjacking and some XSS scenarios.",
+        "remediation": "Add standard security headers (at minimum CSP and X-Frame-Options) at the web server or application layer."
+    }
+]
