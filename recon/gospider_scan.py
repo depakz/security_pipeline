@@ -2,13 +2,27 @@ import subprocess
 import json
 import shutil
 import re
+from pathlib import Path
 
 OUTPUT_FILE = "output/gospider.json"
 
 
+def _resolve_binary(name):
+    in_path = shutil.which(name)
+    if in_path:
+        return in_path
+
+    local = Path(__file__).resolve().parents[1] / "bin" / name
+    if local.exists() and local.is_file():
+        return str(local)
+
+    return None
+
+
 def run_gospider(target):
     try:
-        if shutil.which("gospider") is None:
+        gospider_bin = _resolve_binary("gospider")
+        if gospider_bin is None:
             raise EnvironmentError("gospider not found in PATH")
 
         # normalize target (VERY IMPORTANT)
@@ -16,7 +30,7 @@ def run_gospider(target):
             target = "https://" + target
 
         cmd = [
-            "gospider",
+            gospider_bin,
             "-s", target,
             "-d", "1",
             "-c", "3",

@@ -2,8 +2,21 @@ import subprocess
 import json
 import shutil
 import re
+from pathlib import Path
 
 OUTPUT_FILE = "output/naabu.json"
+
+
+def _resolve_binary(name):
+    in_path = shutil.which(name)
+    if in_path:
+        return in_path
+
+    local = Path(__file__).resolve().parents[1] / "bin" / name
+    if local.exists() and local.is_file():
+        return str(local)
+
+    return None
 
 
 def validate_target(target):
@@ -14,7 +27,7 @@ def validate_target(target):
 
 
 def check_naabu_installed():
-    if shutil.which("naabu") is None:
+    if _resolve_binary("naabu") is None:
         raise EnvironmentError("naabu is not installed or not in PATH")
 
 
@@ -22,9 +35,10 @@ def run_naabu(target):
     try:
         validate_target(target)
         check_naabu_installed()
+        naabu_bin = _resolve_binary("naabu")
 
         cmd = [
-            "naabu",
+            naabu_bin,
             "-host", target,
             "-json",
             "-silent"

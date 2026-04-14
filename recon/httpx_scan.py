@@ -1,21 +1,35 @@
 import subprocess
 import json
 import shutil
+from pathlib import Path
 
 OUTPUT_FILE = "output/httpx.json"
 
 
+def _resolve_binary(name):
+    in_path = shutil.which(name)
+    if in_path:
+        return in_path
+
+    local = Path(__file__).resolve().parents[1] / "bin" / name
+    if local.exists() and local.is_file():
+        return str(local)
+
+    return None
+
+
 def check_httpx():
-    if shutil.which("httpx") is None:
+    if _resolve_binary("httpx") is None:
         raise EnvironmentError("httpx is not installed or not in PATH")
 
 
 def run_httpx(target):
     try:
         check_httpx()
+        httpx_bin = _resolve_binary("httpx")
 
         cmd = [
-            "httpx",
+            httpx_bin,
             "-u", target,
             "-json",
             "-silent",

@@ -1,12 +1,11 @@
 [
     {
-        "url": "https://pentest-ground.com",
+        "url": "https://example.com",
         "status_code": 200,
-        "title": "Pentest-Ground",
-        "webserver": "nginx/1.29.8",
+        "title": "Example Domain",
+        "webserver": "cloudflare",
         "tech": [
-            "Google Tag Manager",
-            "Nginx:1.29.8"
+            "Cloudflare"
         ],
         "ip": ""
     }

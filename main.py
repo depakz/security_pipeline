@@ -1,12 +1,13 @@
 import json
 import sys
 import time
+import argparse
 from datetime import datetime, timezone
 import threading
 import inspect
+from brain.dag_engine import DAGBrain
+from brain.exploitability_reporter import ExploitabilityReporter
 from engine.validation_engine import ValidationEngine
-from validators.redis import RedisNoAuthValidator
-from validators.http import MissingSecurityHeadersValidator
 from recon.naabu_scan import run_naabu
 from recon.httpx_scan import run_httpx
 from recon.nuclei_scan import run_nuclei
@@ -140,11 +141,21 @@ def run_with_progress(label, func, *args, **kwargs):
     return value
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: python3 main.py <target>")
+    parser = argparse.ArgumentParser(
+        description="Run the penetration testing pipeline against a target host or URL."
+    )
+    parser.add_argument(
+        "target",
+        nargs="?",
+        help="Target hostname or URL (for example: example.com or https://example.com)",
+    )
+    args = parser.parse_args()
+
+    if not args.target:
+        parser.print_help()
         sys.exit(1)
 
-    target = sys.argv[1]
+    target = args.target
     scan_start = time.time()
     scan_time = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     logger.info(f"Starting penetration testing pipeline for target: {target}")
@@ -183,20 +194,79 @@ def main():
 
     # Step 3: Validation Engine (truth generator)
     try:
-        logger.info("Running validation engine...")
+        logger.info("Running DAG validation planner...")
         state = build_validation_state(parsed_data)
 
+        dag_brain = DAGBrain()
+        plan = dag_brain.plan_validations(state)
+
         vengine = ValidationEngine()
-        vengine.register(RedisNoAuthValidator())
-        vengine.register(MissingSecurityHeadersValidator())
+        for validator in plan.validators:
+            vengine.register(validator)
 
         validation_results = vengine.run(state)
         with open("output/validations.json", "w") as f:
             json.dump(validation_results, f, indent=4)
 
-        logger.info(f"Validation results saved to output/validations.json ({len(validation_results)} results)")
+        logger.info(
+            f"Validation results saved to output/validations.json ({len(validation_results)} results, {len(plan.validators)} DAG validators)"
+        )
+        
+        # Step 3b: CVE-specific validation and reporting
+        findings = parsed_data.get("findings", [])
+        if findings:
+            logger.info("Planning CVE-specific validations...")
+            cve_plan = dag_brain.plan_cve_validations(state, findings)
+            
+            if cve_plan.cve_to_validators:
+                # Run CVE-specific validators
+                cve_vengine = ValidationEngine()
+                for validator in cve_plan.validator_instances.values():
+                    cve_vengine.register(validator)
+                
+                cve_validation_results = cve_vengine.run(state)
+                
+                # Generate exploitability report
+                reporter = ExploitabilityReporter()
+                cve_verdicts = []
+                
+                for cve_id, cve_data in cve_plan.cve_details.items():
+                    # Get validators for this CVE
+                    validators_for_cve = cve_plan.cve_to_validators.get(cve_id, [])
+                    
+                    # Get validation results for these validators
+                    relevant_results = [
+                        result for result in cve_validation_results
+                        if result.get("vulnerability") in validators_for_cve
+                    ]
+                    
+                    # Generate verdict for this CVE
+                    verdict = reporter.generate_verdict(
+                        cve_data=cve_data,
+                        validation_results=relevant_results,
+                        validators_tested=validators_for_cve,
+                    )
+                    cve_verdicts.append(verdict)
+                
+                # Generate and save full report
+                report = reporter.generate_report(cve_verdicts)
+                with open("output/exploitability_report.json", "w") as f:
+                    json.dump(report, f, indent=4)
+                
+                logger.info(
+                    f"Exploitability report saved to output/exploitability_report.json "
+                    f"({len(cve_plan.cve_to_validators)} CVEs, "
+                    f"{len(report.get('exploitable_cves', []))} exploitable, "
+                    f"{len(report.get('negligible_cves', []))} negligible)"
+                )
+            else:
+                logger.info("No CVEs found in findings for validation")
+        else:
+            logger.info("No findings to validate for CVEs")
     except Exception as e:
         logger.info(f"Validation engine failed: {e}")
+        import traceback
+        traceback.print_exc()
 
     # Step 4: Decision Engine
     logger.info("Deciding next actions...")

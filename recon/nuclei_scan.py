@@ -3,8 +3,38 @@ import json
 import shutil
 import threading
 import time
+from pathlib import Path
 
 OUTPUT_FILE = "output/nuclei.json"
+
+
+def _stop_process(process):
+    if process is None:
+        return
+    if process.poll() is not None:
+        return
+
+    try:
+        process.terminate()
+        process.wait(timeout=3)
+    except Exception:
+        try:
+            process.kill()
+            process.wait(timeout=2)
+        except Exception:
+            pass
+
+
+def _resolve_binary(name):
+    in_path = shutil.which(name)
+    if in_path:
+        return in_path
+
+    local = Path(__file__).resolve().parents[1] / "bin" / name
+    if local.exists() and local.is_file():
+        return str(local)
+
+    return None
 
 
 def _truncate(value, limit):
@@ -17,18 +47,18 @@ def _truncate(value, limit):
 
 
 def run_nuclei(target, progress=None):
+    process = None
     try:
-        if shutil.which("nuclei") is None:
+        nuclei_bin = _resolve_binary("nuclei")
+        if nuclei_bin is None:
             raise EnvironmentError("nuclei not installed or not in PATH")
 
         cmd = [
-            "nuclei",
+            nuclei_bin,
             "-u", target,
             "-jsonl",
             "-silent",
             "-no-interactsh",
-            "-stats",
-            "-si", "5"
         ]
 
         if isinstance(progress, dict):
@@ -57,32 +87,30 @@ def run_nuclei(target, progress=None):
             progress["detail"] = " | " + " | ".join(parts)
 
         def read_stderr():
-            buffer = ""
             while True:
-                chunk = process.stderr.read(1024) if process.stderr is not None else ""
-                if not chunk:
+                if process.stderr is None:
                     break
-                buffer += chunk
-                buffer = buffer.replace("\r", "\n")
-                lines = buffer.split("\n")
-                buffer = lines.pop()  # remainder
-                for line in lines:
-                    s = (line or "").strip()
-                    if not s:
-                        continue
-                    with stderr_lock:
-                        stderr_lines.append(s)
-                        if len(stderr_lines) > 500:
-                            del stderr_lines[:-500]
-                        last_stats["line"] = s[:80]
-                    update_progress()
-            leftover = buffer.strip()
-            if leftover:
+
+                line = process.stderr.readline()
+                if not line:
+                    if process.poll() is not None:
+                        break
+                    time.sleep(0.05)
+                    continue
+
+                s = (line or "").strip()
+                if not s:
+                    continue
+
+                # Ignore nuclei stats ticker lines if present.
+                if s.startswith("{") and '"duration"' in s and '"percent"' in s:
+                    continue
+
                 with stderr_lock:
-                    stderr_lines.append(leftover)
+                    stderr_lines.append(s)
                     if len(stderr_lines) > 500:
                         del stderr_lines[:-500]
-                    last_stats["line"] = leftover[:80]
+                    last_stats["line"] = s[:80]
                 update_progress()
 
         stderr_thread = threading.Thread(target=read_stderr, daemon=True)
@@ -165,7 +193,12 @@ def run_nuclei(target, progress=None):
 
         return OUTPUT_FILE
 
+    except KeyboardInterrupt:
+        _stop_process(process)
+        raise
+
     except Exception as e:
+        _stop_process(process)
         with open(OUTPUT_FILE, "w") as f:
             json.dump({
                 "error": str(e),
