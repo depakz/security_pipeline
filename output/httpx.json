@@ -1,11 +1,12 @@
 [
     {
-        "url": "https://example.com",
+        "url": "https://demo.testfire.net",
         "status_code": 200,
-        "title": "Example Domain",
-        "webserver": "cloudflare",
+        "title": "Altoro Mutual",
+        "webserver": "Apache-Coyote/1.1",
         "tech": [
-            "Cloudflare"
+            "Apache Tomcat",
+            "Java"
         ],
         "ip": ""
     }

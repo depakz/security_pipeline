@@ -25,49 +25,76 @@ def run_gospider(target):
         if gospider_bin is None:
             raise EnvironmentError("gospider not found in PATH")
 
-        # normalize target (VERY IMPORTANT)
-        if not target.startswith("http"):
-            target = "https://" + target
+        # Normalize target. If the caller doesn't specify a scheme, try HTTPS then HTTP.
+        candidates = []
+        if isinstance(target, str) and (target.startswith("https://") or target.startswith("http://")):
+            candidates = [target]
+        else:
+            candidates = [f"https://{target}", f"http://{target}"]
 
-        cmd = [
-            gospider_bin,
-            "-s", target,
-            "-d", "1",
-            "-c", "3",
-            "-t", "2"
-        ]
+        last_error = "No output from gospider (blocked or non-crawlable target)"
+        fallback_data = None
 
-        process = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True
-        )
+        for candidate in candidates:
+            cmd = [
+                gospider_bin,
+                "-s",
+                candidate,
+                "-d",
+                "1",
+                "-c",
+                "3",
+                "-t",
+                "2",
+            ]
 
-        if process.returncode != 0:
-            raise RuntimeError(process.stderr.strip() or "gospider failed silently")
+            process = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+            )
 
-        # 🔥 CRITICAL FIX: combine both streams
-        output = (process.stdout or "") + "\n" + (process.stderr or "")
+            if process.returncode != 0:
+                last_error = process.stderr.strip() or "gospider failed silently"
+                continue
 
-        if not output.strip():
-            raise ValueError("No output from gospider (blocked or non-crawlable target)")
+            # Combine both streams (some gospider builds log to stderr).
+            output = (process.stdout or "") + "\n" + (process.stderr or "")
+            if not output.strip():
+                last_error = "No output from gospider (blocked or non-crawlable target)"
+                continue
 
-        endpoints = set()
+            endpoints = set()
+            for line in output.splitlines():
+                match = re.search(r"https?://[^\s\]]+", line)
+                if match:
+                    endpoints.add(match.group(0))
 
-        for line in output.splitlines():
-            match = re.search(r"https?://[^\s\]]+", line)
-            if match:
-                endpoints.add(match.group(0))
+            data = {
+                "target": candidate,
+                "endpoints": list(endpoints),
+            }
 
-        data = {
-            "target": target,
-            "endpoints": list(endpoints)
-        }
+            # Prefer the first scheme that yields actual endpoints.
+            if endpoints:
+                break
+
+            # Keep a non-error fallback (matches previous behavior: empty endpoints is OK).
+            fallback_data = data
+
+        else:
+            data = None
+
+        if data is None:
+            if fallback_data is not None:
+                data = fallback_data
+            else:
+                raise ValueError(last_error)
 
     except Exception as e:
         data = {
             "error": str(e),
-            "debug_hint": "check WAF blocking, URL scheme, or crawl depth"
+            "debug_hint": "check WAF blocking, URL scheme, or crawl depth",
         }
 
     with open(OUTPUT_FILE, "w") as f:

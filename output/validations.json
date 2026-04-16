@@ -1,1 +1,81 @@
-[]
+[
+    {
+        "success": false,
+        "vulnerability": "ftp-connection-failed",
+        "severity": "info",
+        "validation": {
+            "status": "failed",
+            "confidence": 0.0
+        },
+        "evidence": {
+            "request": {
+                "host": "demo.testfire.net",
+                "port": 21,
+                "user": "anonymous"
+            },
+            "response": "timed out",
+            "matched": "",
+            "extra": {
+                "port": 21
+            }
+        },
+        "impact": "",
+        "remediation": "",
+        "validator_id": "ftp_anonymous_login",
+        "validator_class": "FTPAnonymousLoginValidator",
+        "priority": 80
+    },
+    {
+        "success": true,
+        "vulnerability": "missing-security-headers",
+        "severity": "info",
+        "validation": {
+            "status": "confirmed",
+            "confidence": 0.8
+        },
+        "evidence": {
+            "request": "https://demo.testfire.net",
+            "response": {
+                "Server": "Apache-Coyote/1.1",
+                "Set-Cookie": "JSESSIONID=A2927BE7FB52906B61E48D81BB2D70BA; Path=/; Secure; HttpOnly",
+                "Content-Type": "text/html;charset=ISO-8859-1",
+                "Transfer-Encoding": "chunked",
+                "Date": "Thu, 16 Apr 2026 06:46:54 GMT",
+                "Connection": "close"
+            },
+            "matched": "CSP,X-Frame-Options",
+            "extra": {}
+        },
+        "impact": "Missing headers can increase exposure to clickjacking and some XSS scenarios.",
+        "remediation": "Add standard security headers (at minimum CSP and X-Frame-Options) at the web server or application layer.",
+        "validator_id": "missing_security_headers",
+        "validator_class": "MissingSecurityHeadersValidator",
+        "priority": 10
+    },
+    {
+        "success": false,
+        "vulnerability": "ftp-connection-failed",
+        "severity": "info",
+        "validation": {
+            "status": "failed",
+            "confidence": 0.0
+        },
+        "evidence": {
+            "request": {
+                "host": "demo.testfire.net",
+                "port": 21,
+                "user": "anonymous"
+            },
+            "response": "timed out",
+            "matched": "",
+            "extra": {
+                "port": 21
+            }
+        },
+        "impact": "",
+        "remediation": "",
+        "validator_id": "ftp_anonymous_login",
+        "validator_class": "FTPAnonymousLoginValidator",
+        "priority": 80
+    }
+]

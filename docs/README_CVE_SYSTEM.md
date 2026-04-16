@@ -49,13 +49,13 @@ Website Scan → CVE Detection → Validator Mapping → Automated Testing → R
 
 ### 1. Run the integration test
 ```bash
-python3 test_cve_pipeline.py
+python3 tests/test_cve_pipeline.py
 ```
 **Expected output**: All tests pass ✅
 
 ### 2. Run the full pipeline
 ```bash
-python3 main.py --target <example.com>
+python3 main.py --cve-report <example.com>
 ```
 **Expected output**: Exploitability report saved to `output/exploitability_report.json`
 
@@ -275,7 +275,7 @@ All components are tested:
 
 ```bash
 # Run integration test
-python3 test_cve_pipeline.py
+python3 tests/test_cve_pipeline.py
 
 # Output:
 # === Testing CVE Mapping ===
@@ -328,9 +328,9 @@ Want checklists? → INTEGRATION_CHECKLIST.md ← Implementation status
 
 ## Next Steps
 
-1. **Run the test**: `python3 test_cve_pipeline.py`
+1. **Run the test**: `python3 tests/test_cve_pipeline.py`
 2. **Read the docs**: Start with [CVE_QUICK_REFERENCE.md](CVE_QUICK_REFERENCE.md)
-3. **Try a scan**: `python3 main.py --target example.com`
+3. **Try a scan**: `python3 main.py --cve-report example.com`
 4. **Extend it**: Add new CVEs following [CVE_VALIDATION_GUIDE.md](CVE_VALIDATION_GUIDE.md)
 
 ## Summary

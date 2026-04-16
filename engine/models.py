@@ -1,10 +1,41 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 
 _ALLOWED_SEVERITIES = {"critical", "high", "medium", "low", "info"}
+
+
+@dataclass
+class ExecutionContext:
+    target: str = ""
+    endpoints: List[str] = field(default_factory=list)
+    findings: List[Dict[str, Any]] = field(default_factory=list)
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+    @classmethod
+    def from_state(cls, state: Dict[str, Any]) -> "ExecutionContext":
+        if not isinstance(state, dict):
+            return cls()
+
+        target = str(state.get("target") or "")
+
+        endpoints = state.get("endpoints") or []
+        if not isinstance(endpoints, list):
+            endpoints = []
+        endpoints = [e for e in endpoints if isinstance(e, str)]
+
+        findings = state.get("findings") or []
+        if not isinstance(findings, list):
+            findings = []
+        findings = [f for f in findings if isinstance(f, dict)]
+
+        metadata = state.get("metadata") or {}
+        if not isinstance(metadata, dict):
+            metadata = {}
+
+        return cls(target=target, endpoints=endpoints, findings=findings, metadata=metadata)
 
 
 @dataclass
@@ -41,6 +72,7 @@ class ValidationResult:
             confidence = 1.0
 
         return {
+            "success": bool(self.success),
             "vulnerability": self.vulnerability,
             "severity": severity,
             "validation": {

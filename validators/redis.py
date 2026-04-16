@@ -1,9 +1,13 @@
 import socket
+from typing import Optional
 
-from engine.models import Evidence, ValidationResult
+from engine.models import Evidence, ExecutionContext, ValidationResult
 
 
 class RedisNoAuthValidator:
+    def __init__(self, context: Optional[ExecutionContext] = None):
+        self.context = context
+
     def can_run(self, state):
         ports = state.get("ports", []) or []
         return 6379 in ports

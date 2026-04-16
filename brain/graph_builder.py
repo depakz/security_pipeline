@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from collections import defaultdict, deque
+import heapq
+from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Any, Dict, Iterable, List, Tuple
 
@@ -84,16 +85,31 @@ class GraphBuilder:
             incoming[target] += 1
             incoming.setdefault(source, 0)
 
-        queue = deque([node_id for node_id in graph.nodes if incoming.get(node_id, 0) == 0])
+        def _priority(node_id: str) -> int:
+            node = graph.nodes.get(node_id)
+            if not node or node.kind != "validator":
+                return 0
+
+            spec = node.data.get("spec")
+            try:
+                return int(getattr(spec, "priority", 0) or 0)
+            except Exception:
+                return 0
+
+        heap: List[Tuple[int, str]] = []
+        for node_id in graph.nodes:
+            if incoming.get(node_id, 0) == 0:
+                heapq.heappush(heap, (-_priority(node_id), node_id))
+
         ordered: List[str] = []
 
-        while queue:
-            node_id = queue.popleft()
+        while heap:
+            _, node_id = heapq.heappop(heap)
             ordered.append(node_id)
             for next_id in outgoing.get(node_id, []):
                 incoming[next_id] -= 1
                 if incoming[next_id] == 0:
-                    queue.append(next_id)
+                    heapq.heappush(heap, (-_priority(next_id), next_id))
 
         if len(ordered) != len(graph.nodes):
             raise ValueError("Graph contains a cycle or unresolved dependency")

@@ -4,6 +4,11 @@ Test script to verify CVE detection and validation pipeline
 """
 
 import json
+import os
+import sys
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from brain.dag_engine import DAGBrain
 from brain.exploitability_reporter import ExploitabilityReporter
 from brain.cve_mapper import CVEMapper

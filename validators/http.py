@@ -1,10 +1,14 @@
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
+from typing import Optional
 
-from engine.models import Evidence, ValidationResult
+from engine.models import Evidence, ExecutionContext, ValidationResult
 
 
 class MissingSecurityHeadersValidator:
+    def __init__(self, context: Optional[ExecutionContext] = None):
+        self.context = context
+
     def can_run(self, state):
         protocols = state.get("protocols", []) or []
         return "http" in protocols

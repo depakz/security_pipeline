@@ -11,6 +11,7 @@ class ValidatorSpec:
     class_path: str
     description: str
     severity: str = "info"
+    priority: int = 0
     keywords: List[str] = field(default_factory=list)
     required_ports: List[int] = field(default_factory=list)
     required_protocols: List[str] = field(default_factory=list)
@@ -32,8 +33,19 @@ DEFAULT_VALIDATOR_SPECS: List[ValidatorSpec] = [
         class_path="validators.redis.RedisNoAuthValidator",
         description="Checks whether Redis is reachable on port 6379 without authentication.",
         severity="high",
+        priority=100,
         keywords=["redis", "6379", "unauthenticated", "no auth"],
         required_ports=[6379],
+    ),
+    ValidatorSpec(
+        id="ftp_anonymous_login",
+        name="FTPAnonymousLoginValidator",
+        class_path="validators.ftp.FTPAnonymousLoginValidator",
+        description="Checks whether the FTP service allows anonymous login on port 21.",
+        severity="high",
+        priority=80,
+        keywords=["ftp", "21", "anonymous"],
+        required_ports=[21],
     ),
     ValidatorSpec(
         id="missing_security_headers",
@@ -41,6 +53,7 @@ DEFAULT_VALIDATOR_SPECS: List[ValidatorSpec] = [
         class_path="validators.http.MissingSecurityHeadersValidator",
         description="Checks for missing security headers on HTTP endpoints.",
         severity="info",
+        priority=10,
         keywords=["http", "headers", "csp", "x-frame-options"],
         required_protocols=["http"],
     ),

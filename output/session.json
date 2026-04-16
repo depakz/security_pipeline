@@ -1,28 +1,470 @@
 {
     "scan_info": {
-        "target": "--help",
-        "scan_time": "2026-04-14T19:42:03.836245Z",
+        "target": "demo.testfire.net",
+        "scan_time": "2026-04-16T06:33:31.544067Z",
         "scanner": "ReconX",
         "profile": "full_scan",
-        "duration_seconds": 2
+        "duration_seconds": 792
     },
     "assets": [
         {
-            "host": "--help",
-            "ip": "",
-            "ports": [],
-            "technologies": [],
-            "endpoints": []
+            "host": "demo.testfire.net",
+            "ip": "65.61.137.117",
+            "ports": [
+                {
+                    "port": 21,
+                    "protocol": "tcp",
+                    "service": "ftp",
+                    "version": ""
+                },
+                {
+                    "port": 80,
+                    "protocol": "tcp",
+                    "service": "http",
+                    "version": ""
+                },
+                {
+                    "port": 443,
+                    "protocol": "tcp",
+                    "service": "https",
+                    "version": ""
+                },
+                {
+                    "port": 8080,
+                    "protocol": "tcp",
+                    "service": "",
+                    "version": ""
+                }
+            ],
+            "technologies": [
+                "Apache Tomcat",
+                "Apache-Coyote/1.1",
+                "Java"
+            ],
+            "endpoints": [
+                "https://demo.testfire.net",
+                "https://demo.testfire.net/cgi.exe",
+                "https://demo.testfire.net/default.jsp?content=security.htm",
+                "https://demo.testfire.net/feedback.jsp",
+                "https://demo.testfire.net/index.jsp",
+                "https://demo.testfire.net/index.jsp?content=business.htm",
+                "https://demo.testfire.net/index.jsp?content=business_cards.htm",
+                "https://demo.testfire.net/index.jsp?content=business_deposit.htm",
+                "https://demo.testfire.net/index.jsp?content=business_insurance.htm",
+                "https://demo.testfire.net/index.jsp?content=business_lending.htm",
+                "https://demo.testfire.net/index.jsp?content=business_other.htm",
+                "https://demo.testfire.net/index.jsp?content=business_retirement.htm",
+                "https://demo.testfire.net/index.jsp?content=inside.htm",
+                "https://demo.testfire.net/index.jsp?content=inside_about.htm",
+                "https://demo.testfire.net/index.jsp?content=inside_careers.htm",
+                "https://demo.testfire.net/index.jsp?content=inside_contact.htm",
+                "https://demo.testfire.net/index.jsp?content=inside_investor.htm",
+                "https://demo.testfire.net/index.jsp?content=inside_press.htm",
+                "https://demo.testfire.net/index.jsp?content=personal.htm",
+                "https://demo.testfire.net/index.jsp?content=personal_cards.htm",
+                "https://demo.testfire.net/index.jsp?content=personal_checking.htm",
+                "https://demo.testfire.net/index.jsp?content=personal_deposit.htm",
+                "https://demo.testfire.net/index.jsp?content=personal_investments.htm",
+                "https://demo.testfire.net/index.jsp?content=personal_loans.htm",
+                "https://demo.testfire.net/index.jsp?content=personal_other.htm",
+                "https://demo.testfire.net/index.jsp?content=personal_savings.htm",
+                "https://demo.testfire.net/index.jsp?content=privacy.htm",
+                "https://demo.testfire.net/index.jsp?content=security.htm",
+                "https://demo.testfire.net/login.jsp",
+                "https://demo.testfire.net/status_check.jsp",
+                "https://demo.testfire.net/style.css",
+                "https://demo.testfire.net/subscribe.jsp",
+                "https://demo.testfire.net/survey_questions.jsp",
+                "https://demo.testfire.net/swagger/index.html"
+            ]
         }
     ],
-    "findings": [],
+    "findings": [
+        {
+            "id": "VULN-001",
+            "title": "Weak Cipher Suites Detection",
+            "description": "A weak cipher is defined as an encryption/decryption algorithm that uses a key of insufficient length. Using an insufficient length for a key in an encryption/decryption algorithm opens up the possibility (or probability) that the encryption scheme could be broken.",
+            "severity": "low",
+            "cvss_score": 3.1,
+            "cwe": "",
+            "cve": [],
+            "asset": "demo.testfire.net",
+            "port": 443,
+            "protocol": "tcp",
+            "evidence": {
+                "source": "nuclei",
+                "template": "weak-cipher-suites",
+                "name": "Weak Cipher Suites Detection",
+                "matched_url": "demo.testfire.net:443",
+                "type": "ssl",
+                "matcher": "tls-1.0",
+                "extracted_results": [
+                    "[tls10 TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA]"
+                ]
+            },
+            "impact": "",
+            "remediation": "",
+            "references": [
+                "http://ciphersuite.info",
+                "https://www.acunetix.com/vulnerabilities/web/tls-ssl-weak-cipher-suites/"
+            ],
+            "tags": [
+                "ssl",
+                "weak-cipher-suites",
+                "tls",
+                "misconfig",
+                "https",
+                "vuln"
+            ]
+        },
+        {
+            "id": "VULN-002",
+            "title": "Apache Detection",
+            "description": "Some Apache servers have the version on the response header. The OpenSSL version can be also obtained",
+            "severity": "info",
+            "cvss_score": 0.0,
+            "cwe": "",
+            "cve": [],
+            "asset": "demo.testfire.net",
+            "port": 443,
+            "protocol": "tcp",
+            "evidence": {
+                "source": "nuclei",
+                "template": "apache-detect",
+                "name": "Apache Detection",
+                "matched_url": "https://demo.testfire.net",
+                "type": "http",
+                "curl_command": "curl -X 'GET' -H 'Accept: */*' -H 'Accept-Language: en' -H 'User-Agent: Mozilla/5.0 (X11; CrOS aarch64 15225.0.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36' 'https://demo.testfire.net'",
+                "request": "GET / HTTP/1.1\r\nHost: demo.testfire.net\r\nUser-Agent: Mozilla/5.0 (X11; CrOS aarch64 15225.0.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36\r\nConnection: close\r\nAccept: */*\r\nAccept-Language: en\r\nAccept-Encoding: gzip\r\n\r\n",
+                "response": "HTTP/1.1 200 OK\r\nConnection: close\r\nTransfer-Encoding: chunked\r\nContent-Type: text/html;charset=ISO-8859-1\r\nDate: Thu, 16 Apr 2026 06:34:34 GMT\r\nServer: Apache-Coyote/1.1\r\nSet-Cookie: JSESSIONID=F1A11D5DAABE471A662674A2096B161F; Path=/; Secure; HttpOnly\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n \r\n    \r\n\r\n \r\n\r\n<!-- BEGIN HEADER -->\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" >\r\n\r\n\r\n\r\n<head>\r\n\t<title>Altoro Mutual</title>\r\n  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\" />\r\n  <link href=\"/style.css\" rel=\"stylesheet\" type=\"text/css\" />\r\n</head>\r\n<body style=\"margin-top:5px;\">\r\n\r\n<div id=\"header\" style=\"margin-bottom:5px; width: 99%;\">\r\n  <form id=\"frmSearch\" method=\"get\" action=\"/search.jsp\">\r\n\t  <table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\r\n\t\t  <tr>\r\n\t\t      <td rowspan=\"2\"><a id=\"HyperLink1\" href=\"/index.jsp\"><img src=\"/images/logo.gif\" width=283 height=80/></a></td>\r\n\t\t\t  <td align=\"right\" valign=\"top\">\r\n  \t\t\t  <a id=\"LoginLink\" href=\"/login.jsp\"><font style=\"font-weight: bold; color: red;\">Sign In</font></a> | <a id=\"HyperLink3\" href=\"/index.jsp?content=inside_contact.htm\">Contact Us</a> | <a id=\"HyperLink4\" href=\"/feedback.jsp\">Feedback</a> | <label for=\"txtSearch\">Search</label>\r\n          <input type=\"text\" name=\"query\" id=\"query\" accesskey=\"S\" />\r\n          <input type=\"submit\" value=\"Go\" />\r\n\t\t\t  </td>\r\n\t\t  </tr>\r\n\t\t  <tr>\r\n\t\t\t  <td align=\"right\" style=\"background-image:url('/images/gradient.jpg');padding:0px;margin:0px;\"><img src=\"/images/header_pic.jpg\" alt=\"\" width=354 height=60/></td>\r\n\t\t  </tr>\r\n\t  </table>\r\n\t</form>\r\n</div>\r\n\r\n<table cellspacing=\"0\" width=\"100%\">\r\n  <tr>\r\n    <td width=\"25%\" class=\"bt br bb\"><div id=\"Header1\"><img id=\"Image1\" src=\"/images/pf_lock.gif\" width=12 height=14 style=\"vertical-align: bottom;\" alt=\"Secure Login\"/> &nbsp; <a id=\"AccountLink\" href=\"/login.jsp\" class=\"focus\" >ONLINE BANKING LOGIN</a></div></td>\r\n    <td width=\"25%\" class=\"cc bt br bb\"><div id=\"Header2\"><a id=\"LinkHeader2\" class=\"focus\" href=\"/index.jsp?content=personal.htm\" >PERSONAL</a></div></td>\r\n    <td width=\"25%\" class=\"cc bt br bb\"><div id=\"Header3\"><a id=\"LinkHeader3\" class=\"focus\" href=\"/index.jsp?content=business.htm\" >SMALL BUSINESS</a></div></td>\r\n    <td width=\"25%\" class=\"cc bt bb\"><div id=\"Header4\"><a id=\"LinkHeader4\" class=\"focus\" href=\"/index.jsp?content=inside.htm\">INSIDE ALTORO MUTUAL</a></div></td>\r\n  </tr>\r\n  <tr>\r\n  \r\n  <!-- END HEADER -->\r\n\r\n\r\n<div id=\"wrapper\" style=\"width: 99%;\">\r\n\t \r\n\r\n<!-- TOC BEGIN -->     \r\n     <td valign=\"top\" class=\"cc br bb\">\r\n        <br style=\"line-height: 10px;\"/>\r\n        \r\n        <a id=\"CatLink1\" class=\"subheader\" href=\"index.jsp?content=personal.htm\">PERSONAL</a>\r\n        <ul class=\"sidebar\">\r\n            <li><a id=\"MenuHyperLink1\" href=\"index.jsp?content=personal_deposit.htm\">Deposit Product</a></li>\r\n            <li><a id=\"MenuHyperLink2\" href=\"index.jsp?content=personal_checking.htm\">Checking</a></li>\r\n            <li><a id=\"MenuHyperLink3\" href=\"index.jsp?content=personal_loans.htm\">Loan Products</a></li>\r\n            <li><a id=\"MenuHyperLink4\" href=\"index.jsp?content=personal_cards.htm\">Cards</a></li>\r\n            <li><a id=\"MenuHyperLink5\" href=\"index.jsp?content=personal_investments.htm\">Investments &amp; Insurance</a></li>\r\n            <li><a id=\"MenuHyperLink6\" href=\"index.jsp?content=personal_other.htm\">Other Services</a></li>\r\n        </ul>\r\n\r\n        <a id=\"CatLink2\" class=\"subheader\" href=\"index.jsp?content=business.htm\">SMALL BUSINESS</a>\r\n        <ul class=\"sidebar\">\r\n            <li><a id=\"MenuHyperLink7\" href=\"index.jsp?content=business_deposit.htm\">Deposit Products</a></li>\r\n            <li><a id=\"MenuHyperLink8\" href=\"index.jsp?content=business_lending.htm\">Lending Services</a></li>\r\n            <li><a id=\"MenuHyperLink9\" href=\"index.jsp?content=business_cards.htm\">Cards</a></li>\r\n            <li>...(truncated)",
+                "extracted_results": [
+                    "Apache-Coyote/1.1"
+                ]
+            },
+            "impact": "",
+            "remediation": "",
+            "references": [],
+            "tags": [
+                "tech",
+                "apache",
+                "discovery",
+                "https",
+                "apache-detect"
+            ]
+        },
+        {
+            "id": "VULN-003",
+            "title": "CAA Record",
+            "description": "A CAA record was discovered. A CAA record is used to specify which certificate authorities (CAs) are allowed to issue certificates for a domain.",
+            "severity": "info",
+            "cvss_score": 0.0,
+            "cwe": "cwe-200",
+            "cve": [],
+            "asset": "demo.testfire.net",
+            "port": null,
+            "protocol": "",
+            "evidence": {
+                "source": "nuclei",
+                "template": "caa-fingerprint",
+                "name": "CAA Record",
+                "matched_url": "demo.testfire.net",
+                "type": "dns",
+                "request": ";; opcode: QUERY, status: NOERROR, id: 38630\n;; flags: rd; QUERY: 1, ANSWER: 0, AUTHORITY: 0, ADDITIONAL: 1\n\n;; OPT PSEUDOSECTION:\n; EDNS: version 0; flags:; udp: 4096\n\n;; QUESTION SECTION:\n;demo.testfire.net.\tIN\t CAA\n",
+                "response": ";; opcode: QUERY, status: NOERROR, id: 38630\n;; flags: qr rd ra; QUERY: 1, ANSWER: 0, AUTHORITY: 1, ADDITIONAL: 1\n\n;; OPT PSEUDOSECTION:\n; EDNS: version 0; flags:; udp: 1232\n\n;; QUESTION SECTION:\n;demo.testfire.net.\tIN\t CAA\n\n;; AUTHORITY SECTION:\ntestfire.net.\t86400\tIN\tSOA\tasia3.akam.net. hostmaster.akamai.com. 1366025607 43200 7200 604800 86400\n"
+            },
+            "impact": "",
+            "remediation": "",
+            "references": [
+                "https://support.dnsimple.com/articles/caa-record/#whats-a-caa-record"
+            ],
+            "tags": [
+                "dns",
+                "caa",
+                "discovery",
+                "caa-fingerprint"
+            ]
+        },
+        {
+            "id": "VULN-004",
+            "title": "Deprecated TLS Detection",
+            "description": "Both TLS 1.1 and SSLv3 are deprecated in favor of stronger encryption.\n",
+            "severity": "info",
+            "cvss_score": 0.0,
+            "cwe": "",
+            "cve": [],
+            "asset": "demo.testfire.net",
+            "port": 443,
+            "protocol": "tcp",
+            "evidence": {
+                "source": "nuclei",
+                "template": "deprecated-tls",
+                "name": "Deprecated TLS Detection",
+                "matched_url": "demo.testfire.net:443",
+                "type": "ssl",
+                "extracted_results": [
+                    "tls11"
+                ]
+            },
+            "impact": "",
+            "remediation": "Update the web server's TLS configuration to disable TLS 1.1 and SSLv3.\n",
+            "references": [
+                "https://ssl-config.mozilla.org/#config=intermediate"
+            ],
+            "tags": [
+                "deprecated-tls",
+                "ssl",
+                "tls",
+                "https",
+                "vuln"
+            ]
+        },
+        {
+            "id": "VULN-005",
+            "title": "Detect SSL Certificate Issuer",
+            "description": "Extract the issuer's organization from the target's certificate. Issuers are entities which sign and distribute certificates.\n",
+            "severity": "info",
+            "cvss_score": 0.0,
+            "cwe": "",
+            "cve": [],
+            "asset": "demo.testfire.net",
+            "port": 443,
+            "protocol": "tcp",
+            "evidence": {
+                "source": "nuclei",
+                "template": "ssl-issuer",
+                "name": "Detect SSL Certificate Issuer",
+                "matched_url": "demo.testfire.net:443",
+                "type": "ssl",
+                "extracted_results": [
+                    "Sectigo Limited"
+                ]
+            },
+            "impact": "",
+            "remediation": "",
+            "references": [],
+            "tags": [
+                "ssl",
+                "tls",
+                "discovery",
+                "https",
+                "ssl-issuer"
+            ]
+        },
+        {
+            "id": "VULN-006",
+            "title": "HTTP Missing Security Headers",
+            "description": "This template searches for missing HTTP security headers. The impact of these missing headers can vary.\n",
+            "severity": "info",
+            "cvss_score": 0.0,
+            "cwe": "",
+            "cve": [],
+            "asset": "demo.testfire.net",
+            "port": 443,
+            "protocol": "tcp",
+            "evidence": {
+                "source": "nuclei",
+                "template": "http-missing-security-headers",
+                "name": "HTTP Missing Security Headers",
+                "matched_url": "https://demo.testfire.net",
+                "type": "http",
+                "matcher": "cross-origin-opener-policy",
+                "curl_command": "curl -X 'GET' -H 'Accept: */*' -H 'Accept-Language: en' -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36 Edg/108.0.1462.42' 'https://demo.testfire.net'",
+                "request": "GET / HTTP/1.1\r\nHost: demo.testfire.net\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36 Edg/108.0.1462.42\r\nConnection: close\r\nAccept: */*\r\nAccept-Language: en\r\nAccept-Encoding: gzip\r\n\r\n",
+                "response": "HTTP/1.1 200 OK\r\nConnection: close\r\nTransfer-Encoding: chunked\r\nContent-Type: text/html;charset=ISO-8859-1\r\nDate: Thu, 16 Apr 2026 06:35:37 GMT\r\nServer: Apache-Coyote/1.1\r\nSet-Cookie: JSESSIONID=927EBE0805755843678ADC4FEA2061AD; Path=/; Secure; HttpOnly\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n \r\n    \r\n\r\n \r\n\r\n<!-- BEGIN HEADER -->\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" >\r\n\r\n\r\n\r\n<head>\r\n\t<title>Altoro Mutual</title>\r\n  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\" />\r\n  <link href=\"/style.css\" rel=\"stylesheet\" type=\"text/css\" />\r\n</head>\r\n<body style=\"margin-top:5px;\">\r\n\r\n<div id=\"header\" style=\"margin-bottom:5px; width: 99%;\">\r\n  <form id=\"frmSearch\" method=\"get\" action=\"/search.jsp\">\r\n\t  <table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\r\n\t\t  <tr>\r\n\t\t      <td rowspan=\"2\"><a id=\"HyperLink1\" href=\"/index.jsp\"><img src=\"/images/logo.gif\" width=283 height=80/></a></td>\r\n\t\t\t  <td align=\"right\" valign=\"top\">\r\n  \t\t\t  <a id=\"LoginLink\" href=\"/login.jsp\"><font style=\"font-weight: bold; color: red;\">Sign In</font></a> | <a id=\"HyperLink3\" href=\"/index.jsp?content=inside_contact.htm\">Contact Us</a> | <a id=\"HyperLink4\" href=\"/feedback.jsp\">Feedback</a> | <label for=\"txtSearch\">Search</label>\r\n          <input type=\"text\" name=\"query\" id=\"query\" accesskey=\"S\" />\r\n          <input type=\"submit\" value=\"Go\" />\r\n\t\t\t  </td>\r\n\t\t  </tr>\r\n\t\t  <tr>\r\n\t\t\t  <td align=\"right\" style=\"background-image:url('/images/gradient.jpg');padding:0px;margin:0px;\"><img src=\"/images/header_pic.jpg\" alt=\"\" width=354 height=60/></td>\r\n\t\t  </tr>\r\n\t  </table>\r\n\t</form>\r\n</div>\r\n\r\n<table cellspacing=\"0\" width=\"100%\">\r\n  <tr>\r\n    <td width=\"25%\" class=\"bt br bb\"><div id=\"Header1\"><img id=\"Image1\" src=\"/images/pf_lock.gif\" width=12 height=14 style=\"vertical-align: bottom;\" alt=\"Secure Login\"/> &nbsp; <a id=\"AccountLink\" href=\"/login.jsp\" class=\"focus\" >ONLINE BANKING LOGIN</a></div></td>\r\n    <td width=\"25%\" class=\"cc bt br bb\"><div id=\"Header2\"><a id=\"LinkHeader2\" class=\"focus\" href=\"/index.jsp?content=personal.htm\" >PERSONAL</a></div></td>\r\n    <td width=\"25%\" class=\"cc bt br bb\"><div id=\"Header3\"><a id=\"LinkHeader3\" class=\"focus\" href=\"/index.jsp?content=business.htm\" >SMALL BUSINESS</a></div></td>\r\n    <td width=\"25%\" class=\"cc bt bb\"><div id=\"Header4\"><a id=\"LinkHeader4\" class=\"focus\" href=\"/index.jsp?content=inside.htm\">INSIDE ALTORO MUTUAL</a></div></td>\r\n  </tr>\r\n  <tr>\r\n  \r\n  <!-- END HEADER -->\r\n\r\n\r\n<div id=\"wrapper\" style=\"width: 99%;\">\r\n\t \r\n\r\n<!-- TOC BEGIN -->     \r\n     <td valign=\"top\" class=\"cc br bb\">\r\n        <br style=\"line-height: 10px;\"/>\r\n        \r\n        <a id=\"CatLink1\" class=\"subheader\" href=\"index.jsp?content=personal.htm\">PERSONAL</a>\r\n        <ul class=\"sidebar\">\r\n            <li><a id=\"MenuHyperLink1\" href=\"index.jsp?content=personal_deposit.htm\">Deposit Product</a></li>\r\n            <li><a id=\"MenuHyperLink2\" href=\"index.jsp?content=personal_checking.htm\">Checking</a></li>\r\n            <li><a id=\"MenuHyperLink3\" href=\"index.jsp?content=personal_loans.htm\">Loan Products</a></li>\r\n            <li><a id=\"MenuHyperLink4\" href=\"index.jsp?content=personal_cards.htm\">Cards</a></li>\r\n            <li><a id=\"MenuHyperLink5\" href=\"index.jsp?content=personal_investments.htm\">Investments &amp; Insurance</a></li>\r\n            <li><a id=\"MenuHyperLink6\" href=\"index.jsp?content=personal_other.htm\">Other Services</a></li>\r\n        </ul>\r\n\r\n        <a id=\"CatLink2\" class=\"subheader\" href=\"index.jsp?content=business.htm\">SMALL BUSINESS</a>\r\n        <ul class=\"sidebar\">\r\n            <li><a id=\"MenuHyperLink7\" href=\"index.jsp?content=business_deposit.htm\">Deposit Products</a></li>\r\n            <li><a id=\"MenuHyperLink8\" href=\"index.jsp?content=business_lending.htm\">Lending Services</a></li>\r\n            <li><a id=\"MenuHyperLink9\" href=\"index.jsp?content=business_cards.htm\">Cards</a></li>\r\n            <li>...(truncated)"
+            },
+            "impact": "Missing browser-side mitigations can increase the impact of XSS, clickjacking, and related attacks.",
+            "remediation": "Add recommended security headers (e.g., CSP, HSTS, X-Frame-Options/Frame-Options, X-Content-Type-Options) at the web server or application layer.",
+            "references": [],
+            "tags": [
+                "generic",
+                "http-missing-security-headers",
+                "misconfig",
+                "headers",
+                "https",
+                "vuln"
+            ]
+        },
+        {
+            "id": "VULN-007",
+            "title": "Missing Cookie SameSite Strict",
+            "description": "Identified cookies that lacked the samesite=strict attribute, which prevented enforcement of restrictions on cross-domain cookie transmission.\n",
+            "severity": "info",
+            "cvss_score": 0.0,
+            "cwe": "cwe-693",
+            "cve": [],
+            "asset": "demo.testfire.net",
+            "port": 443,
+            "protocol": "tcp",
+            "evidence": {
+                "source": "nuclei",
+                "template": "missing-cookie-samesite-strict",
+                "name": "Missing Cookie SameSite Strict",
+                "matched_url": "https://demo.testfire.net",
+                "type": "http",
+                "curl_command": "curl -X 'GET' -H 'Accept: */*' -H 'Accept-Language: en' -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36' 'https://demo.testfire.net'",
+                "request": "GET / HTTP/1.1\r\nHost: demo.testfire.net\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36\r\nConnection: close\r\nAccept: */*\r\nAccept-Language: en\r\nAccept-Encoding: gzip\r\n\r\n",
+                "response": "HTTP/1.1 200 OK\r\nConnection: close\r\nTransfer-Encoding: chunked\r\nContent-Type: text/html;charset=ISO-8859-1\r\nDate: Thu, 16 Apr 2026 06:34:57 GMT\r\nServer: Apache-Coyote/1.1\r\nSet-Cookie: JSESSIONID=8DC485B38D3CA0D2F0B31EBFA7F019FA; Path=/; Secure; HttpOnly\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n \r\n    \r\n\r\n \r\n\r\n<!-- BEGIN HEADER -->\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" >\r\n\r\n\r\n\r\n<head>\r\n\t<title>Altoro Mutual</title>\r\n  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\" />\r\n  <link href=\"/style.css\" rel=\"stylesheet\" type=\"text/css\" />\r\n</head>\r\n<body style=\"margin-top:5px;\">\r\n\r\n<div id=\"header\" style=\"margin-bottom:5px; width: 99%;\">\r\n  <form id=\"frmSearch\" method=\"get\" action=\"/search.jsp\">\r\n\t  <table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\r\n\t\t  <tr>\r\n\t\t      <td rowspan=\"2\"><a id=\"HyperLink1\" href=\"/index.jsp\"><img src=\"/images/logo.gif\" width=283 height=80/></a></td>\r\n\t\t\t  <td align=\"right\" valign=\"top\">\r\n  \t\t\t  <a id=\"LoginLink\" href=\"/login.jsp\"><font style=\"font-weight: bold; color: red;\">Sign In</font></a> | <a id=\"HyperLink3\" href=\"/index.jsp?content=inside_contact.htm\">Contact Us</a> | <a id=\"HyperLink4\" href=\"/feedback.jsp\">Feedback</a> | <label for=\"txtSearch\">Search</label>\r\n          <input type=\"text\" name=\"query\" id=\"query\" accesskey=\"S\" />\r\n          <input type=\"submit\" value=\"Go\" />\r\n\t\t\t  </td>\r\n\t\t  </tr>\r\n\t\t  <tr>\r\n\t\t\t  <td align=\"right\" style=\"background-image:url('/images/gradient.jpg');padding:0px;margin:0px;\"><img src=\"/images/header_pic.jpg\" alt=\"\" width=354 height=60/></td>\r\n\t\t  </tr>\r\n\t  </table>\r\n\t</form>\r\n</div>\r\n\r\n<table cellspacing=\"0\" width=\"100%\">\r\n  <tr>\r\n    <td width=\"25%\" class=\"bt br bb\"><div id=\"Header1\"><img id=\"Image1\" src=\"/images/pf_lock.gif\" width=12 height=14 style=\"vertical-align: bottom;\" alt=\"Secure Login\"/> &nbsp; <a id=\"AccountLink\" href=\"/login.jsp\" class=\"focus\" >ONLINE BANKING LOGIN</a></div></td>\r\n    <td width=\"25%\" class=\"cc bt br bb\"><div id=\"Header2\"><a id=\"LinkHeader2\" class=\"focus\" href=\"/index.jsp?content=personal.htm\" >PERSONAL</a></div></td>\r\n    <td width=\"25%\" class=\"cc bt br bb\"><div id=\"Header3\"><a id=\"LinkHeader3\" class=\"focus\" href=\"/index.jsp?content=business.htm\" >SMALL BUSINESS</a></div></td>\r\n    <td width=\"25%\" class=\"cc bt bb\"><div id=\"Header4\"><a id=\"LinkHeader4\" class=\"focus\" href=\"/index.jsp?content=inside.htm\">INSIDE ALTORO MUTUAL</a></div></td>\r\n  </tr>\r\n  <tr>\r\n  \r\n  <!-- END HEADER -->\r\n\r\n\r\n<div id=\"wrapper\" style=\"width: 99%;\">\r\n\t \r\n\r\n<!-- TOC BEGIN -->     \r\n     <td valign=\"top\" class=\"cc br bb\">\r\n        <br style=\"line-height: 10px;\"/>\r\n        \r\n        <a id=\"CatLink1\" class=\"subheader\" href=\"index.jsp?content=personal.htm\">PERSONAL</a>\r\n        <ul class=\"sidebar\">\r\n            <li><a id=\"MenuHyperLink1\" href=\"index.jsp?content=personal_deposit.htm\">Deposit Product</a></li>\r\n            <li><a id=\"MenuHyperLink2\" href=\"index.jsp?content=personal_checking.htm\">Checking</a></li>\r\n            <li><a id=\"MenuHyperLink3\" href=\"index.jsp?content=personal_loans.htm\">Loan Products</a></li>\r\n            <li><a id=\"MenuHyperLink4\" href=\"index.jsp?content=personal_cards.htm\">Cards</a></li>\r\n            <li><a id=\"MenuHyperLink5\" href=\"index.jsp?content=personal_investments.htm\">Investments &amp; Insurance</a></li>\r\n            <li><a id=\"MenuHyperLink6\" href=\"index.jsp?content=personal_other.htm\">Other Services</a></li>\r\n        </ul>\r\n\r\n        <a id=\"CatLink2\" class=\"subheader\" href=\"index.jsp?content=business.htm\">SMALL BUSINESS</a>\r\n        <ul class=\"sidebar\">\r\n            <li><a id=\"MenuHyperLink7\" href=\"index.jsp?content=business_deposit.htm\">Deposit Products</a></li>\r\n            <li><a id=\"MenuHyperLink8\" href=\"index.jsp?content=business_lending.htm\">Lending Services</a></li>\r\n            <li><a id=\"MenuHyperLink9\" href=\"index.jsp?content=business_cards.htm\">Cards</a></li>\r\n            <li>...(truncated)",
+                "extracted_results": [
+                    "JSESSIONID=8DC485B38D3CA0D2F0B31EBFA7F019FA; Path=/; Secure; HttpOnly"
+                ]
+            },
+            "impact": "",
+            "remediation": "",
+            "references": [
+                "https://pulsesecurity.co.nz/articles/samesite-lax-csrf"
+            ],
+            "tags": [
+                "misconfig",
+                "samesite",
+                "cookie",
+                "vuln",
+                "https",
+                "missing-cookie-samesite-strict"
+            ]
+        },
+        {
+            "id": "VULN-008",
+            "title": "Public Swagger API - Detect",
+            "description": "Public Swagger API was detected.\n",
+            "severity": "info",
+            "cvss_score": 0.0,
+            "cwe": "cwe-200",
+            "cve": [],
+            "asset": "demo.testfire.net",
+            "port": 443,
+            "protocol": "tcp",
+            "evidence": {
+                "source": "nuclei",
+                "template": "swagger-api",
+                "name": "Public Swagger API - Detect",
+                "matched_url": "https://demo.testfire.net/swagger/index.html",
+                "type": "http",
+                "curl_command": "curl -X 'GET' -H 'Accept: text/html, application/json' -H 'Accept-Language: en' -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.6.6 Mobile/15E148 Safari/604.1' 'https://demo.testfire.net/swagger/index.html'",
+                "request": "GET /swagger/index.html HTTP/1.1\r\nHost: demo.testfire.net\r\nUser-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.6.6 Mobile/15E148 Safari/604.1\r\nAccept: text/html, application/json\r\nAccept-Language: en\r\nAccept-Encoding: gzip\r\n\r\n",
+                "response": "HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length: 1488\r\nAccept-Ranges: bytes\r\nContent-Type: text/html\r\nDate: Thu, 16 Apr 2026 06:39:22 GMT\r\nEtag: W/\"1488-1610554444000\"\r\nLast-Modified: Wed, 13 Jan 2021 16:14:04 GMT\r\nServer: Apache-Coyote/1.1\r\n\r\n<!-- HTML for static distribution bundle build -->\r\n<!DOCTYPE html>\r\n<html lang=\"en\">\r\n  <head>\r\n    <meta charset=\"UTF-8\">\r\n    <title>Swagger UI</title>\r\n    <link rel=\"stylesheet\" type=\"text/css\" href=\"./swagger-ui.css\" >\r\n    <link rel=\"icon\" type=\"image/png\" href=\"./favicon-32x32.png\" sizes=\"32x32\" />\r\n    <link rel=\"icon\" type=\"image/png\" href=\"./favicon-16x16.png\" sizes=\"16x16\" />\r\n    <style>\r\n      html\r\n      {\r\n        box-sizing: border-box;\r\n        overflow: -moz-scrollbars-vertical;\r\n        overflow-y: scroll;\r\n      }\r\n\r\n      *,\r\n      *:before,\r\n      *:after\r\n      {\r\n        box-sizing: inherit;\r\n      }\r\n\r\n      body\r\n      {\r\n        margin:0;\r\n        background: #fafafa;\r\n      }\r\n    </style>\r\n  </head>\r\n\r\n  <body>\r\n    <div id=\"swagger-ui\">\r\n\r\n    <script src=\"./swagger-ui-bundle.js\"> </script>\r\n    <script src=\"./swagger-ui-standalone-preset.js\"> </script>\r\n    <script>\r\n    window.onload = function() {\r\n\r\n      // Build a system\r\n      const ui = SwaggerUIBundle({\r\n        url: window.location.href.substr(0, window.location.href.lastIndexOf(\"\\/\") + 1) + \"properties.json\",\r\n        dom_id: '#swagger-ui',\r\n        deepLinking: true,\r\n        presets: [\r\n          SwaggerUIBundle.presets.apis,\r\n          SwaggerUIStandalonePreset\r\n        ],\r\n        plugins: [\r\n          SwaggerUIBundle.plugins.DownloadUrl\r\n        ],\r\n        layout: \"StandaloneLayout\"\r\n      })\r\n\r\n      window.ui = ui\r\n    }\r\n  </script>\r\n  </div>\r\n  </body>\r\n</html>\r\n"
+            },
+            "impact": "",
+            "remediation": "",
+            "references": [
+                "https://swagger.io/"
+            ],
+            "tags": [
+                "exposure",
+                "api",
+                "swagger",
+                "discovery",
+                "https",
+                "swagger-api"
+            ]
+        },
+        {
+            "id": "VULN-009",
+            "title": "SSL DNS Names",
+            "description": "Extract the Subject Alternative Name (SAN) from the target's certificate. SAN facilitates the usage of additional hostnames with the same certificate.\n",
+            "severity": "info",
+            "cvss_score": 0.0,
+            "cwe": "",
+            "cve": [],
+            "asset": "demo.testfire.net",
+            "port": 443,
+            "protocol": "tcp",
+            "evidence": {
+                "source": "nuclei",
+                "template": "ssl-dns-names",
+                "name": "SSL DNS Names",
+                "matched_url": "demo.testfire.net:443",
+                "type": "ssl",
+                "extracted_results": [
+                    "demo.testfire.net"
+                ]
+            },
+            "impact": "",
+            "remediation": "",
+            "references": [],
+            "tags": [
+                "ssl",
+                "tls",
+                "vuln",
+                "https",
+                "ssl-dns-names"
+            ]
+        },
+        {
+            "id": "VULN-010",
+            "title": "TLS Version - Detect",
+            "description": "TLS version detection is a security process used to determine the version of the Transport Layer Security (TLS) protocol used by a computer or server.\nIt is important to detect the TLS version in order to ensure secure communication between two computers or servers.\n",
+            "severity": "info",
+            "cvss_score": 0.0,
+            "cwe": "",
+            "cve": [],
+            "asset": "demo.testfire.net",
+            "port": 443,
+            "protocol": "tcp",
+            "evidence": {
+                "source": "nuclei",
+                "template": "tls-version",
+                "name": "TLS Version - Detect",
+                "matched_url": "demo.testfire.net:443",
+                "type": "ssl",
+                "extracted_results": [
+                    "tls10"
+                ]
+            },
+            "impact": "",
+            "remediation": "",
+            "references": [],
+            "tags": [
+                "ssl",
+                "discovery",
+                "tls",
+                "tls-version",
+                "https"
+            ]
+        },
+        {
+            "id": "VULN-011",
+            "title": "WAF Detection",
+            "description": "A web application firewall was detected.",
+            "severity": "info",
+            "cvss_score": 0.0,
+            "cwe": "cwe-200",
+            "cve": [],
+            "asset": "demo.testfire.net",
+            "port": 443,
+            "protocol": "tcp",
+            "evidence": {
+                "source": "nuclei",
+                "template": "waf-detect",
+                "name": "WAF Detection",
+                "matched_url": "https://demo.testfire.net/",
+                "type": "http",
+                "matcher": "apachegeneric",
+                "curl_command": "curl -X 'POST' -d '_=<script>alert(1)</script>' -H 'Content-Type: application/x-www-form-urlencoded' -H 'Host: demo.testfire.net' -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.88 Safari/537.36' 'https://demo.testfire.net/'",
+                "request": "POST / HTTP/1.1\r\nHost: demo.testfire.net\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.88 Safari/537.36\r\nConnection: close\r\nContent-Length: 27\r\nContent-Type: application/x-www-form-urlencoded\r\nAccept-Encoding: gzip\r\n\r\n_=<script>alert(1)</script>",
+                "response": "HTTP/1.1 200 OK\r\nConnection: close\r\nTransfer-Encoding: chunked\r\nContent-Type: text/html;charset=ISO-8859-1\r\nDate: Thu, 16 Apr 2026 06:41:53 GMT\r\nServer: Apache-Coyote/1.1\r\nSet-Cookie: JSESSIONID=62D014AAEB931FD55B782568905E2A5F; Path=/; Secure; HttpOnly\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n \r\n    \r\n\r\n \r\n\r\n<!-- BEGIN HEADER -->\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" >\r\n\r\n\r\n\r\n<head>\r\n\t<title>Altoro Mutual</title>\r\n  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\" />\r\n  <link href=\"/style.css\" rel=\"stylesheet\" type=\"text/css\" />\r\n</head>\r\n<body style=\"margin-top:5px;\">\r\n\r\n<div id=\"header\" style=\"margin-bottom:5px; width: 99%;\">\r\n  <form id=\"frmSearch\" method=\"get\" action=\"/search.jsp\">\r\n\t  <table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\r\n\t\t  <tr>\r\n\t\t      <td rowspan=\"2\"><a id=\"HyperLink1\" href=\"/index.jsp\"><img src=\"/images/logo.gif\" width=283 height=80/></a></td>\r\n\t\t\t  <td align=\"right\" valign=\"top\">\r\n  \t\t\t  <a id=\"LoginLink\" href=\"/login.jsp\"><font style=\"font-weight: bold; color: red;\">Sign In</font></a> | <a id=\"HyperLink3\" href=\"/index.jsp?content=inside_contact.htm\">Contact Us</a> | <a id=\"HyperLink4\" href=\"/feedback.jsp\">Feedback</a> | <label for=\"txtSearch\">Search</label>\r\n          <input type=\"text\" name=\"query\" id=\"query\" accesskey=\"S\" />\r\n          <input type=\"submit\" value=\"Go\" />\r\n\t\t\t  </td>\r\n\t\t  </tr>\r\n\t\t  <tr>\r\n\t\t\t  <td align=\"right\" style=\"background-image:url('/images/gradient.jpg');padding:0px;margin:0px;\"><img src=\"/images/header_pic.jpg\" alt=\"\" width=354 height=60/></td>\r\n\t\t  </tr>\r\n\t  </table>\r\n\t</form>\r\n</div>\r\n\r\n<table cellspacing=\"0\" width=\"100%\">\r\n  <tr>\r\n    <td width=\"25%\" class=\"bt br bb\"><div id=\"Header1\"><img id=\"Image1\" src=\"/images/pf_lock.gif\" width=12 height=14 style=\"vertical-align: bottom;\" alt=\"Secure Login\"/> &nbsp; <a id=\"AccountLink\" href=\"/login.jsp\" class=\"focus\" >ONLINE BANKING LOGIN</a></div></td>\r\n    <td width=\"25%\" class=\"cc bt br bb\"><div id=\"Header2\"><a id=\"LinkHeader2\" class=\"focus\" href=\"/index.jsp?content=personal.htm\" >PERSONAL</a></div></td>\r\n    <td width=\"25%\" class=\"cc bt br bb\"><div id=\"Header3\"><a id=\"LinkHeader3\" class=\"focus\" href=\"/index.jsp?content=business.htm\" >SMALL BUSINESS</a></div></td>\r\n    <td width=\"25%\" class=\"cc bt bb\"><div id=\"Header4\"><a id=\"LinkHeader4\" class=\"focus\" href=\"/index.jsp?content=inside.htm\">INSIDE ALTORO MUTUAL</a></div></td>\r\n  </tr>\r\n  <tr>\r\n  \r\n  <!-- END HEADER -->\r\n\r\n\r\n<div id=\"wrapper\" style=\"width: 99%;\">\r\n\t \r\n\r\n<!-- TOC BEGIN -->     \r\n     <td valign=\"top\" class=\"cc br bb\">\r\n        <br style=\"line-height: 10px;\"/>\r\n        \r\n        <a id=\"CatLink1\" class=\"subheader\" href=\"index.jsp?content=personal.htm\">PERSONAL</a>\r\n        <ul class=\"sidebar\">\r\n            <li><a id=\"MenuHyperLink1\" href=\"index.jsp?content=personal_deposit.htm\">Deposit Product</a></li>\r\n            <li><a id=\"MenuHyperLink2\" href=\"index.jsp?content=personal_checking.htm\">Checking</a></li>\r\n            <li><a id=\"MenuHyperLink3\" href=\"index.jsp?content=personal_loans.htm\">Loan Products</a></li>\r\n            <li><a id=\"MenuHyperLink4\" href=\"index.jsp?content=personal_cards.htm\">Cards</a></li>\r\n            <li><a id=\"MenuHyperLink5\" href=\"index.jsp?content=personal_investments.htm\">Investments &amp; Insurance</a></li>\r\n            <li><a id=\"MenuHyperLink6\" href=\"index.jsp?content=personal_other.htm\">Other Services</a></li>\r\n        </ul>\r\n\r\n        <a id=\"CatLink2\" class=\"subheader\" href=\"index.jsp?content=business.htm\">SMALL BUSINESS</a>\r\n        <ul class=\"sidebar\">\r\n            <li><a id=\"MenuHyperLink7\" href=\"index.jsp?content=business_deposit.htm\">Deposit Products</a></li>\r\n            <li><a id=\"MenuHyperLink8\" href=\"index.jsp?content=business_lending.htm\">Lending Services</a></li>\r\n            <li><a id=\"MenuHyperLink9\" href=\"index.jsp?content=business_cards.htm\">Cards</a></li>\r\n            <li>...(truncated)"
+            },
+            "impact": "",
+            "remediation": "",
+            "references": [
+                "https://github.com/ekultek/whatwaf"
+            ],
+            "tags": [
+                "waf",
+                "tech",
+                "misc",
+                "discovery",
+                "https",
+                "waf-detect"
+            ]
+        }
+    ],
     "summary": {
-        "total_findings": 0,
+        "total_findings": 11,
         "critical": 0,
         "high": 0,
         "medium": 0,
-        "low": 0,
-        "info": 0,
-        "risk_score": 0.0
+        "low": 1,
+        "info": 10,
+        "risk_score": 3.1
     }
 }
