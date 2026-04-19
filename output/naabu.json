@@ -1,29 +1,3 @@
 {
-    "target": "demo.testfire.net",
-    "open_ports": [
-        {
-            "port": 21,
-            "service": "",
-            "product": "",
-            "version": ""
-        },
-        {
-            "port": 443,
-            "service": "",
-            "product": "",
-            "version": ""
-        },
-        {
-            "port": 8080,
-            "service": "",
-            "product": "",
-            "version": ""
-        },
-        {
-            "port": 80,
-            "service": "",
-            "product": "",
-            "version": ""
-        }
-    ]
+    "error": "naabu is not installed or not in PATH"
 }

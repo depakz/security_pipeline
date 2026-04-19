@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Optional
 from engine.models import ExecutionContext
 
 from .cve_mapper import CVEMapper
-from .graph_builder import DAGGraph, GraphBuilder
+from .graph_builder import DAGGraph, GraphBuilder, GraphEngineAdapter
 from .kb import ValidatorSpec, get_default_validator_specs
 from validators.ftp import FTPAnonymousLoginValidator
 from validators.http import MissingSecurityHeadersValidator
@@ -39,9 +39,13 @@ class CVEValidationPlan:
 
 
 class DAGBrain:
-    def __init__(self, validator_specs: Optional[List[ValidatorSpec]] = None):
+    def __init__(self, validator_specs: Optional[List[ValidatorSpec]] = None, use_graph_engine: bool = False):
         self.validator_specs = validator_specs or get_default_validator_specs()
-        self.graph_builder = GraphBuilder()
+        # Allow optional use of GraphEngine via adapter without breaking API
+        if use_graph_engine:
+            self.graph_builder = GraphEngineAdapter()
+        else:
+            self.graph_builder = GraphBuilder()
         self.cve_mapper = CVEMapper()
 
     def build_graph(self, state: Dict[str, Any]) -> DAGGraph:
