@@ -11,6 +11,7 @@ from engine.validation_engine import StateManager, ValidationEngine
 import importlib
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from utils.session import save_graph_snapshot
+import os
 from recon.naabu_scan import run_naabu
 from recon.httpx_scan import run_httpx
 from recon.nuclei_scan import run_nuclei
@@ -320,7 +321,13 @@ def main():
                 elif action == "ssh_brute":
                     host = params.get("host") or state.get("target")
                     port = params.get("port") or 22
-                    r = run_ssh_brute(host or "", int(port))
+                    # Determine explicit opt-in: env var or param or state.allow_destructive
+                    env_ok = os.environ.get("PENTESTER_ENABLE_BRUTEFORCE", "0") == "1"
+                    param_ok = bool(params.get("enable_bruteforce"))
+                    state_ok = bool(state.get("allow_destructive", False))
+                    enable = env_ok or param_ok or state_ok
+                    creds = params.get("credentials") or params.get("creds")
+                    r = run_ssh_brute(host or "", int(port), creds=creds, enable_bruteforce=enable)
                     result.update({"success": bool(r.get("success")), "result": r})
                     # include banner as loot
                     ev = r.get("evidence") or {}

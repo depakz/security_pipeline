@@ -139,12 +139,18 @@ def run_git_extractor(base_url: str) -> Dict:
 
 
 def run_ssh_brute(host: str, port: int = 22, creds: List[Dict] = None) -> Dict:
-    """Safe SSH 'brute' handler — non-destructive: only fetches SSH banner.
+    """SSH handler with optional, explicit opt-in brute/auth attempts.
 
-    It will NOT attempt authentication or password guessing. If `creds` are
-    provided, it will note them but will not try them unless explicitly
-    enabled elsewhere.
+    Behavior:
+    - Always attempts a non-destructive banner grab.
+    - Only attempts authentication if `enable_bruteforce` is True.
+      In that case, it will try credentials provided in `creds` (list of {"user":..., "pass":...}).
+    - Authentication attempts use `paramiko` if available; otherwise return informative error.
+
+    Safety: This function will never perform blind dictionary attacks unless the caller
+    explicitly enables `enable_bruteforce` and supplies credential candidates.
     """
+    result = {"success": False, "evidence": {}}
     try:
         s = socket.socket()
         s.settimeout(5)
@@ -158,7 +164,48 @@ def run_ssh_brute(host: str, port: int = 22, creds: List[Dict] = None) -> Dict:
         except Exception:
             pass
 
-        return {"success": True, "evidence": {"banner": banner, "host": host, "port": port}}
+        result["evidence"]["banner"] = banner
+        result["evidence"]["host"] = host
+        result["evidence"]["port"] = port
+
+        if not enable_bruteforce:
+            result.update({"success": True, "note": "banner_only"})
+            return result
+
+        # Explicitly requested: try authentication for provided credentials only
+        if not creds:
+            return {"success": False, "evidence": "enable_bruteforce_requested_but_no_credentials_provided"}
+
+        try:
+            import paramiko
+        except Exception:
+            return {"success": False, "evidence": "paramiko_not_installed"}
+
+        # Attempt provided credentials (do not perform any aggressive guessing)
+        ssh_client = paramiko.SSHClient()
+        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        for cred in creds:
+            user = cred.get("user") or cred.get("username")
+            pwd = cred.get("pass") or cred.get("password")
+            if not user or pwd is None:
+                continue
+            try:
+                ssh_client.connect(hostname=host, port=int(port), username=user, password=pwd, timeout=5, banner_timeout=5, allow_agent=False, look_for_keys=False)
+                # successful auth
+                result.update({"success": True, "evidence": {"authenticated_user": user}})
+                try:
+                    ssh_client.close()
+                except Exception:
+                    pass
+                return result
+            except Exception as e:
+                # record failure for this credential
+                result.setdefault("attempts", []).append({"user": user, "error": str(e)})
+
+        # No creds succeeded
+        result.update({"success": False, "evidence": result.get("attempts", [])})
+        return result
+
     except Exception as e:
         return {"success": False, "evidence": str(e)}
 
