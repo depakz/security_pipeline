@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional, Tuple
 
 from engine.models import ExecutionContext
+from utils.logger import logger
 
 
 def _is_confirmed(result: Dict[str, Any]) -> bool:
@@ -58,6 +59,15 @@ class ValidationEngine:
 
         for validator in validators:
             try:
+                # Safety: skip validators explicitly marked as destructive
+                if getattr(validator, "destructive", False):
+                    logger.warning(f"Skipping destructive validator: {getattr(validator, 'validator_id', validator.__class__.__name__)}")
+                    findings.append({
+                        "success": False,
+                        "vulnerability": getattr(validator, "validator_id", validator.__class__.__name__),
+                        "error": "validator_marked_destructive",
+                    })
+                    continue
                 if not hasattr(validator, "can_run") or not hasattr(validator, "run"):
                     continue
 

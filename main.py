@@ -8,13 +8,17 @@ import inspect
 from brain.dag_engine import DAGBrain
 from brain.exploitability_reporter import ExploitabilityReporter
 from engine.validation_engine import StateManager, ValidationEngine
+import importlib
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from utils.session import save_graph_snapshot
+import os
 from recon.naabu_scan import run_naabu
 from recon.httpx_scan import run_httpx
 from recon.nuclei_scan import run_nuclei
 from recon.gospider_scan import run_gospider
 from aggregator.parser import parse_all
 from engine.decision import decide_actions
-from engine.executor import run_sqlmap, test_xss
+from engine.executor import run_sqlmap, test_xss, run_git_extractor, run_ssh_brute, run_config_reader
 from utils.logger import logger
 from utils.retry import retry
 from utils.session import save_session
@@ -218,102 +222,164 @@ def main():
     # Optional: save session
     save_session(parsed_data)
 
-    # Step 3: Validation Engine (truth generator)
+    # Step 3: DAG-driven Validation & Attack Chaining
     try:
-        logger.info("Running DAG validation planner (feedback loop)...")
+        logger.info("Building DAG-driven state machine...")
         state = build_validation_state(parsed_data)
 
-        dag_brain = DAGBrain()
-        vengine = ValidationEngine()
-        state_manager = StateManager()
+        # Build planner that uses GraphEngineAdapter (mirrors DAG into runtime engine)
+        dag_brain = DAGBrain(use_graph_engine=True)
+        dag = dag_brain.build_graph(state)
+        engine = dag_brain.graph_builder.engine
 
-        max_iterations = 5
-        for iteration in range(1, max_iterations + 1):
-            plan = dag_brain.plan_validations(state)
-            iteration_results = vengine.run(plan, state)
-            new_confirmed = state_manager.update(state, iteration_results)
+        # validator spec map from the brain
+        specs = dag_brain.validator_specs
+        spec_map = {s.id: s for s in specs}
 
-            logger.info(
-                f"Validation iteration {iteration}: {len(iteration_results)} results, "
-                f"{new_confirmed} new confirmations, {len(plan.validators)} validators planned"
-            )
+        # Execution loop: run ready edges until exhaustion
+        logger.info("Starting DAG execution loop...")
+        max_workers = 4
+        executor = ThreadPoolExecutor(max_workers=max_workers)
 
-            if new_confirmed == 0:
+        def execute_edge(u: str, v: str, edge):
+            action = edge.action
+            params = dict(edge.params or {})
+            result = {"success": False}
+
+            try:
+                if action == "run_validator":
+                    vid = params.get("validator_id")
+                    spec = spec_map.get(vid)
+                    if spec is None:
+                        result.update({"error": "unknown_validator", "validator_id": vid})
+                    else:
+                        # dynamic import
+                        module_path, cls_name = spec.class_path.rsplit(".", 1)
+                        mod = importlib.import_module(module_path)
+                        cls = getattr(mod, cls_name)
+                        # instantiate with context when possible
+                        try:
+                            inst = cls(context=None)
+                        except Exception:
+                            inst = cls()
+
+                        # prepare a minimal state for validator
+                        try_state = dict(state)
+                        # merge params like url/port
+                        try_state.update(params)
+
+                        # check can_run
+                        can_run = True
+                        if hasattr(inst, "can_run"):
+                            try:
+                                can_run = bool(inst.can_run(try_state))
+                            except Exception:
+                                can_run = False
+
+                        if not can_run:
+                            result.update({"success": False, "skipped": True})
+                        else:
+                            r = inst.run(try_state)
+                            # If result is ValidationResult, convert to dict-like
+                            if hasattr(r, "to_dict"):
+                                rdict = r.to_dict()
+                            elif isinstance(r, dict):
+                                rdict = r
+                            else:
+                                rdict = {"raw": str(r)}
+
+                            result.update({"success": bool(rdict.get("success", False)), "result": rdict})
+
+                            # extract loot if present
+                            loot = {}
+                            ev = rdict.get("evidence") or {}
+                            extra = ev.get("extra") or {}
+                            if isinstance(extra, dict):
+                                loot.update(extra)
+                            # also look for matched tokens
+                            if ev.get("matched"):
+                                loot["matched"] = ev.get("matched")
+
+                            if loot:
+                                engine.inject_loot_into_downstream(v, loot)
+
+                elif action == "git_extractor":
+                    base = params.get("url") or state.get("url") or state.get("target")
+                    r = run_git_extractor(base or "")
+                    result.update({"success": bool(r.get("success")), "result": r})
+                    # if found credentials or paths, inject loot
+                    loot = {}
+                    ev = r.get("evidence") or {}
+                    if isinstance(ev, dict):
+                        if ev.get("paths"):
+                            loot["paths"] = ev.get("paths")
+                        if ev.get("credentials"):
+                            loot["credentials"] = ev.get("credentials")
+                    if loot:
+                        engine.inject_loot_into_downstream(v, loot)
+
+                elif action == "ssh_brute":
+                    host = params.get("host") or state.get("target")
+                    port = params.get("port") or 22
+                    # Determine explicit opt-in: env var or param or state.allow_destructive
+                    env_ok = os.environ.get("PENTESTER_ENABLE_BRUTEFORCE", "0") == "1"
+                    param_ok = bool(params.get("enable_bruteforce"))
+                    state_ok = bool(state.get("allow_destructive", False))
+                    enable = env_ok or param_ok or state_ok
+                    creds = params.get("credentials") or params.get("creds")
+                    r = run_ssh_brute(host or "", int(port), creds=creds, enable_bruteforce=enable)
+                    result.update({"success": bool(r.get("success")), "result": r})
+                    # include banner as loot
+                    ev = r.get("evidence") or {}
+                    loot = {}
+                    if isinstance(ev, dict) and ev.get("banner"):
+                        loot["banner"] = ev.get("banner")
+                        engine.inject_loot_into_downstream(v, loot)
+
+                elif action == "config_reader":
+                    target_url = params.get("url") or state.get("url")
+                    r = run_config_reader(target_url or "")
+                    result.update({"success": bool(r.get("success")), "result": r})
+                    ev = r.get("evidence") or {}
+                    loot = {}
+                    if isinstance(ev, dict) and ev.get("matched_indicators"):
+                        loot["secrets"] = ev.get("matched_indicators")
+                        engine.inject_loot_into_downstream(v, loot)
+
+                else:
+                    # default: mark as executed with generic result
+                    result.update({"info": "action-executed", "action": action, "params": params})
+
+            except Exception as e:
+                result.update({"error": str(e)})
+
+            # mark edge executed and attach result
+            engine.mark_edge_executed(u, v, result=result)
+            return (u, v, result)
+
+        # main loop
+        while True:
+            ready = engine.get_ready_edges()
+            if not ready:
                 break
 
-        validation_results = state.get("validation_results", [])
-        with open("output/validations.json", "w") as f:
-            json.dump(validation_results, f, indent=4)
+            futures = []
+            for u, v, edge in ready:
+                futures.append(executor.submit(execute_edge, u, v, edge))
 
-        logger.info(f"Validation results saved to output/validations.json ({len(validation_results)} results)")
+            for fut in as_completed(futures):
+                try:
+                    u, v, res = fut.result()
+                    logger.info(f"Edge executed: {u} -> {v} result: {res.get('success', False)}")
+                except Exception as e:
+                    logger.info(f"Edge execution failed: {e}")
 
-        # Step 3b: CVE-specific validation and reporting (optional)
-        if args.cve_report:
-            findings = parsed_data.get("findings", [])
-            if findings:
-                logger.info("Planning CVE-specific validations...")
-                cve_plan = dag_brain.plan_cve_validations(state, findings)
+        # persist final graph snapshot
+        snapshot = engine.get_graph_snapshot()
+        save_graph_snapshot(snapshot)
 
-                if cve_plan.cve_to_validators:
-                    # Run CVE-specific validators
-                    cve_vengine = ValidationEngine()
-                    for validator in cve_plan.validator_instances.values():
-                        cve_vengine.register(validator)
-
-                    cve_validation_results = cve_vengine.run(state)
-
-                    # Generate exploitability report
-                    reporter = ExploitabilityReporter()
-                    cve_verdicts = []
-
-                    for cve_id, cve_data in cve_plan.cve_details.items():
-                        # Get validators for this CVE
-                        validators_for_cve = cve_plan.cve_to_validators.get(cve_id, [])
-
-                        # Get validation results for these validators
-                        relevant_results = []
-                        validators_set = set(v for v in validators_for_cve if isinstance(v, str))
-                        for result in cve_validation_results:
-                            if not isinstance(result, dict):
-                                continue
-
-                            # Prefer explicit linkage from ValidationEngine.
-                            rid = result.get("validator_id")
-                            if isinstance(rid, str) and rid in validators_set:
-                                relevant_results.append(result)
-                                continue
-
-                            # Backward-compatible fallback: try to match by vulnerability name.
-                            vuln = result.get("vulnerability")
-                            if isinstance(vuln, str):
-                                if vuln in validators_set or vuln.replace("-", "_") in validators_set:
-                                    relevant_results.append(result)
-
-                        # Generate verdict for this CVE
-                        verdict = reporter.generate_verdict(
-                            cve_data=cve_data,
-                            validation_results=relevant_results,
-                            validators_tested=validators_for_cve,
-                        )
-                        cve_verdicts.append(verdict)
-
-                    # Generate and save full report
-                    report = reporter.generate_report(cve_verdicts)
-                    with open("output/exploitability_report.json", "w") as f:
-                        json.dump(report, f, indent=4)
-
-                    logger.info(
-                        f"Exploitability report saved to output/exploitability_report.json "
-                        f"({len(cve_plan.cve_to_validators)} CVEs, "
-                        f"{len(report.get('exploitable_cves', []))} exploitable, "
-                        f"{len(report.get('negligible_cves', []))} negligible)"
-                    )
-                else:
-                    logger.info("No CVEs found in findings for validation")
-            else:
-                logger.info("No findings to validate for CVEs")
     except Exception as e:
-        logger.info(f"Validation engine failed: {e}")
+        logger.info(f"DAG execution failed: {e}")
         import traceback
         traceback.print_exc()
 

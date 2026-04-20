@@ -8,6 +8,7 @@ from engine.models import Evidence, ExecutionContext, ValidationResult
 class MissingSecurityHeadersValidator:
     def __init__(self, context: Optional[ExecutionContext] = None):
         self.context = context
+        self.destructive = False
 
     def can_run(self, state):
         protocols = state.get("protocols", []) or []

@@ -1,13 +1,3 @@
-[
-    {
-        "url": "https://demo.testfire.net",
-        "status_code": 200,
-        "title": "Altoro Mutual",
-        "webserver": "Apache-Coyote/1.1",
-        "tech": [
-            "Apache Tomcat",
-            "Java"
-        ],
-        "ip": ""
-    }
-]
+{
+    "error": "Empty HTTPX output"
+}

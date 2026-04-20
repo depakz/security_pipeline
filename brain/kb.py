@@ -99,3 +99,56 @@ def extract_keywords(value: Any) -> List[str]:
     elif value is not None:
         keywords.append(str(value).lower())
     return keywords
+
+
+# Chaining rules: simple representation of horizontal and vertical chaining
+# Each rule maps a trigger (finding type or keyword) to a sequence of actions
+# Example: "git_directory_found" -> ["git_extractor", "ssh_brute_if_creds"]
+CHAINING_RULES = {
+    "git_directory_found": [
+        {
+            "action": "git_extractor",
+            "produces": ["credentials", "paths"],
+            "next_if": {"credentials": "ssh_brute"},
+        },
+    ],
+    "lfi_detected": [
+        {
+            "action": "config_reader",
+            "produces": ["secrets", "files"],
+            "next_if": {"secrets": "credential_parsing"},
+        },
+    ],
+    # Horizontal chaining example: git extractor -> ssh brute on discovered IPs
+    "credentials_found": [
+        {"action": "ssh_brute", "produces": ["valid_creds", "loot"]},
+    ],
+}
+
+
+def get_chaining_for_trigger(trigger: str):
+    return CHAINING_RULES.get(trigger, [])
+
+
+def detect_triggers_from_findings(findings: List[dict]) -> List[str]:
+    """Scan findings for simple trigger indicators.
+
+    This is intentionally conservative: we match well-known scanner finding keys
+    and simple keywords to map to chaining triggers.
+    """
+    triggers: List[str] = []
+    for f in findings or []:
+        if not isinstance(f, dict):
+            continue
+        title = (f.get("title") or "").lower()
+        if "\.git" in title or "git" in title and ("directory" in title or "exposed" in title):
+            triggers.append("git_directory_found")
+        # nuclei LFI fingerprints may have 'lfi' or 'local file' in matcher
+        if "lfi" in title or "local file" in title:
+            triggers.append("lfi_detected")
+        # credentials heuristics
+        if "password" in title or "credentials" in title or "aws_access_key" in title:
+            triggers.append("credentials_found")
+
+    # dedupe
+    return sorted(set(triggers))
