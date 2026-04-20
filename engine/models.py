@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import Any, Dict, List
+from urllib.parse import urljoin
 
 
 _ALLOWED_SEVERITIES = {"critical", "high", "medium", "low", "info"}
@@ -21,10 +22,46 @@ class ExecutionContext:
 
         target = str(state.get("target") or "")
 
-        endpoints = state.get("endpoints") or []
-        if not isinstance(endpoints, list):
-            endpoints = []
-        endpoints = [e for e in endpoints if isinstance(e, str)]
+        endpoints: List[str] = []
+
+        # Backward compatible: endpoint URLs as strings
+        raw_endpoints = state.get("endpoints") or []
+        if isinstance(raw_endpoints, list):
+            for item in raw_endpoints:
+                if isinstance(item, str) and item.strip():
+                    endpoints.append(item.strip())
+                elif isinstance(item, dict):
+                    u = item.get("url")
+                    if not isinstance(u, str) or not u.strip():
+                        continue
+                    u = u.strip()
+                    if u.startswith("http://") or u.startswith("https://"):
+                        endpoints.append(u)
+                        continue
+
+                    base = state.get("url")
+                    if isinstance(base, str) and base.startswith(("http://", "https://")):
+                        try:
+                            endpoints.append(urljoin(base.rstrip("/") + "/", u.lstrip("/")))
+                        except Exception:
+                            pass
+
+        # New: optional raw URL list if state.endpoints is structured
+        extra_urls = state.get("endpoint_urls") or []
+        if isinstance(extra_urls, list):
+            for u in extra_urls:
+                if isinstance(u, str) and u.strip():
+                    endpoints.append(u.strip())
+
+        # Stable dedupe
+        deduped: List[str] = []
+        seen = set()
+        for u in endpoints:
+            if u in seen:
+                continue
+            seen.add(u)
+            deduped.append(u)
+        endpoints = deduped
 
         findings = state.get("findings") or []
         if not isinstance(findings, list):

@@ -5,6 +5,8 @@ from datetime import datetime, timezone
 from hashlib import sha1
 from urllib.parse import urlparse
 
+from utils.normalizer import is_noise_url
+
 
 _SEVERITY_ORDER = ["critical", "high", "medium", "low", "info"]
 _SEVERITY_TO_DEFAULT_CVSS = {
@@ -371,7 +373,7 @@ def _dedupe_findings(findings):
     return list(deduped.values())
 
 
-def _collect_asset_ports(target_host, naabu_data, httpx_data, gospider_data, nuclei_data):
+def _collect_asset_ports(target_host, naabu_data, httpx_data, gospider_data, katana_data, gau_data, nuclei_data):
     ports = {}
 
     def add_port(port, service="", version="", protocol="tcp"):
@@ -413,8 +415,10 @@ def _collect_asset_ports(target_host, naabu_data, httpx_data, gospider_data, nuc
             except Exception:
                 continue
 
-    if isinstance(gospider_data, dict):
-        for url in gospider_data.get("endpoints", []) or []:
+    for crawler_data in (gospider_data, katana_data, gau_data):
+        if not isinstance(crawler_data, dict):
+            continue
+        for url in crawler_data.get("endpoints", []) or []:
             if not isinstance(url, str) or not url:
                 continue
             try:
@@ -472,23 +476,31 @@ def _collect_asset_technologies(httpx_data):
     return [tech[k] for k in sorted(tech.keys())]
 
 
-def _collect_asset_endpoints(target_host, gospider_data):
-    if not isinstance(gospider_data, dict):
-        return []
+def _collect_asset_endpoints(target_host, gospider_data, katana_data, gau_data):
     endpoints = []
     seen = set()
-    for url in gospider_data.get("endpoints", []) or []:
-        if not isinstance(url, str) or not url:
+
+    for crawler_data in (gospider_data, katana_data, gau_data):
+        if not isinstance(crawler_data, dict):
             continue
-        try:
-            parsed = urlparse(url)
-            if not _in_scope_hostname(parsed.hostname, target_host):
+
+        for url in crawler_data.get("endpoints", []) or []:
+            if not isinstance(url, str) or not url:
                 continue
-        except Exception:
-            continue
-        if url not in seen:
-            seen.add(url)
-            endpoints.append(url)
+
+            if is_noise_url(url):
+                continue
+
+            try:
+                parsed = urlparse(url)
+                if not _in_scope_hostname(parsed.hostname, target_host):
+                    continue
+            except Exception:
+                continue
+
+            if url not in seen:
+                seen.add(url)
+                endpoints.append(url)
     return sorted(endpoints)
 
 
@@ -562,6 +574,8 @@ def parse_all(target, scan_time=None, scanner="ReconX", profile="full_scan", dur
     naabu_data = _safe_load_json("output/naabu.json")
     httpx_data = _safe_load_json("output/httpx.json")
     gospider_data = _safe_load_json("output/gospider.json")
+    katana_data = _safe_load_json("output/katana.json")
+    gau_data = _safe_load_json("output/gau.json")
     nuclei_data = _safe_load_json("output/nuclei.json")
 
     scan_info = {
@@ -575,9 +589,9 @@ def parse_all(target, scan_time=None, scanner="ReconX", profile="full_scan", dur
     asset = {
         "host": target_host,
         "ip": _resolve_ip(target_host, httpx_data=httpx_data),
-        "ports": _collect_asset_ports(target_host, naabu_data, httpx_data, gospider_data, nuclei_data),
+        "ports": _collect_asset_ports(target_host, naabu_data, httpx_data, gospider_data, katana_data, gau_data, nuclei_data),
         "technologies": _collect_asset_technologies(httpx_data),
-        "endpoints": _collect_asset_endpoints(target_host, gospider_data),
+        "endpoints": _collect_asset_endpoints(target_host, gospider_data, katana_data, gau_data),
     }
 
     findings = []

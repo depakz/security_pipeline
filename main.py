@@ -16,10 +16,13 @@ from recon.naabu_scan import run_naabu
 from recon.httpx_scan import run_httpx
 from recon.nuclei_scan import run_nuclei
 from recon.gospider_scan import run_gospider
+from recon.katana_scan import run_katana
+from recon.gau_scan import run_gau
 from aggregator.parser import parse_all
 from engine.decision import decide_actions
 from engine.executor import run_sqlmap, test_xss, run_git_extractor, run_ssh_brute, run_config_reader
 from utils.logger import logger
+from utils.normalizer import normalize_endpoints
 from utils.retry import retry
 from utils.session import save_session
 
@@ -29,6 +32,7 @@ def build_validation_state(report):
     target = scan_info.get("target") or ""
 
     ports = []
+    services = []
     protocols = []
     url = ""
     endpoints = []
@@ -47,6 +51,8 @@ def build_validation_state(report):
                 ports.append(port)
 
             svc = (p.get("service") or "").strip().lower()
+            if svc:
+                services.append(svc)
             if svc in ("http", "https"):
                 protocols.append("http")
 
@@ -77,14 +83,29 @@ def build_validation_state(report):
         "summary": report.get("summary", {}) if isinstance(report, dict) else {},
     }
 
+    # Fallback: if discovery produced nothing, seed a few high-value paths.
+    if not endpoints and url:
+        base = str(url).rstrip("/")
+        endpoints = [
+            f"{base}/admin",
+            f"{base}/login",
+            f"{base}/api",
+        ]
+
+    # Smart Normalizer: dedup + param extraction + tags + noise filtering
+    endpoint_objects = normalize_endpoints(endpoints, target=target)
+
     return {
         "target": target,
+        "endpoints": endpoint_objects,
+        "endpoint_urls": endpoints,
+        "services": sorted(set(services)),
         "ports": sorted(set(ports)),
         "protocols": sorted(set(protocols)),
         "url": url,
-        "endpoints": endpoints,
         "findings": findings,
         "metadata": metadata,
+        "vulnerabilities": [],
         # feedback loop state
         "validation_results": [],
         "confirmed_vulns": [],
@@ -202,6 +223,12 @@ def main():
     
     logger.info("Running Gospider scan...")
     run_with_progress("Gospider scan", run_gospider, target)
+
+    logger.info("Running Katana scan...")
+    run_with_progress("Katana scan", run_katana, target)
+
+    logger.info("Running GAU scan...")
+    run_with_progress("GAU scan", run_gau, target)
 
     # Step 2: Aggregation
     logger.info("Aggregating results...")
