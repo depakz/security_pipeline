@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 
 _ALLOWED_SEVERITIES = {"critical", "high", "medium", "low", "info"}
@@ -47,6 +47,35 @@ class Evidence:
 
 
 @dataclass
+class EvidenceBundle:
+    """
+    Enhanced evidence storage for high-confidence validation.
+    
+    Stores complete evidence of actual code execution, not just pattern matches.
+    Examples:
+    - Shell command output (not just HTTP response)
+    - File contents extracted via LFI
+    - Successfully executed exploit code
+    """
+    raw_request: str  # Full HTTP request or command
+    raw_response: str  # Full HTTP response or command output
+    matched_indicator: str  # The specific string/pattern matched
+    execution_proof: Dict[str, Any] = field(default_factory=dict)  # e.g., {"shell_output": "..."}
+    tool_logs: List[Dict[str, Any]] = field(default_factory=list)  # Output from scanner tools
+    metadata: Dict[str, Any] = field(default_factory=dict)  # Additional context
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "raw_request": self.raw_request,
+            "raw_response": self.raw_response,
+            "matched_indicator": self.matched_indicator,
+            "execution_proof": self.execution_proof,
+            "tool_logs": self.tool_logs,
+            "metadata": self.metadata,
+        }
+
+
+@dataclass
 class ValidationResult:
     success: bool
     confidence: float
@@ -55,6 +84,15 @@ class ValidationResult:
     evidence: Evidence
     impact: str = ""
     remediation: str = ""
+    confidence_score: float = 0.0  # High-precision confidence (0.0-1.0)
+    evidence_bundle: Optional[EvidenceBundle] = None  # Enhanced evidence for successful exploits
+    chain_source: Optional[str] = None  # Parent vulnerability that enabled this attack
+    execution_proved: bool = False  # True if we have shell output or file content, not just regex match
+
+    def __post_init__(self):
+        """Ensure confidence_score is synced with confidence if not explicitly set."""
+        if self.confidence_score == 0.0:
+            self.confidence_score = self.confidence
 
     def to_dict(self) -> Dict[str, Any]:
         severity = (self.severity or "info").strip().lower()
@@ -71,13 +109,25 @@ class ValidationResult:
         if confidence > 1.0:
             confidence = 1.0
 
-        return {
+        try:
+            confidence_score = float(self.confidence_score)
+        except Exception:
+            confidence_score = confidence
+
+        if confidence_score < 0.0:
+            confidence_score = 0.0
+        if confidence_score > 1.0:
+            confidence_score = 1.0
+
+        result = {
             "success": bool(self.success),
             "vulnerability": self.vulnerability,
             "severity": severity,
             "validation": {
                 "status": "confirmed" if self.success else "failed",
                 "confidence": confidence,
+                "confidence_score": confidence_score,
+                "execution_proved": self.execution_proved,
             },
             "evidence": {
                 "request": self.evidence.request,
@@ -88,3 +138,11 @@ class ValidationResult:
             "impact": self.impact,
             "remediation": self.remediation,
         }
+
+        if self.evidence_bundle is not None:
+            result["evidence_bundle"] = self.evidence_bundle.to_dict()
+
+        if self.chain_source is not None:
+            result["chain_source"] = self.chain_source
+
+        return result
