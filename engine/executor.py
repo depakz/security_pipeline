@@ -138,7 +138,7 @@ def run_git_extractor(base_url: str) -> Dict:
         return {"success": False, "evidence": str(e)}
 
 
-def run_ssh_brute(host: str, port: int = 22, creds: List[Dict] = None) -> Dict:
+def run_ssh_brute(host: str, port: int = 22, creds: List[Dict] = None, enable_bruteforce: bool = False) -> Dict:
     """SSH handler with optional, explicit opt-in brute/auth attempts.
 
     Behavior:

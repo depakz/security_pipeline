@@ -10,19 +10,26 @@ This module extends the original DAG engine to support:
 
 from __future__ import annotations
 
+import asyncio
+import importlib
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
+from time import perf_counter
 from typing import Any, Dict, List, Optional, Callable
+from urllib.parse import urlsplit
 
 from engine.models import ExecutionContext
 from brain.fact_store import FactStore
 from brain.endpoint_normalizer import EndpointNormalizer
 from brain.attack_chain_manager import AttackChainManager, ChainedExploitationNode
+from engine.executor import run_sqlmap, test_xss, run_git_extractor, run_ssh_brute, run_config_reader
 
 from .cve_mapper import CVEMapper
 from .graph_builder import DAGGraph, GraphBuilder, GraphEngineAdapter
 from .kb import ValidatorSpec, get_default_validator_specs
 from validators.ftp import FTPAnonymousLoginValidator
 from validators.http import MissingSecurityHeadersValidator
+from validators.integrity import IntegrityValidator
 from validators.redis import RedisNoAuthValidator
 
 
@@ -30,6 +37,7 @@ VALIDATOR_CLASS_MAP = {
     "validators.redis.RedisNoAuthValidator": RedisNoAuthValidator,
     "validators.http.MissingSecurityHeadersValidator": MissingSecurityHeadersValidator,
     "validators.ftp.FTPAnonymousLoginValidator": FTPAnonymousLoginValidator,
+    "validators.integrity.IntegrityValidator": IntegrityValidator,
 }
 
 
@@ -304,3 +312,330 @@ class DAGBrain:
             "active_chains": self.attack_chain_manager.get_active_chains(),
             "chain_statistics": self.attack_chain_manager.get_chain_statistics(),
         }
+
+    def create_concurrent_engine(
+        self,
+        state: Dict[str, Any],
+        max_workers: int = 20,
+    ) -> "ConcurrentValidationEngine":
+        """Create a concurrent validation engine tied to this planner and state."""
+        return ConcurrentValidationEngine(self, state=state, max_workers=max_workers)
+
+
+class ConcurrentValidationEngine:
+    """Async DAG execution engine that runs ready validations concurrently."""
+
+    def __init__(
+        self,
+        dag_brain: Optional[DAGBrain] = None,
+        state: Optional[Dict[str, Any]] = None,
+        max_workers: int = 20,
+    ):
+        self.dag_brain = dag_brain or DAGBrain(use_graph_engine=True)
+        self.state = dict(state or {})
+        self.max_workers = max(1, int(max_workers or 1))
+        self.fact_store = self.dag_brain.fact_store
+        self._thread_pool = ThreadPoolExecutor(max_workers=self.max_workers)
+        self._execution_cache: set[str] = set()
+        self._metrics: Dict[str, Any] = {
+            "ready_edges_seen": 0,
+            "queued_edges": 0,
+            "queued_batches": 0,
+            "dedupe_skips": 0,
+            "executed_edges": 0,
+            "executed_batches": 0,
+            "batch_durations_ms": [],
+            "batch_sizes": [],
+        }
+
+    def _normalize_target_key(self, value: Any, state: Dict[str, Any]) -> str:
+        raw = str(value or state.get("url") or state.get("target") or "").strip()
+        if not raw:
+            return "unknown"
+
+        parsed = urlsplit(raw if "://" in raw else f"//{raw}")
+        host = parsed.hostname or raw.split(":")[0].split("/")[0]
+        port = parsed.port
+        if port is None:
+            if parsed.scheme == "https":
+                port = 443
+            elif parsed.scheme == "http":
+                port = 80
+
+        host_key = host.lower() if isinstance(host, str) else str(host).lower()
+        if port is not None:
+            return f"{host_key}:{port}"
+        return host_key
+
+    def _edge_target_key(self, u: str, v: str, edge, state: Dict[str, Any]) -> str:
+        params = dict(edge.params or {})
+        for candidate in (params.get("host"), params.get("url"), params.get("endpoint"), params.get("target"), state.get("url"), state.get("target")):
+            key = self._normalize_target_key(candidate, state)
+            if key != "unknown":
+                return key
+        return self._normalize_target_key(f"{u}:{v}", state)
+
+    def _edge_batch_key(self, u: str, v: str, edge, state: Dict[str, Any]) -> str:
+        """Batch by target + action + validator-type for better execution locality."""
+        params = dict(edge.params or {})
+        target_key = self._edge_target_key(u, v, edge, state)
+        action = str(edge.action or "action")
+        validator_id = str(params.get("validator_id") or params.get("id") or "generic")
+        return f"{target_key}|{action}|{validator_id}"
+
+    def _dedupe_key(self, u: str, v: str, edge, batch_key: str) -> str:
+        params = edge.params or {}
+        validator_id = params.get("validator_id") or params.get("id") or ""
+        action = edge.action or "action"
+        return f"{batch_key}|{action}|{validator_id}|{u}|{v}"
+
+    async def run_pipeline(self) -> Dict[str, Any]:
+        """Run the DAG pipeline using an asyncio queue and worker pool."""
+        pipeline_started = perf_counter()
+        state = dict(self.state)
+        if not state:
+            return {"results": [], "snapshot": {}, "scheduler_metrics": self._finalize_metrics(0.0)}
+
+        self.dag_brain.build_graph(state)
+        runtime = getattr(self.dag_brain.graph_builder, "engine", None)
+        if runtime is None:
+            return {"results": [], "snapshot": {}, "scheduler_metrics": self._finalize_metrics(0.0)}
+
+        spec_map = {spec.id: spec for spec in self.dag_brain.validator_specs}
+        queue: asyncio.Queue = asyncio.Queue()
+        queued_edge_ids: set[str] = set()
+        results: List[Dict[str, Any]] = []
+
+        def enqueue_ready_edges() -> None:
+            batched: Dict[str, List[Any]] = {}
+            for u, v, edge in runtime.get_ready_edges():
+                self._metrics["ready_edges_seen"] += 1
+                edge_id = getattr(edge, "id", f"{u}->{v}")
+                if edge_id in queued_edge_ids:
+                    self._metrics["dedupe_skips"] += 1
+                    continue
+                batch_key = self._edge_batch_key(u, v, edge, state)
+                dedupe_key = self._dedupe_key(u, v, edge, batch_key)
+                if dedupe_key in self._execution_cache:
+                    self._metrics["dedupe_skips"] += 1
+                    continue
+                queued_edge_ids.add(edge_id)
+                batched.setdefault(batch_key, []).append((u, v, edge, dedupe_key))
+
+            for batch_key, items in batched.items():
+                queue.put_nowait((batch_key, items))
+                self._metrics["queued_batches"] += 1
+                self._metrics["queued_edges"] += len(items)
+
+        enqueue_ready_edges()
+        if queue.empty():
+            snapshot = runtime.get_graph_snapshot()
+            metrics = self._finalize_metrics((perf_counter() - pipeline_started) * 1000.0)
+            if isinstance(snapshot, dict):
+                snapshot["scheduler_metrics"] = metrics
+            try:
+                from utils.session import save_graph_snapshot
+
+                save_graph_snapshot(snapshot)
+            except Exception:
+                pass
+            return {"results": [], "snapshot": snapshot, "scheduler_metrics": metrics}
+
+        async def worker() -> None:
+            while True:
+                item = await queue.get()
+                if item is None:
+                    queue.task_done()
+                    return
+
+                batch_key, batch_items = item
+                try:
+                    started = perf_counter()
+                    outcome = await asyncio.get_running_loop().run_in_executor(
+                        self._thread_pool,
+                        self._execute_batch_sync,
+                        batch_key,
+                        batch_items,
+                        state,
+                        spec_map,
+                        runtime,
+                    )
+                    duration_ms = (perf_counter() - started) * 1000.0
+                    executed_items = outcome.get("items", []) if isinstance(outcome, dict) else []
+                    batch_size = int(outcome.get("batch_size", len(batch_items))) if isinstance(outcome, dict) else len(batch_items)
+                    results.extend(executed_items)
+                    self._metrics["executed_batches"] += 1
+                    self._metrics["executed_edges"] += len(executed_items)
+                    self._metrics["batch_durations_ms"].append(duration_ms)
+                    self._metrics["batch_sizes"].append(batch_size)
+                    enqueue_ready_edges()
+                finally:
+                    queue.task_done()
+
+        workers = [asyncio.create_task(worker()) for _ in range(self.max_workers)]
+        await queue.join()
+
+        for _ in workers:
+            await queue.put(None)
+        await asyncio.gather(*workers, return_exceptions=True)
+
+        snapshot = runtime.get_graph_snapshot()
+        metrics = self._finalize_metrics((perf_counter() - pipeline_started) * 1000.0)
+        if isinstance(snapshot, dict):
+            snapshot["scheduler_metrics"] = metrics
+        try:
+            from utils.session import save_graph_snapshot
+
+            save_graph_snapshot(snapshot)
+        except Exception:
+            pass
+
+        return {"results": results, "snapshot": snapshot, "scheduler_metrics": metrics}
+
+    def _execute_batch_sync(self, batch_key: str, batch_items, state: Dict[str, Any], spec_map: Dict[str, Any], runtime) -> Dict[str, Any]:
+        batch_results: List[Dict[str, Any]] = []
+        for u, v, edge, dedupe_key in batch_items:
+            if dedupe_key in self._execution_cache:
+                continue
+            self._execution_cache.add(dedupe_key)
+            batch_results.append(self._execute_edge_sync(u, v, edge, state, spec_map, runtime, batch_key=batch_key))
+        return {"items": batch_results, "batch_size": len(batch_items)}
+
+    def _finalize_metrics(self, total_duration_ms: float) -> Dict[str, Any]:
+        batch_durations = self._metrics.get("batch_durations_ms", []) or []
+        batch_sizes = self._metrics.get("batch_sizes", []) or []
+        ready_edges_seen = int(self._metrics.get("ready_edges_seen", 0) or 0)
+        dedupe_skips = int(self._metrics.get("dedupe_skips", 0) or 0)
+
+        dedupe_hit_rate = (dedupe_skips / ready_edges_seen) if ready_edges_seen > 0 else 0.0
+        avg_batch_duration_ms = (sum(batch_durations) / len(batch_durations)) if batch_durations else 0.0
+        avg_batch_size = (sum(batch_sizes) / len(batch_sizes)) if batch_sizes else 0.0
+
+        return {
+            "max_workers": self.max_workers,
+            "total_duration_ms": round(float(total_duration_ms), 2),
+            "ready_edges_seen": ready_edges_seen,
+            "queued_edges": int(self._metrics.get("queued_edges", 0) or 0),
+            "queued_batches": int(self._metrics.get("queued_batches", 0) or 0),
+            "executed_edges": int(self._metrics.get("executed_edges", 0) or 0),
+            "executed_batches": int(self._metrics.get("executed_batches", 0) or 0),
+            "dedupe_skips": dedupe_skips,
+            "dedupe_hit_rate": round(float(dedupe_hit_rate), 4),
+            "avg_batch_duration_ms": round(float(avg_batch_duration_ms), 2),
+            "avg_batch_size": round(float(avg_batch_size), 2),
+        }
+
+    def _execute_edge_sync(self, u: str, v: str, edge, state: Dict[str, Any], spec_map: Dict[str, Any], runtime, batch_key: str = "") -> Dict[str, Any]:
+        action = edge.action
+        params = dict(edge.params or {})
+        result: Dict[str, Any] = {"success": False, "batch_key": batch_key}
+
+        try:
+            if action == "run_validator":
+                vid = params.get("validator_id")
+                spec = spec_map.get(vid)
+                if spec is None:
+                    result.update({"error": "unknown_validator", "validator_id": vid})
+                else:
+                    module_path, cls_name = spec.class_path.rsplit(".", 1)
+                    mod = importlib.import_module(module_path)
+                    cls = getattr(mod, cls_name)
+
+                    try:
+                        inst = cls(context=None)
+                    except Exception:
+                        inst = cls()
+
+                    try_state = dict(state)
+                    try_state.update(params)
+
+                    can_run = True
+                    if hasattr(inst, "can_run"):
+                        try:
+                            can_run = bool(inst.can_run(try_state))
+                        except Exception:
+                            can_run = False
+
+                    if not can_run:
+                        result.update({"success": False, "skipped": True})
+                    else:
+                        r = inst.run(try_state)
+                        if isinstance(r, list):
+                            rdict = [item.to_dict() if hasattr(item, "to_dict") else item for item in r]
+                        elif hasattr(r, "to_dict"):
+                            rdict = r.to_dict()
+                        elif isinstance(r, dict):
+                            rdict = r
+                        else:
+                            rdict = {"raw": str(r)}
+
+                        if isinstance(rdict, list):
+                            result.update({"success": any(bool(item.get("success", False)) for item in rdict if isinstance(item, dict)), "result": rdict})
+                        else:
+                            result.update({"success": bool(rdict.get("success", False)), "result": rdict})
+
+                        loot: Dict[str, Any] = {}
+                        dict_results = rdict if isinstance(rdict, list) else [rdict]
+                        for item in dict_results:
+                            if not isinstance(item, dict):
+                                continue
+                            ev = item.get("evidence") or {}
+                            extra = ev.get("extra") or {}
+                            if isinstance(extra, dict):
+                                loot.update(extra)
+                            if ev.get("matched"):
+                                loot["matched"] = ev.get("matched")
+                        if loot:
+                            runtime.inject_loot_into_downstream(v, loot)
+
+            elif action == "sqlmap":
+                endpoint = params.get("endpoint") or state.get("url") or state.get("target") or ""
+                r = run_sqlmap(endpoint)
+                result.update({"success": bool(r.get("success")), "result": r})
+
+            elif action == "xss":
+                endpoint = params.get("endpoint") or state.get("url") or state.get("target") or ""
+                r = test_xss(endpoint)
+                result.update({"success": bool(r.get("success")), "result": r})
+
+            elif action == "git_extractor":
+                base = params.get("url") or state.get("url") or state.get("target") or ""
+                r = run_git_extractor(base)
+                result.update({"success": bool(r.get("success")), "result": r})
+                loot: Dict[str, Any] = {}
+                ev = r.get("evidence") or {}
+                if isinstance(ev, dict):
+                    if ev.get("paths"):
+                        loot["paths"] = ev.get("paths")
+                    if ev.get("credentials"):
+                        loot["credentials"] = ev.get("credentials")
+                if loot:
+                    runtime.inject_loot_into_downstream(v, loot)
+
+            elif action == "ssh_brute":
+                host = params.get("host") or state.get("target") or ""
+                port = params.get("port") or 22
+                enable = bool(params.get("enable_bruteforce")) or bool(state.get("allow_destructive", False))
+                creds = params.get("credentials") or params.get("creds")
+                r = run_ssh_brute(host, int(port), creds=creds, enable_bruteforce=enable)
+                result.update({"success": bool(r.get("success")), "result": r})
+                ev = r.get("evidence") or {}
+                if isinstance(ev, dict) and ev.get("banner"):
+                    runtime.inject_loot_into_downstream(v, {"banner": ev.get("banner")})
+
+            elif action == "config_reader":
+                target_url = params.get("url") or state.get("url") or ""
+                r = run_config_reader(target_url)
+                result.update({"success": bool(r.get("success")), "result": r})
+                ev = r.get("evidence") or {}
+                if isinstance(ev, dict) and ev.get("matched_indicators"):
+                    runtime.inject_loot_into_downstream(v, {"secrets": ev.get("matched_indicators")})
+
+            else:
+                result.update({"info": "action-executed", "action": action, "params": params})
+
+        except Exception as e:
+            result.update({"error": str(e)})
+
+        runtime.mark_edge_executed(u, v, result=result)
+        return {"from": u, "to": v, "result": result}

@@ -28,6 +28,16 @@ class VulnerabilitySpec:
 
 DEFAULT_VALIDATOR_SPECS: List[ValidatorSpec] = [
     ValidatorSpec(
+        id="integrity_validator",
+        name="IntegrityValidator",
+        class_path="validators.integrity.IntegrityValidator",
+        description="Checks for insecure deserialization and unsigned package integrity issues.",
+        severity="high",
+        priority=90,
+        keywords=["deserialization", "serialization", "integrity", "signature", "package"],
+        required_protocols=["http"],
+    ),
+    ValidatorSpec(
         id="redis_no_auth",
         name="RedisNoAuthValidator",
         class_path="validators.redis.RedisNoAuthValidator",
@@ -141,7 +151,7 @@ def detect_triggers_from_findings(findings: List[dict]) -> List[str]:
         if not isinstance(f, dict):
             continue
         title = (f.get("title") or "").lower()
-        if "\.git" in title or "git" in title and ("directory" in title or "exposed" in title):
+        if ".git" in title or ("git" in title and ("directory" in title or "exposed" in title)):
             triggers.append("git_directory_found")
         # nuclei LFI fingerprints may have 'lfi' or 'local file' in matcher
         if "lfi" in title or "local file" in title:
