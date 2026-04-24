@@ -2,10 +2,11 @@ import json
 import sys
 import time
 import argparse
+import asyncio
 from datetime import datetime, timezone
 import threading
 import inspect
-from brain.dag_engine import DAGBrain
+from brain.dag_engine_enhanced import DAGBrain, ConcurrentValidationEngine
 from brain.exploitability_reporter import ExploitabilityReporter
 from engine.validation_engine import StateManager, ValidationEngine
 import importlib
@@ -226,157 +227,17 @@ def main():
     try:
         logger.info("Building DAG-driven state machine...")
         state = build_validation_state(parsed_data)
-
-        # Build planner that uses GraphEngineAdapter (mirrors DAG into runtime engine)
         dag_brain = DAGBrain(use_graph_engine=True)
-        dag = dag_brain.build_graph(state)
-        engine = dag_brain.graph_builder.engine
+        concurrent_engine = ConcurrentValidationEngine(dag_brain=dag_brain, state=state, max_workers=20)
 
-        # validator spec map from the brain
-        specs = dag_brain.validator_specs
-        spec_map = {s.id: s for s in specs}
-
-        # Execution loop: run ready edges until exhaustion
-        logger.info("Starting DAG execution loop...")
-        max_workers = 4
-        executor = ThreadPoolExecutor(max_workers=max_workers)
-
-        def execute_edge(u: str, v: str, edge):
-            action = edge.action
-            params = dict(edge.params or {})
-            result = {"success": False}
-
-            try:
-                if action == "run_validator":
-                    vid = params.get("validator_id")
-                    spec = spec_map.get(vid)
-                    if spec is None:
-                        result.update({"error": "unknown_validator", "validator_id": vid})
-                    else:
-                        # dynamic import
-                        module_path, cls_name = spec.class_path.rsplit(".", 1)
-                        mod = importlib.import_module(module_path)
-                        cls = getattr(mod, cls_name)
-                        # instantiate with context when possible
-                        try:
-                            inst = cls(context=None)
-                        except Exception:
-                            inst = cls()
-
-                        # prepare a minimal state for validator
-                        try_state = dict(state)
-                        # merge params like url/port
-                        try_state.update(params)
-
-                        # check can_run
-                        can_run = True
-                        if hasattr(inst, "can_run"):
-                            try:
-                                can_run = bool(inst.can_run(try_state))
-                            except Exception:
-                                can_run = False
-
-                        if not can_run:
-                            result.update({"success": False, "skipped": True})
-                        else:
-                            r = inst.run(try_state)
-                            # If result is ValidationResult, convert to dict-like
-                            if hasattr(r, "to_dict"):
-                                rdict = r.to_dict()
-                            elif isinstance(r, dict):
-                                rdict = r
-                            else:
-                                rdict = {"raw": str(r)}
-
-                            result.update({"success": bool(rdict.get("success", False)), "result": rdict})
-
-                            # extract loot if present
-                            loot = {}
-                            ev = rdict.get("evidence") or {}
-                            extra = ev.get("extra") or {}
-                            if isinstance(extra, dict):
-                                loot.update(extra)
-                            # also look for matched tokens
-                            if ev.get("matched"):
-                                loot["matched"] = ev.get("matched")
-
-                            if loot:
-                                engine.inject_loot_into_downstream(v, loot)
-
-                elif action == "git_extractor":
-                    base = params.get("url") or state.get("url") or state.get("target")
-                    r = run_git_extractor(base or "")
-                    result.update({"success": bool(r.get("success")), "result": r})
-                    # if found credentials or paths, inject loot
-                    loot = {}
-                    ev = r.get("evidence") or {}
-                    if isinstance(ev, dict):
-                        if ev.get("paths"):
-                            loot["paths"] = ev.get("paths")
-                        if ev.get("credentials"):
-                            loot["credentials"] = ev.get("credentials")
-                    if loot:
-                        engine.inject_loot_into_downstream(v, loot)
-
-                elif action == "ssh_brute":
-                    host = params.get("host") or state.get("target")
-                    port = params.get("port") or 22
-                    # Determine explicit opt-in: env var or param or state.allow_destructive
-                    env_ok = os.environ.get("PENTESTER_ENABLE_BRUTEFORCE", "0") == "1"
-                    param_ok = bool(params.get("enable_bruteforce"))
-                    state_ok = bool(state.get("allow_destructive", False))
-                    enable = env_ok or param_ok or state_ok
-                    creds = params.get("credentials") or params.get("creds")
-                    r = run_ssh_brute(host or "", int(port), creds=creds, enable_bruteforce=enable)
-                    result.update({"success": bool(r.get("success")), "result": r})
-                    # include banner as loot
-                    ev = r.get("evidence") or {}
-                    loot = {}
-                    if isinstance(ev, dict) and ev.get("banner"):
-                        loot["banner"] = ev.get("banner")
-                        engine.inject_loot_into_downstream(v, loot)
-
-                elif action == "config_reader":
-                    target_url = params.get("url") or state.get("url")
-                    r = run_config_reader(target_url or "")
-                    result.update({"success": bool(r.get("success")), "result": r})
-                    ev = r.get("evidence") or {}
-                    loot = {}
-                    if isinstance(ev, dict) and ev.get("matched_indicators"):
-                        loot["secrets"] = ev.get("matched_indicators")
-                        engine.inject_loot_into_downstream(v, loot)
-
-                else:
-                    # default: mark as executed with generic result
-                    result.update({"info": "action-executed", "action": action, "params": params})
-
-            except Exception as e:
-                result.update({"error": str(e)})
-
-            # mark edge executed and attach result
-            engine.mark_edge_executed(u, v, result=result)
-            return (u, v, result)
-
-        # main loop
-        while True:
-            ready = engine.get_ready_edges()
-            if not ready:
-                break
-
-            futures = []
-            for u, v, edge in ready:
-                futures.append(executor.submit(execute_edge, u, v, edge))
-
-            for fut in as_completed(futures):
-                try:
-                    u, v, res = fut.result()
-                    logger.info(f"Edge executed: {u} -> {v} result: {res.get('success', False)}")
-                except Exception as e:
-                    logger.info(f"Edge execution failed: {e}")
-
-        # persist final graph snapshot
-        snapshot = engine.get_graph_snapshot()
+        logger.info("Starting concurrent DAG execution loop...")
+        pipeline_result = asyncio.run(concurrent_engine.run_pipeline())
+        snapshot = pipeline_result.get("snapshot", {})
         save_graph_snapshot(snapshot)
+        logger.info(
+            "Concurrent DAG execution completed with %s executed edges",
+            len(pipeline_result.get("results", [])),
+        )
 
     except Exception as e:
         logger.info(f"DAG execution failed: {e}")
