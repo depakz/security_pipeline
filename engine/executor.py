@@ -1,20 +1,64 @@
 import subprocess
-from typing import Dict, List
+from typing import Dict, List, Optional
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 from urllib.request import Request, urlopen
 import socket
 import json
 
 
-def run_sqlmap(url):
+def _normalize_target_url(url: str) -> str:
+    """Normalize URL for active testing.
+
+    Keeps only the first value for duplicated query keys. Scanner-matched URLs
+    can include injected duplicate params (e.g., id=1&id=<payload>) that make
+    sqlmap treat input as tainted and abort early.
+    """
     try:
+        parts = urlsplit(url)
+        pairs = parse_qsl(parts.query, keep_blank_values=True)
+        if not pairs:
+            return url
+
+        normalized = []
+        seen = set()
+        for k, v in pairs:
+            if not k or k in seen:
+                continue
+            seen.add(k)
+            normalized.append((k, v))
+
+        query = urlencode(normalized, doseq=True)
+        return urlunsplit((parts.scheme, parts.netloc, parts.path, query, parts.fragment))
+    except Exception:
+        return url
+
+
+def run_sqlmap(url: str, cookie: Optional[str] = None):
+    try:
+        target_url = _normalize_target_url(url)
+        cmd = ["sqlmap", "-u", target_url, "--batch", "--level=1"]
+        if cookie:
+            cmd.extend(["--cookie", cookie])
+
         result = subprocess.run(
-            ["sqlmap", "-u", url, "--batch", "--level=1"],
+            cmd,
             capture_output=True,
             text=True,
             timeout=300,
         )
-        success = "is vulnerable" in (result.stdout or "").lower()
+        stdout_l = (result.stdout or "").lower()
+        success_indicators = (
+            "is vulnerable",
+            "parameter '",
+            "might be injectable",
+            "sql injection",
+            "type: boolean-based blind",
+            "type: error-based",
+            "type: union query",
+            "type: stacked queries",
+            "type: time-based blind",
+        )
+        success = any(indicator in stdout_l for indicator in success_indicators)
 
         # Prefer the tail for signal (banner is at the top).
         stdout = (result.stdout or "").strip()
@@ -24,6 +68,7 @@ def run_sqlmap(url):
             "success": bool(success),
             "evidence": {
                 "exit_code": result.returncode,
+                "target_url": target_url,
                 "output_tail": tail[:4000],
             },
         }
@@ -51,7 +96,7 @@ def _set_query_param(url: str, param: str, value: str) -> str:
     return urlunsplit((parts.scheme, parts.netloc, parts.path, query, parts.fragment))
 
 
-def test_xss(url):
+def test_xss(url: str, cookie: Optional[str] = None):
     try:
         payload = "<script>alert(1)</script>"
 
@@ -65,8 +110,13 @@ def test_xss(url):
             test_url = _set_query_param(url, param, payload)
 
             # -sS: silent but show errors, -L: follow redirects
+            curl_cmd = ["curl", "-sS", "-L", "--max-time", "15"]
+            if cookie:
+                curl_cmd.extend(["-H", f"Cookie: {cookie}"])
+            curl_cmd.append(test_url)
+
             result = subprocess.run(
-                ["curl", "-sS", "-L", "--max-time", "15", test_url],
+                curl_cmd,
                 capture_output=True,
                 text=True,
             )

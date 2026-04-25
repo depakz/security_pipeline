@@ -1,0 +1,222 @@
+{
+    "nodes": [
+        {
+            "id": "target:localhost",
+            "kind": "root",
+            "label": "localhost",
+            "state": {
+                "target": "localhost"
+            }
+        },
+        {
+            "id": "port:8080",
+            "kind": "discovery",
+            "label": "Port 8080",
+            "state": {
+                "port": 8080
+            }
+        },
+        {
+            "id": "protocol:http",
+            "kind": "discovery",
+            "label": "HTTP",
+            "state": {
+                "protocol": "http"
+            }
+        },
+        {
+            "id": "validator:missing_security_headers",
+            "kind": "validator",
+            "label": "MissingSecurityHeadersValidator",
+            "state": {
+                "spec": {
+                    "id": "missing_security_headers",
+                    "name": "MissingSecurityHeadersValidator",
+                    "class_path": "validators.http.MissingSecurityHeadersValidator",
+                    "description": "Checks for missing security headers on HTTP endpoints.",
+                    "severity": "info",
+                    "priority": 10,
+                    "keywords": [
+                        "http",
+                        "headers",
+                        "csp",
+                        "x-frame-options"
+                    ],
+                    "required_ports": [],
+                    "required_protocols": [
+                        "http"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "vulnerability:redis-no-auth",
+            "kind": "vulnerability",
+            "label": "Unauthenticated Redis Access",
+            "state": {
+                "spec": {
+                    "id": "redis-no-auth",
+                    "title": "Unauthenticated Redis Access",
+                    "description": "Redis exposed on 6379 and accepting unauthenticated connections.",
+                    "severity": "high",
+                    "keywords": [
+                        "redis",
+                        "6379",
+                        "auth"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "vulnerability:missing-security-headers",
+            "kind": "vulnerability",
+            "label": "Missing Security Headers",
+            "state": {
+                "spec": {
+                    "id": "missing-security-headers",
+                    "title": "Missing Security Headers",
+                    "description": "HTTP response missing baseline defensive headers.",
+                    "severity": "info",
+                    "keywords": [
+                        "headers",
+                        "csp",
+                        "x-frame-options",
+                        "http"
+                    ]
+                }
+            }
+        }
+    ],
+    "edges": [
+        {
+            "from": "target:localhost",
+            "to": "port:8080",
+            "id": "edge_target:localhost_to_port:8080",
+            "action": "edge_action",
+            "params": {},
+            "executed": true,
+            "result": {
+                "success": false,
+                "batch_key": "localhost:443|edge_action|generic",
+                "info": "action-executed",
+                "action": "edge_action",
+                "params": {}
+            }
+        },
+        {
+            "from": "target:localhost",
+            "to": "protocol:http",
+            "id": "edge_target:localhost_to_protocol:http",
+            "action": "edge_action",
+            "params": {},
+            "executed": true,
+            "result": {
+                "success": false,
+                "batch_key": "localhost:443|edge_action|generic",
+                "info": "action-executed",
+                "action": "edge_action",
+                "params": {}
+            }
+        },
+        {
+            "from": "target:localhost",
+            "to": "validator:missing_security_headers",
+            "id": "edge_target:localhost_to_validator:missing_security_headers",
+            "action": "edge_action",
+            "params": {
+                "validator_id": "missing_security_headers"
+            },
+            "executed": true,
+            "result": {
+                "success": false,
+                "batch_key": "localhost:443|edge_action|missing_security_headers",
+                "info": "action-executed",
+                "action": "edge_action",
+                "params": {
+                    "validator_id": "missing_security_headers"
+                }
+            }
+        },
+        {
+            "from": "target:localhost",
+            "to": "vulnerability:redis-no-auth",
+            "id": "edge_target:localhost_to_vulnerability:redis-no-auth",
+            "action": "edge_action",
+            "params": {},
+            "executed": true,
+            "result": {
+                "success": false,
+                "batch_key": "localhost:443|edge_action|generic",
+                "info": "action-executed",
+                "action": "edge_action",
+                "params": {}
+            }
+        },
+        {
+            "from": "target:localhost",
+            "to": "vulnerability:missing-security-headers",
+            "id": "edge_target:localhost_to_vulnerability:missing-security-headers",
+            "action": "edge_action",
+            "params": {},
+            "executed": true,
+            "result": {
+                "success": false,
+                "batch_key": "localhost:443|edge_action|generic",
+                "info": "action-executed",
+                "action": "edge_action",
+                "params": {}
+            }
+        },
+        {
+            "from": "protocol:http",
+            "to": "validator:missing_security_headers",
+            "id": "edge_protocol:http_to_validator:missing_security_headers",
+            "action": "edge_action",
+            "params": {
+                "validator_id": "missing_security_headers"
+            },
+            "executed": true,
+            "result": {
+                "success": false,
+                "batch_key": "localhost:443|edge_action|missing_security_headers",
+                "info": "action-executed",
+                "action": "edge_action",
+                "params": {
+                    "validator_id": "missing_security_headers"
+                }
+            }
+        },
+        {
+            "from": "vulnerability:missing-security-headers",
+            "to": "validator:missing_security_headers",
+            "id": "edge_vulnerability:missing-security-headers_to_validator:missing_security_headers",
+            "action": "edge_action",
+            "params": {
+                "validator_id": "missing_security_headers"
+            },
+            "executed": true,
+            "result": {
+                "success": false,
+                "batch_key": "localhost:443|edge_action|missing_security_headers",
+                "info": "action-executed",
+                "action": "edge_action",
+                "params": {
+                    "validator_id": "missing_security_headers"
+                }
+            }
+        }
+    ],
+    "scheduler_metrics": {
+        "max_workers": 20,
+        "total_duration_ms": 3.46,
+        "ready_edges_seen": 7,
+        "queued_edges": 7,
+        "queued_batches": 2,
+        "executed_edges": 7,
+        "executed_batches": 2,
+        "dedupe_skips": 0,
+        "dedupe_hit_rate": 0.0,
+        "avg_batch_duration_ms": 0.91,
+        "avg_batch_size": 3.5
+    }
+}

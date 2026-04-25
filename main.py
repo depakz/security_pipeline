@@ -25,6 +25,10 @@ from utils.retry import retry
 from utils.session import save_session
 
 
+FINAL_REPORT_FILE = "output/final_report.json"
+CONFIRMED_VULNS_FILE = "output/confirmed_vulnerabilities.json"
+
+
 def build_validation_state(report):
     scan_info = report.get("scan_info", {}) if isinstance(report, dict) else {}
     target = scan_info.get("target") or ""
@@ -92,14 +96,110 @@ def build_validation_state(report):
         "signals": [],
     }
 
-def execute_action(action):
+def execute_action(action, cookie=None):
     if action["action"] == "test_sqli":
-        return run_sqlmap(action["endpoint"])
+        return run_sqlmap(action["endpoint"], cookie=cookie)
 
     if action["action"] == "test_xss":
-        return test_xss(action["endpoint"])
+        return test_xss(action["endpoint"], cookie=cookie)
 
     return {"success": False, "evidence": "Unknown action"}
+
+
+def _action_to_vuln_type(action_name: str) -> str:
+    mapping = {
+        "test_sqli": "sql_injection",
+        "test_xss": "cross_site_scripting",
+    }
+    return mapping.get(action_name, action_name or "unknown")
+
+
+def _build_confirmed_records(actions, results):
+    confirmed = []
+    seen = set()
+
+    for action, result in zip(actions or [], results or []):
+        if not isinstance(action, dict) or not isinstance(result, dict):
+            continue
+        if not result.get("success"):
+            continue
+
+        action_name = action.get("action") or "unknown"
+        endpoint = action.get("endpoint") or ""
+        base = action.get("base") or ""
+        params = action.get("params") or []
+        reason = action.get("reason") or ""
+        vuln_type = _action_to_vuln_type(action_name)
+
+        key = (vuln_type, base, tuple(params) if isinstance(params, list) else ())
+        if key in seen:
+            continue
+        seen.add(key)
+
+        confirmed.append(
+            {
+                "type": vuln_type,
+                "source_action": action_name,
+                "endpoint": endpoint,
+                "base": base,
+                "params": params if isinstance(params, list) else [],
+                "reason": reason,
+                "proof": result.get("evidence", {}),
+            }
+        )
+
+    return confirmed
+
+
+def save_final_reports(target: str, scan_time: str, parsed_data, actions, results):
+    os.makedirs("output", exist_ok=True)
+
+    findings = parsed_data.get("findings", []) if isinstance(parsed_data, dict) else []
+    if not isinstance(findings, list):
+        findings = []
+
+    summary = parsed_data.get("summary", {}) if isinstance(parsed_data, dict) else {}
+    if not isinstance(summary, dict):
+        summary = {}
+
+    confirmed = _build_confirmed_records(actions, results)
+
+    final_report = {
+        "target": target,
+        "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "scan_time": scan_time,
+        "summary": {
+            "potential_findings": len(findings),
+            "confirmed_findings": len(confirmed),
+            "critical": summary.get("critical", 0),
+            "high": summary.get("high", 0),
+            "medium": summary.get("medium", 0),
+            "low": summary.get("low", 0),
+            "info": summary.get("info", 0),
+            "risk_score": summary.get("risk_score", 0),
+        },
+        "confirmed_vulnerabilities": confirmed,
+        "potential_findings": findings,
+        "follow_up_actions": actions or [],
+        "follow_up_results": results or [],
+    }
+
+    with open(FINAL_REPORT_FILE, "w") as f:
+        json.dump(final_report, f, indent=2)
+
+    with open(CONFIRMED_VULNS_FILE, "w") as f:
+        json.dump(
+            {
+                "target": target,
+                "generated_at": final_report["generated_at"],
+                "confirmed_count": len(confirmed),
+                "confirmed_vulnerabilities": confirmed,
+            },
+            f,
+            indent=2,
+        )
+
+    return FINAL_REPORT_FILE, CONFIRMED_VULNS_FILE
 
 
 def run_with_progress(label, func, *args, **kwargs):
@@ -180,6 +280,10 @@ def main():
         action="store_true",
         help="Generate CVE exploitability report (optional).",
     )
+    parser.add_argument(
+        "--cookie",
+        help="Cookie header value to include in HTTP-based scans (example: 'PHPSESSID=...; security=low').",
+    )
     args = parser.parse_args()
 
     if not args.target:
@@ -196,13 +300,13 @@ def main():
     run_with_progress("Naabu scan", run_naabu, target)
     
     logger.info("Running HTTPX scan...")
-    run_with_progress("HTTPX scan", run_httpx, target)
+    run_with_progress("HTTPX scan", run_httpx, target, cookie=args.cookie)
     
     logger.info("Running Nuclei scan...")
-    run_with_progress("Nuclei scan", run_nuclei, target)
+    run_with_progress("Nuclei scan", run_nuclei, target, cookie=args.cookie)
     
     logger.info("Running Gospider scan...")
-    run_with_progress("Gospider scan", run_gospider, target)
+    run_with_progress("Gospider scan", run_gospider, target, cookie=args.cookie)
 
     # Step 2: Aggregation
     logger.info("Aggregating results...")
@@ -250,6 +354,15 @@ def main():
     
     if not actions:
         logger.info("No actionable findings identified.")
+        final_report, confirmed_report = save_final_reports(
+            target=target,
+            scan_time=scan_time,
+            parsed_data=parsed_data,
+            actions=[],
+            results=[],
+        )
+        logger.info("Saved final report: %s", final_report)
+        logger.info("Saved confirmed vulnerabilities report: %s", confirmed_report)
         return
 
     # Step 5: Execution
@@ -257,11 +370,21 @@ def main():
     results = []
     for action in actions:
         logger.info(f"Executing: {action['action']} on {action.get('endpoint')}")
-        result = execute_action(action)
+        result = execute_action(action, cookie=args.cookie)
         results.append(result)
 
     logger.info("Pipeline completed. Summary:")
     print(json.dumps(results, indent=2))
+
+    final_report, confirmed_report = save_final_reports(
+        target=target,
+        scan_time=scan_time,
+        parsed_data=parsed_data,
+        actions=actions,
+        results=results,
+    )
+    logger.info("Saved final report: %s", final_report)
+    logger.info("Saved confirmed vulnerabilities report: %s", confirmed_report)
 
 if __name__ == "__main__":
     main()
