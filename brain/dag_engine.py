@@ -8,16 +8,24 @@ from engine.models import ExecutionContext
 from .cve_mapper import CVEMapper
 from .graph_builder import DAGGraph, GraphBuilder, GraphEngineAdapter
 from .kb import ValidatorSpec, get_default_validator_specs
+from validators.auth import AuthValidator
+from validators.crypto import CryptoValidator
 from validators.deserialization import InsecureDeserializationValidator
 from validators.ftp import FTPAnonymousLoginValidator
 from validators.http import MissingSecurityHeadersValidator
 from validators.idor import IDORValidator
+from validators.logging import LoggingValidator
 from validators.redis import RedisNoAuthValidator
+from validators.ssrf import SSRFValidator
 
 
 VALIDATOR_CLASS_MAP = {
     "validators.redis.RedisNoAuthValidator": RedisNoAuthValidator,
     "validators.http.MissingSecurityHeadersValidator": MissingSecurityHeadersValidator,
+    "validators.crypto.CryptoValidator": CryptoValidator,
+    "validators.auth.AuthValidator": AuthValidator,
+    "validators.logging.LoggingValidator": LoggingValidator,
+    "validators.ssrf.SSRFValidator": SSRFValidator,
     "validators.ftp.FTPAnonymousLoginValidator": FTPAnonymousLoginValidator,
     "validators.idor.IDORValidator": IDORValidator,
     "validators.deserialization.InsecureDeserializationValidator": InsecureDeserializationValidator,
