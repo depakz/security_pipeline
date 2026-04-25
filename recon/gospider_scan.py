@@ -19,7 +19,7 @@ def _resolve_binary(name):
     return None
 
 
-def run_gospider(target):
+def run_gospider(target, cookie=None):
     try:
         gospider_bin = _resolve_binary("gospider")
         if gospider_bin is None:
@@ -47,6 +47,9 @@ def run_gospider(target):
                 "-t",
                 "2",
             ]
+
+            if cookie:
+                cmd.extend(["--cookie", cookie])
 
             process = subprocess.run(
                 cmd,

@@ -1,10 +1,33 @@
 import json
 import os
+from dataclasses import asdict, is_dataclass
 from typing import Dict, Any
 
 SESSION_FILE = "output/session.json"
 SESSION_GRAPH_JSON = "output/session_graph.json"
 SESSION_GRAPH_DOT = "output/session_graph.dot"
+
+
+def _json_default(value: Any):
+    """Fallback serializer for non-JSON-native values.
+
+    Handles dataclass instances (e.g. ValidatorSpec/VulnerabilitySpec),
+    objects exposing `to_dict()`, and set/tuple values.
+    """
+    if is_dataclass(value):
+        return asdict(value)
+
+    to_dict = getattr(value, "to_dict", None)
+    if callable(to_dict):
+        try:
+            return to_dict()
+        except Exception:
+            pass
+
+    if isinstance(value, (set, tuple)):
+        return list(value)
+
+    return str(value)
 
 
 def save_session(data: Dict[str, Any]):
@@ -28,7 +51,7 @@ def save_graph_snapshot(snapshot: Dict[str, Any]):
     """
     os.makedirs(os.path.dirname(SESSION_GRAPH_JSON), exist_ok=True)
     with open(SESSION_GRAPH_JSON, "w") as f:
-        json.dump(snapshot, f, indent=4)
+        json.dump(snapshot, f, indent=4, default=_json_default)
 
     # Emit a simple DOT file
     try:

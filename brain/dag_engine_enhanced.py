@@ -27,8 +27,10 @@ from engine.executor import run_sqlmap, test_xss, run_git_extractor, run_ssh_bru
 from .cve_mapper import CVEMapper
 from .graph_builder import DAGGraph, GraphBuilder, GraphEngineAdapter
 from .kb import ValidatorSpec, get_default_validator_specs
+from validators.deserialization import InsecureDeserializationValidator
 from validators.ftp import FTPAnonymousLoginValidator
 from validators.http import MissingSecurityHeadersValidator
+from validators.idor import IDORValidator
 from validators.integrity import IntegrityValidator
 from validators.redis import RedisNoAuthValidator
 
@@ -38,6 +40,8 @@ VALIDATOR_CLASS_MAP = {
     "validators.http.MissingSecurityHeadersValidator": MissingSecurityHeadersValidator,
     "validators.ftp.FTPAnonymousLoginValidator": FTPAnonymousLoginValidator,
     "validators.integrity.IntegrityValidator": IntegrityValidator,
+    "validators.idor.IDORValidator": IDORValidator,
+    "validators.deserialization.InsecureDeserializationValidator": InsecureDeserializationValidator,
 }
 
 

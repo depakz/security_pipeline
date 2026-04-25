@@ -67,6 +67,26 @@ DEFAULT_VALIDATOR_SPECS: List[ValidatorSpec] = [
         keywords=["http", "headers", "csp", "x-frame-options"],
         required_protocols=["http"],
     ),
+    ValidatorSpec(
+        id="idor_validator",
+        name="IDORValidator",
+        class_path="validators.idor.IDORValidator",
+        description="Tests for object-level authorization bypass by comparing baseline and tampered IDs.",
+        severity="high",
+        priority=70,
+        keywords=["idor", "insecure direct object reference", "object", "a04"],
+        required_protocols=["http"],
+    ),
+    ValidatorSpec(
+        id="insecure_deserialization",
+        name="InsecureDeserializationValidator",
+        class_path="validators.deserialization.InsecureDeserializationValidator",
+        description="Detects serialization signatures and validates potential insecure deserialization via timing probe.",
+        severity="high",
+        priority=75,
+        keywords=["deserialization", "serialized", "Tzo", "rO0", "a08"],
+        required_protocols=["http"],
+    ),
 ]
 
 

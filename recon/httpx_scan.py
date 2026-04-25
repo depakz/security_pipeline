@@ -23,7 +23,7 @@ def check_httpx():
         raise EnvironmentError("httpx is not installed or not in PATH")
 
 
-def run_httpx(target):
+def run_httpx(target, cookie=None):
     try:
         check_httpx()
         httpx_bin = _resolve_binary("httpx")
@@ -35,6 +35,9 @@ def run_httpx(target):
             "-silent",
             "-timeout", "10"
         ]
+
+        if cookie:
+            cmd.extend(["-H", f"Cookie: {cookie}"])
 
         process = subprocess.Popen(
             cmd,

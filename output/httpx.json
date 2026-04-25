@@ -1,12 +1,12 @@
 [
     {
-        "url": "https://altoro.testfire.net",
+        "url": "http://localhost:8080/vulnerabilities/sqli/?id=1&Submit=Submit",
         "status_code": 200,
-        "title": "Altoro Mutual",
-        "webserver": "Apache-Coyote/1.1",
+        "title": "Vulnerability: SQL Injection :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*",
+        "webserver": "Apache/2.4.25 (Debian)",
         "tech": [
-            "Apache Tomcat",
-            "Java"
+            "Debian",
+            "Apache HTTP Server:2.4.25"
         ],
         "ip": ""
     }

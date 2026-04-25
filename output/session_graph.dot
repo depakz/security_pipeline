@@ -1,0 +1,15 @@
+digraph session_graph {
+  "target:localhost" [label="localhost"];
+  "port:8080" [label="Port 8080"];
+  "protocol:http" [label="HTTP"];
+  "validator:missing_security_headers" [label="MissingSecurityHeadersValidator"];
+  "vulnerability:redis-no-auth" [label="Unauthenticated Redis Access"];
+  "vulnerability:missing-security-headers" [label="Missing Security Headers"];
+  "target:localhost" -> "port:8080" [label="edge_target:localhost_to_port:8080: edge_action"];
+  "target:localhost" -> "protocol:http" [label="edge_target:localhost_to_protocol:http: edge_action"];
+  "target:localhost" -> "validator:missing_security_headers" [label="edge_target:localhost_to_validator:missing_security_headers: edge_action"];
+  "target:localhost" -> "vulnerability:redis-no-auth" [label="edge_target:localhost_to_vulnerability:redis-no-auth: edge_action"];
+  "target:localhost" -> "vulnerability:missing-security-headers" [label="edge_target:localhost_to_vulnerability:missing-security-headers: edge_action"];
+  "protocol:http" -> "validator:missing_security_headers" [label="edge_protocol:http_to_validator:missing_security_headers: edge_action"];
+  "vulnerability:missing-security-headers" -> "validator:missing_security_headers" [label="edge_vulnerability:missing-security-headers_to_validator:missing_security_headers: edge_action"];
+}

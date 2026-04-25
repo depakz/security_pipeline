@@ -1,7 +1,4 @@
 {
-    "target": "https://example.com",
-    "endpoints": [
-        "https://iana.org/domains/example",
-        "https://example.com"
-    ]
+    "error": "gospider failed silently",
+    "debug_hint": "check WAF blocking, URL scheme, or crawl depth"
 }

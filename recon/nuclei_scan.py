@@ -46,7 +46,7 @@ def _truncate(value, limit):
     return s[:limit] + "...(truncated)"
 
 
-def run_nuclei(target, progress=None):
+def run_nuclei(target, progress=None, cookie=None):
     process = None
     try:
         nuclei_bin = _resolve_binary("nuclei")
@@ -60,6 +60,9 @@ def run_nuclei(target, progress=None):
             "-silent",
             "-no-interactsh",
         ]
+
+        if cookie:
+            cmd.extend(["-H", f"Cookie: {cookie}"])
 
         if isinstance(progress, dict):
             progress["detail"] = " | starting nuclei"
