@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 import threading
 import inspect
 from brain.dag_engine_enhanced import DAGBrain, ConcurrentValidationEngine
+from brain.compliance_mapper import ComplianceMapper
 from brain.exploitability_reporter import ExploitabilityReporter
 from engine.validation_engine import StateManager, ValidationEngine
 import importlib
@@ -151,6 +152,26 @@ def _build_confirmed_records(actions, results):
     return confirmed
 
 
+def _annotate_records(records):
+    annotated = []
+    for record in records or []:
+        if isinstance(record, dict):
+            annotated.append(ComplianceMapper.annotate_record(record))
+    return annotated
+
+
+def _summarize_compliance(records):
+    frameworks = {"OWASP": [], "PCI-DSS": [], "SOC2": [], "NIST": []}
+    for record in records or []:
+        if not isinstance(record, dict):
+            continue
+        for framework, label in (record.get("compliance_tags") or {}).items():
+            bucket = frameworks.setdefault(framework, [])
+            if label not in bucket:
+                bucket.append(label)
+    return frameworks
+
+
 def save_final_reports(target: str, scan_time: str, parsed_data, actions, results):
     os.makedirs("output", exist_ok=True)
 
@@ -162,14 +183,17 @@ def save_final_reports(target: str, scan_time: str, parsed_data, actions, result
     if not isinstance(summary, dict):
         summary = {}
 
-    confirmed = _build_confirmed_records(actions, results)
+    confirmed = _annotate_records(_build_confirmed_records(actions, results))
+    annotated_findings = _annotate_records(findings)
+    annotated_results = _annotate_records(results)
+    compliance_overview = _summarize_compliance(annotated_findings + confirmed + annotated_results)
 
     final_report = {
         "target": target,
         "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "scan_time": scan_time,
         "summary": {
-            "potential_findings": len(findings),
+            "potential_findings": len(annotated_findings),
             "confirmed_findings": len(confirmed),
             "critical": summary.get("critical", 0),
             "high": summary.get("high", 0),
@@ -178,10 +202,11 @@ def save_final_reports(target: str, scan_time: str, parsed_data, actions, result
             "info": summary.get("info", 0),
             "risk_score": summary.get("risk_score", 0),
         },
+        "compliance_overview": compliance_overview,
         "confirmed_vulnerabilities": confirmed,
-        "potential_findings": findings,
+        "potential_findings": annotated_findings,
         "follow_up_actions": actions or [],
-        "follow_up_results": results or [],
+        "follow_up_results": annotated_results,
     }
 
     with open(FINAL_REPORT_FILE, "w") as f:
@@ -198,6 +223,9 @@ def save_final_reports(target: str, scan_time: str, parsed_data, actions, result
             f,
             indent=2,
         )
+
+    if compliance_overview.get("OWASP"):
+        logger.info("OWASP compliance labels: %s", ", ".join(compliance_overview["OWASP"]))
 
     return FINAL_REPORT_FILE, CONFIRMED_VULNS_FILE
 
@@ -374,7 +402,7 @@ def main():
         results.append(result)
 
     logger.info("Pipeline completed. Summary:")
-    print(json.dumps(results, indent=2))
+    print(json.dumps(_annotate_records(results), indent=2))
 
     final_report, confirmed_report = save_final_reports(
         target=target,

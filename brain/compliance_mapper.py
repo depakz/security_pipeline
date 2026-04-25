@@ -10,6 +10,24 @@ class ComplianceMapper:
     """Map technical vulnerability types to common compliance frameworks."""
 
     MAPPING: Dict[str, Dict[str, str]] = {
+        "Cryptographic Failures": {
+            "OWASP": "A02:2021-Cryptographic Failures",
+            "PCI-DSS": "Requirement 3.4 / 4.1",
+            "SOC2": "CC6.7 (Encryption and Transmission Protection)",
+            "NIST": "SP 800-53 (SC-8 Transmission Confidentiality and Integrity)",
+        },
+        "Identification and Authentication Failures": {
+            "OWASP": "A07:2021-Identification and Authentication Failures",
+            "PCI-DSS": "Requirement 8.2",
+            "SOC2": "CC6.1 (Access Protection)",
+            "NIST": "SP 800-53 (IA-2 Identification and Authentication)",
+        },
+        "Security Logging and Monitoring Failures": {
+            "OWASP": "A09:2021-Security Logging and Monitoring Failures",
+            "PCI-DSS": "Requirement 10.2 / 10.6",
+            "SOC2": "CC7.2 (Change Detection) / CC7.3 (Monitoring)",
+            "NIST": "SP 800-53 (AU-2 Event Logging / AU-6 Audit Review)",
+        },
         "SSRF": {
             "OWASP": "A10:2021-Server-Side Request Forgery",
             "PCI-DSS": "Requirement 6.4.1",
@@ -48,6 +66,12 @@ class ComplianceMapper:
         value = (vulnerability_type or "").strip().lower()
         if not value:
             return ""
+        if "crypt" in value or "tls" in value or "ssl" in value or "cipher" in value:
+            return "Cryptographic Failures"
+        if "auth" in value or "login" in value or "credential" in value or "password" in value:
+            return "Identification and Authentication Failures"
+        if "log" in value or "monitor" in value or "audit" in value:
+            return "Security Logging and Monitoring Failures"
         if "ssrf" in value:
             return "SSRF"
         if "credential" in value or "password" in value or "token" in value:
