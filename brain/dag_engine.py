@@ -8,13 +8,18 @@ from engine.models import ExecutionContext
 from .cve_mapper import CVEMapper
 from .graph_builder import DAGGraph, GraphBuilder, GraphEngineAdapter
 from .kb import ValidatorSpec, get_default_validator_specs
+from validators.access_control import BrokenAccessControlValidator
 from validators.auth import AuthValidator
+from validators.components import OutdatedComponentsValidator
 from validators.crypto import CryptoValidator
 from validators.deserialization import InsecureDeserializationValidator
+from validators.injection import InjectionValidator
+from validators.insecure_design import InsecureDesignValidator
 from validators.ftp import FTPAnonymousLoginValidator
 from validators.http import MissingSecurityHeadersValidator
 from validators.idor import IDORValidator
 from validators.logging import LoggingValidator
+from validators.misconfiguration import SecurityMisconfigurationValidator
 from validators.redis import RedisNoAuthValidator
 from validators.ssrf import SSRFValidator
 
@@ -22,9 +27,14 @@ from validators.ssrf import SSRFValidator
 VALIDATOR_CLASS_MAP = {
     "validators.redis.RedisNoAuthValidator": RedisNoAuthValidator,
     "validators.http.MissingSecurityHeadersValidator": MissingSecurityHeadersValidator,
+    "validators.injection.InjectionValidator": InjectionValidator,
+    "validators.insecure_design.InsecureDesignValidator": InsecureDesignValidator,
+    "validators.access_control.BrokenAccessControlValidator": BrokenAccessControlValidator,
     "validators.crypto.CryptoValidator": CryptoValidator,
     "validators.auth.AuthValidator": AuthValidator,
     "validators.logging.LoggingValidator": LoggingValidator,
+    "validators.misconfiguration.SecurityMisconfigurationValidator": SecurityMisconfigurationValidator,
+    "validators.components.OutdatedComponentsValidator": OutdatedComponentsValidator,
     "validators.ssrf.SSRFValidator": SSRFValidator,
     "validators.ftp.FTPAnonymousLoginValidator": FTPAnonymousLoginValidator,
     "validators.idor.IDORValidator": IDORValidator,

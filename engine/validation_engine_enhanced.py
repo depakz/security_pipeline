@@ -15,6 +15,7 @@ from engine.models import ExecutionContext, ValidationResult
 from brain.fact_store import FactStore, FactCategory, Fact, PrerequisiteQuery
 from brain.endpoint_normalizer import EndpointNormalizer
 from brain.attack_chain_manager import AttackChainManager, ChainedExploitationNode
+from brain.proof_collector import ProofCollector
 from utils.logger import logger
 
 
@@ -47,6 +48,7 @@ class ValidationResultProcessor:
         self.fact_store = fact_store
         self.endpoint_normalizer = endpoint_normalizer or EndpointNormalizer()
         self.attack_chain_manager = attack_chain_manager
+        self.proof_collector = ProofCollector()
         self.extraction_rules: Dict[str, Callable[[Dict], List[Fact]]] = {}
         self._register_default_extraction_rules()
 
@@ -212,6 +214,8 @@ class ValidationResultProcessor:
         if not _is_confirmed(result):
             return result
 
+        result = self.proof_collector.attach(result)
+
         # Extract and store facts
         facts = self.extract_facts_from_result(result)
 
@@ -364,6 +368,8 @@ class ValidationEngine:
                     out = r.to_dict() if hasattr(r, "to_dict") else r
                     if not isinstance(out, dict):
                         continue
+
+                    out = self.result_processor.process_result(out)
 
                     if validator_id:
                         out.setdefault("validator_id", validator_id)
