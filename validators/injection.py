@@ -5,6 +5,7 @@ from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 import requests
 
+from brain.attack_variant_catalog import get_attack_variants
 from engine.models import Evidence, EvidenceBundle, ExecutionContext, ValidationResult
 
 
@@ -31,6 +32,17 @@ TEMPLATE_PAYLOAD = "{{7*7}}"
 TEMPLATE_MARKERS = ("49", TEMPLATE_PAYLOAD)
 LDAP_PAYLOAD = "*)(uid=*)"
 LDAP_MARKERS = ("ldap error", "invalid dn", "filter error", "ldap:")
+
+
+def _get_payload_variants() -> Dict[str, List[str]]:
+    return {
+        "sqli": get_attack_variants("A03", "sqli_payloads", [SQLI_PAYLOAD]),
+        "xss": get_attack_variants("A03", "xss_payloads", [XSS_PAYLOAD]),
+        "command": get_attack_variants("A03", "command_payloads", [COMMAND_PAYLOAD]),
+        "file": get_attack_variants("A03", "file_payloads", [FILE_PAYLOAD]),
+        "template": get_attack_variants("A03", "template_payloads", [TEMPLATE_PAYLOAD]),
+        "ldap": get_attack_variants("A03", "ldap_payloads", [LDAP_PAYLOAD]),
+    }
 
 
 def _replace_query_param(url: str, key: str, value: str) -> str:
@@ -112,29 +124,102 @@ class InjectionValidator:
             headers["Cookie"] = cookie.strip()
 
         candidate_params = _candidate_params(state, target_url)
+        variants = _get_payload_variants()
         findings: List[ValidationResult] = []
 
         for param in candidate_params:
             baseline_url = _replace_query_param(target_url, param, "injection-test")
-            sqli_url = _replace_query_param(target_url, param, SQLI_PAYLOAD)
-            xss_url = _replace_query_param(target_url, param, XSS_PAYLOAD)
-            command_url = _replace_query_param(target_url, param, COMMAND_PAYLOAD)
-            file_url = _replace_query_param(target_url, param, FILE_PAYLOAD)
-            template_url = _replace_query_param(target_url, param, TEMPLATE_PAYLOAD)
-            ldap_url = _replace_query_param(target_url, param, LDAP_PAYLOAD)
 
             try:
                 baseline = self._run_probe(baseline_url, headers, timeout)
-                sqli = self._run_probe(sqli_url, headers, timeout)
-                xss = self._run_probe(xss_url, headers, timeout)
-                command = self._run_probe(command_url, headers, timeout)
-                file_probe = self._run_probe(file_url, headers, timeout)
-                template_probe = self._run_probe(template_url, headers, timeout)
-                ldap_probe = self._run_probe(ldap_url, headers, timeout)
             except requests.RequestException:
                 continue
 
-            if sqli["sql_error_hits"]:
+            sqli = None
+            sqli_payload_used = ""
+            for payload in variants["sqli"]:
+                probe_url = _replace_query_param(target_url, param, payload)
+                try:
+                    candidate = self._run_probe(probe_url, headers, timeout)
+                except requests.RequestException:
+                    continue
+                if candidate["sql_error_hits"]:
+                    sqli = candidate
+                    sqli["probe_url"] = probe_url
+                    sqli_payload_used = payload
+                    break
+
+            xss = None
+            xss_payload_used = ""
+            for payload in variants["xss"]:
+                probe_url = _replace_query_param(target_url, param, payload)
+                try:
+                    candidate = self._run_probe(probe_url, headers, timeout)
+                except requests.RequestException:
+                    continue
+                if candidate["xss_reflected"]:
+                    xss = candidate
+                    xss["probe_url"] = probe_url
+                    xss_payload_used = payload
+                    break
+
+            command = None
+            command_payload_used = ""
+            for payload in variants["command"]:
+                probe_url = _replace_query_param(target_url, param, payload)
+                try:
+                    candidate = self._run_probe(probe_url, headers, timeout)
+                except requests.RequestException:
+                    continue
+                if candidate["command_marker_seen"]:
+                    command = candidate
+                    command["probe_url"] = probe_url
+                    command_payload_used = payload
+                    break
+
+            file_probe = None
+            file_payload_used = ""
+            for payload in variants["file"]:
+                probe_url = _replace_query_param(target_url, param, payload)
+                try:
+                    candidate = self._run_probe(probe_url, headers, timeout)
+                except requests.RequestException:
+                    continue
+                if candidate["file_marker_seen"]:
+                    file_probe = candidate
+                    file_probe["probe_url"] = probe_url
+                    file_payload_used = payload
+                    break
+
+            template_probe = None
+            template_payload_used = ""
+            for payload in variants["template"]:
+                probe_url = _replace_query_param(target_url, param, payload)
+                try:
+                    candidate = self._run_probe(probe_url, headers, timeout)
+                except requests.RequestException:
+                    continue
+                if candidate["template_marker_seen"]:
+                    template_probe = candidate
+                    template_probe["probe_url"] = probe_url
+                    template_payload_used = payload
+                    break
+
+            ldap_probe = None
+            ldap_payload_used = ""
+            for payload in variants["ldap"]:
+                probe_url = _replace_query_param(target_url, param, payload)
+                try:
+                    candidate = self._run_probe(probe_url, headers, timeout)
+                except requests.RequestException:
+                    continue
+                if candidate["ldap_marker_seen"]:
+                    ldap_probe = candidate
+                    ldap_probe["probe_url"] = probe_url
+                    ldap_payload_used = payload
+                    break
+
+            if sqli and sqli["sql_error_hits"]:
                 findings.append(
                     ValidationResult(
                         success=True,
@@ -142,17 +227,17 @@ class InjectionValidator:
                         severity="high",
                         vulnerability="a03-injection-sqli",
                         evidence=Evidence(
-                            request={"baseline_url": baseline_url, "probe_url": sqli_url, "param": param},
+                            request={"baseline_url": baseline_url, "probe_url": sqli.get("probe_url"), "param": param},
                             response={
                                 "baseline_status": baseline["status_code"],
                                 "probe_status": sqli["status_code"],
                                 "sql_error_hits": sqli["sql_error_hits"],
                             },
                             matched=",".join(sqli["sql_error_hits"]),
-                            extra={"param": param, "payload": SQLI_PAYLOAD},
+                            extra={"param": param, "payload": sqli_payload_used, "attempted_payload_variants": variants["sqli"]},
                         ),
                         evidence_bundle=EvidenceBundle(
-                            raw_request=f"GET {sqli_url}",
+                            raw_request=f"GET {sqli.get('probe_url')}",
                             raw_response=_clip(sqli["body"]),
                             matched_indicator=",".join(sqli["sql_error_hits"]),
                             execution_proof={"sql_error_visible": True},
@@ -164,7 +249,7 @@ class InjectionValidator:
                     )
                 )
 
-            if xss["xss_reflected"]:
+            if xss and xss["xss_reflected"]:
                 findings.append(
                     ValidationResult(
                         success=True,
@@ -172,19 +257,19 @@ class InjectionValidator:
                         severity="high",
                         vulnerability="a03-injection-xss",
                         evidence=Evidence(
-                            request={"baseline_url": baseline_url, "probe_url": xss_url, "param": param},
+                            request={"baseline_url": baseline_url, "probe_url": xss.get("probe_url"), "param": param},
                             response={
                                 "baseline_status": baseline["status_code"],
                                 "probe_status": xss["status_code"],
                                 "reflected": True,
                             },
-                            matched=XSS_PAYLOAD,
-                            extra={"param": param, "payload": XSS_PAYLOAD},
+                            matched=xss_payload_used,
+                            extra={"param": param, "payload": xss_payload_used, "attempted_payload_variants": variants["xss"]},
                         ),
                         evidence_bundle=EvidenceBundle(
-                            raw_request=f"GET {xss_url}",
+                            raw_request=f"GET {xss.get('probe_url')}",
                             raw_response=_clip(xss["body"]),
-                            matched_indicator=XSS_PAYLOAD,
+                            matched_indicator=xss_payload_used,
                             execution_proof={"payload_reflected": True},
                             metadata={"param": param, "probe": "xss"},
                         ),
@@ -194,7 +279,7 @@ class InjectionValidator:
                     )
                 )
 
-            if command["command_marker_seen"]:
+            if command and command["command_marker_seen"]:
                 findings.append(
                     ValidationResult(
                         success=True,
@@ -202,17 +287,17 @@ class InjectionValidator:
                         severity="high",
                         vulnerability="a03-injection-command",
                         evidence=Evidence(
-                            request={"baseline_url": baseline_url, "probe_url": command_url, "param": param},
+                            request={"baseline_url": baseline_url, "probe_url": command.get("probe_url"), "param": param},
                             response={
                                 "baseline_status": baseline["status_code"],
                                 "probe_status": command["status_code"],
                                 "command_marker_seen": True,
                             },
                             matched=COMMAND_MARKER,
-                            extra={"param": param, "payload": COMMAND_PAYLOAD},
+                            extra={"param": param, "payload": command_payload_used, "attempted_payload_variants": variants["command"]},
                         ),
                         evidence_bundle=EvidenceBundle(
-                            raw_request=f"GET {command_url}",
+                            raw_request=f"GET {command.get('probe_url')}",
                             raw_response=_clip(command["body"]),
                             matched_indicator=COMMAND_MARKER,
                             execution_proof={"command_marker_seen": True},
@@ -224,7 +309,7 @@ class InjectionValidator:
                     )
                 )
 
-            if file_probe["file_marker_seen"]:
+            if file_probe and file_probe["file_marker_seen"]:
                 findings.append(
                     ValidationResult(
                         success=True,
@@ -232,17 +317,17 @@ class InjectionValidator:
                         severity="high",
                         vulnerability="a03-injection-file",
                         evidence=Evidence(
-                            request={"baseline_url": baseline_url, "probe_url": file_url, "param": param},
+                            request={"baseline_url": baseline_url, "probe_url": file_probe.get("probe_url"), "param": param},
                             response={
                                 "baseline_status": baseline["status_code"],
                                 "probe_status": file_probe["status_code"],
                                 "file_marker_seen": True,
                             },
                             matched=",".join([marker for marker in FILE_MARKERS if marker in file_probe["body"]]) or FILE_PAYLOAD,
-                            extra={"param": param, "payload": FILE_PAYLOAD},
+                            extra={"param": param, "payload": file_payload_used, "attempted_payload_variants": variants["file"]},
                         ),
                         evidence_bundle=EvidenceBundle(
-                            raw_request=f"GET {file_url}",
+                            raw_request=f"GET {file_probe.get('probe_url')}",
                             raw_response=_clip(file_probe["body"]),
                             matched_indicator="file_read_marker",
                             execution_proof={"file_marker_seen": True},
@@ -254,7 +339,7 @@ class InjectionValidator:
                     )
                 )
 
-            if template_probe["template_marker_seen"]:
+            if template_probe and template_probe["template_marker_seen"]:
                 findings.append(
                     ValidationResult(
                         success=True,
@@ -262,19 +347,19 @@ class InjectionValidator:
                         severity="high",
                         vulnerability="a03-injection-template",
                         evidence=Evidence(
-                            request={"baseline_url": baseline_url, "probe_url": template_url, "param": param},
+                            request={"baseline_url": baseline_url, "probe_url": template_probe.get("probe_url"), "param": param},
                             response={
                                 "baseline_status": baseline["status_code"],
                                 "probe_status": template_probe["status_code"],
                                 "template_marker_seen": True,
                             },
-                            matched=TEMPLATE_PAYLOAD,
-                            extra={"param": param, "payload": TEMPLATE_PAYLOAD},
+                            matched=template_payload_used,
+                            extra={"param": param, "payload": template_payload_used, "attempted_payload_variants": variants["template"]},
                         ),
                         evidence_bundle=EvidenceBundle(
-                            raw_request=f"GET {template_url}",
+                            raw_request=f"GET {template_probe.get('probe_url')}",
                             raw_response=_clip(template_probe["body"]),
-                            matched_indicator=TEMPLATE_PAYLOAD,
+                            matched_indicator=template_payload_used,
                             execution_proof={"template_marker_seen": True},
                             metadata={"param": param, "probe": "template"},
                         ),
@@ -284,7 +369,7 @@ class InjectionValidator:
                     )
                 )
 
-            if ldap_probe["ldap_marker_seen"]:
+            if ldap_probe and ldap_probe["ldap_marker_seen"]:
                 findings.append(
                     ValidationResult(
                         success=True,
@@ -292,19 +377,19 @@ class InjectionValidator:
                         severity="high",
                         vulnerability="a03-injection-ldap",
                         evidence=Evidence(
-                            request={"baseline_url": baseline_url, "probe_url": ldap_url, "param": param},
+                            request={"baseline_url": baseline_url, "probe_url": ldap_probe.get("probe_url"), "param": param},
                             response={
                                 "baseline_status": baseline["status_code"],
                                 "probe_status": ldap_probe["status_code"],
                                 "ldap_marker_seen": True,
                             },
-                            matched=LDAP_PAYLOAD,
-                            extra={"param": param, "payload": LDAP_PAYLOAD},
+                            matched=ldap_payload_used,
+                            extra={"param": param, "payload": ldap_payload_used, "attempted_payload_variants": variants["ldap"]},
                         ),
                         evidence_bundle=EvidenceBundle(
-                            raw_request=f"GET {ldap_url}",
+                            raw_request=f"GET {ldap_probe.get('probe_url')}",
                             raw_response=_clip(ldap_probe["body"]),
-                            matched_indicator=LDAP_PAYLOAD,
+                            matched_indicator=ldap_payload_used,
                             execution_proof={"ldap_marker_seen": True},
                             metadata={"param": param, "probe": "ldap"},
                         ),

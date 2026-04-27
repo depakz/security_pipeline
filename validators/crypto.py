@@ -5,6 +5,7 @@ import ssl
 from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import urlsplit
 
+from brain.attack_variant_catalog import get_attack_variants
 from engine.models import Evidence, ExecutionContext, ValidationResult
 from utils.logger import logger
 
@@ -23,7 +24,14 @@ def _build_headers(state: Dict[str, Any]) -> Dict[str, str]:
 
 
 def _has_sensitive_headers(headers: Dict[str, str]) -> List[str]:
-    sensitive_names = {"authorization", "proxy-authorization", "cookie", "x-api-key", "x-auth-token", "x-access-token"}
+    sensitive_names = {
+        name.lower()
+        for name in get_attack_variants(
+            "A02",
+            "sensitive_headers",
+            ["Authorization", "Proxy-Authorization", "Cookie", "X-API-Key", "X-Auth-Token", "X-Access-Token"],
+        )
+    }
     return sorted({name for name in headers if name.lower() in sensitive_names})
 
 
@@ -75,6 +83,11 @@ class CryptoValidator:
         timeout = int(state.get("timeout", 8) or 8)
         headers = _build_headers(state)
         sensitive_headers = _has_sensitive_headers(headers)
+        attempted_sensitive_header_variants = get_attack_variants(
+            "A02",
+            "sensitive_headers",
+            ["Authorization", "Proxy-Authorization", "Cookie", "X-API-Key", "X-Auth-Token", "X-Access-Token"],
+        )
 
         logger.info("CryptoValidator: probing %s", target_url)
 
@@ -93,7 +106,10 @@ class CryptoValidator:
                         request={"target": target_url, "probe": "tls_version"},
                         response=tls_probe,
                         matched=",".join(weak_versions),
-                        extra={"weak_versions": weak_versions},
+                        extra={
+                            "weak_versions": weak_versions,
+                            "attempted_sensitive_header_variants": attempted_sensitive_header_variants,
+                        },
                     ),
                     impact="The service accepts deprecated TLS versions that weaken transport confidentiality and integrity.",
                     remediation="Disable TLS 1.0 and TLS 1.1, enforce TLS 1.2+ or TLS 1.3, and restrict weak cipher suites.",
@@ -108,7 +124,10 @@ class CryptoValidator:
                     request={"target": target_url, "probe": "tls_version"},
                     response=tls_probe,
                     matched="",
-                    extra={"sensitive_headers_present": sensitive_headers},
+                    extra={
+                        "sensitive_headers_present": sensitive_headers,
+                        "attempted_sensitive_header_variants": attempted_sensitive_header_variants,
+                    },
                 ),
                 impact="No weak TLS version was confirmed from the available probe.",
                 remediation="Keep TLS restricted to modern versions and continue monitoring cipher policy drift.",
@@ -125,7 +144,10 @@ class CryptoValidator:
                     request={"target": target_url, "headers": sensitive_headers},
                     response={"scheme": parts.scheme, "transport": "plaintext"},
                     matched=",".join(sensitive_headers),
-                    extra={"url": target_url},
+                    extra={
+                        "url": target_url,
+                        "attempted_sensitive_header_variants": attempted_sensitive_header_variants,
+                    },
                 ),
                 impact="Sensitive headers are being transmitted without transport encryption, exposing credentials or session material.",
                 remediation="Require HTTPS, redirect HTTP to HTTPS, and avoid sending credentials or session tokens over plaintext transport.",
@@ -140,6 +162,7 @@ class CryptoValidator:
                 request={"target": target_url},
                 response={"sensitive_headers_present": sensitive_headers},
                 matched="",
+                extra={"attempted_sensitive_header_variants": attempted_sensitive_header_variants},
             ),
             impact="No weak cryptographic transport behavior was confirmed.",
             remediation="Prefer HTTPS everywhere and monitor TLS configuration continuously.",

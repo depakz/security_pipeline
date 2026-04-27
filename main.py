@@ -8,6 +8,7 @@ import threading
 import inspect
 from brain.dag_engine_enhanced import DAGBrain, ConcurrentValidationEngine
 from brain.compliance_mapper import ComplianceMapper
+from brain.owasp_depth_matrix import build_depth_coverage
 from brain.exploitability_reporter import ExploitabilityReporter
 from engine.validation_engine import StateManager, ValidationEngine
 import importlib
@@ -172,7 +173,30 @@ def _summarize_compliance(records):
     return frameworks
 
 
-def save_final_reports(target: str, scan_time: str, parsed_data, actions, results):
+def _extract_pipeline_validation_records(pipeline_result):
+    out = []
+    if not isinstance(pipeline_result, dict):
+        return out
+
+    for edge_result in pipeline_result.get("results", []) or []:
+        if not isinstance(edge_result, dict):
+            continue
+        result_wrapper = edge_result.get("result")
+        if not isinstance(result_wrapper, dict):
+            continue
+
+        payload = result_wrapper.get("result")
+        if isinstance(payload, dict):
+            out.append(payload)
+        elif isinstance(payload, list):
+            for item in payload:
+                if isinstance(item, dict):
+                    out.append(item)
+
+    return out
+
+
+def save_final_reports(target: str, scan_time: str, parsed_data, actions, results, pipeline_validation_results=None):
     os.makedirs("output", exist_ok=True)
 
     findings = parsed_data.get("findings", []) if isinstance(parsed_data, dict) else []
@@ -186,7 +210,11 @@ def save_final_reports(target: str, scan_time: str, parsed_data, actions, result
     confirmed = _annotate_records(_build_confirmed_records(actions, results))
     annotated_findings = _annotate_records(findings)
     annotated_results = _annotate_records(results)
-    compliance_overview = _summarize_compliance(annotated_findings + confirmed + annotated_results)
+    annotated_pipeline_results = _annotate_records(pipeline_validation_results or [])
+    all_report_records = annotated_findings + confirmed + annotated_results + annotated_pipeline_results
+
+    compliance_overview = _summarize_compliance(all_report_records)
+    owasp_depth_coverage = build_depth_coverage(all_report_records)
 
     final_report = {
         "target": target,
@@ -203,8 +231,10 @@ def save_final_reports(target: str, scan_time: str, parsed_data, actions, result
             "risk_score": summary.get("risk_score", 0),
         },
         "compliance_overview": compliance_overview,
+        "owasp_depth_coverage": owasp_depth_coverage,
         "confirmed_vulnerabilities": confirmed,
         "potential_findings": annotated_findings,
+        "validator_findings": annotated_pipeline_results,
         "follow_up_actions": actions or [],
         "follow_up_results": annotated_results,
     }
@@ -226,6 +256,12 @@ def save_final_reports(target: str, scan_time: str, parsed_data, actions, result
 
     if compliance_overview.get("OWASP"):
         logger.info("OWASP compliance labels: %s", ", ".join(compliance_overview["OWASP"]))
+    logger.info(
+        "OWASP depth coverage: %.2f%% (%s/%s subcases)",
+        float((owasp_depth_coverage.get("summary") or {}).get("overall_subcase_coverage_percent", 0.0) or 0.0),
+        int((owasp_depth_coverage.get("summary") or {}).get("subcases_tested", 0) or 0),
+        int((owasp_depth_coverage.get("summary") or {}).get("subcases_total", 0) or 0),
+    )
 
     return FINAL_REPORT_FILE, CONFIRMED_VULNS_FILE
 
@@ -356,6 +392,7 @@ def main():
     save_session(parsed_data)
 
     # Step 3: DAG-driven Validation & Attack Chaining
+    pipeline_result = {}
     try:
         logger.info("Building DAG-driven state machine...")
         state = build_validation_state(parsed_data)
@@ -388,6 +425,7 @@ def main():
             parsed_data=parsed_data,
             actions=[],
             results=[],
+            pipeline_validation_results=_extract_pipeline_validation_records(pipeline_result),
         )
         logger.info("Saved final report: %s", final_report)
         logger.info("Saved confirmed vulnerabilities report: %s", confirmed_report)
@@ -410,6 +448,7 @@ def main():
         parsed_data=parsed_data,
         actions=actions,
         results=results,
+        pipeline_validation_results=_extract_pipeline_validation_records(pipeline_result),
     )
     logger.info("Saved final report: %s", final_report)
     logger.info("Saved confirmed vulnerabilities report: %s", confirmed_report)

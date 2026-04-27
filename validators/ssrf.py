@@ -5,6 +5,7 @@ from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 import requests
 
+from brain.attack_variant_catalog import get_attack_variants
 from engine.models import Evidence, ExecutionContext, ValidationResult
 from utils.logger import logger
 
@@ -45,7 +46,7 @@ def _candidate_params(state: Dict[str, Any], target_url: str) -> List[str]:
     if query_params:
         return query_params
 
-    return list(DEFAULT_PARAMS)
+    return list(get_attack_variants("A10", "ssrf_params", list(DEFAULT_PARAMS)))
 
 
 class SSRFValidator:
@@ -71,6 +72,7 @@ class SSRFValidator:
             headers["Cookie"] = cookie.strip()
 
         candidate_params = _candidate_params(state, target_url)
+        loopback_targets = get_attack_variants("A10", "loopback_targets", list(LOOPBACK_TARGETS))
         baseline_value = str(state.get("ssrf_baseline", "https://example.com/"))
 
         logger.info("SSRFValidator: probing %s with parameters %s", target_url, candidate_params)
@@ -80,7 +82,7 @@ class SSRFValidator:
                 continue
 
             baseline_url = _replace_query_param(target_url, param, baseline_value)
-            for loopback_url in LOOPBACK_TARGETS:
+            for loopback_url in loopback_targets:
                 probe_url = _replace_query_param(target_url, param, loopback_url)
 
                 try:
@@ -106,7 +108,12 @@ class SSRFValidator:
                                     "probe_snippet": probe_body[:500],
                                 },
                                 matched=",".join(matched_markers) if matched_markers else loopback_url,
-                                extra={"param": param, "loopback_url": loopback_url, "candidate_params": candidate_params},
+                                extra={
+                                    "param": param,
+                                    "loopback_url": loopback_url,
+                                    "candidate_params": candidate_params,
+                                    "attempted_loopback_targets": loopback_targets,
+                                },
                             ),
                             impact="The application appears to fetch attacker-controlled URLs, enabling internal network probing or metadata access.",
                             remediation="Restrict outbound fetch destinations with allowlists, block loopback/link-local ranges, and normalize URL parsing before fetches.",
@@ -124,7 +131,11 @@ class SSRFValidator:
                                 request={"baseline_url": baseline_url, "probe_url": probe_url, "param": param},
                                 response=str(exc),
                                 matched=str(exc),
-                                extra={"loopback_url": loopback_url, "candidate_params": candidate_params},
+                                extra={
+                                    "loopback_url": loopback_url,
+                                    "candidate_params": candidate_params,
+                                    "attempted_loopback_targets": loopback_targets,
+                                },
                             ),
                             impact="The application processed a server-side URL fetch attempt and surfaced loopback-specific network behavior.",
                             remediation="Block loopback, localhost, and internal RFC1918 destinations in outbound fetch logic and use strict URL allowlists.",
@@ -137,8 +148,9 @@ class SSRFValidator:
             vulnerability="a10-server-side-request-forgery",
             evidence=Evidence(
                 request={"target": target_url, "candidate_params": candidate_params},
-                response={"loopback_targets": LOOPBACK_TARGETS},
+                response={"loopback_targets": loopback_targets},
                 matched="",
+                extra={"attempted_loopback_targets": loopback_targets},
             ),
             impact="No SSRF behavior was confirmed from the tested loopback probes.",
             remediation="Keep URL fetchers behind allowlists and monitor internal-destination egress attempts.",
