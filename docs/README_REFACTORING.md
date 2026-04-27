@@ -4,6 +4,8 @@
 
 Your red-teaming pipeline has been comprehensively refactored from a linear vulnerability scanner into an **expert-level intelligent attack orchestrator** with sophisticated vulnerability chaining capabilities.
 
+For the current OWASP validator coverage and proof model, see [OWASP_COVERAGE_MATRIX.md](OWASP_COVERAGE_MATRIX.md).
+
 **Status:** ✅ **COMPLETE & PRODUCTION-READY**
 
 ---

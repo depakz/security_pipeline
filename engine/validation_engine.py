@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional, Tuple
 
 from engine.models import ExecutionContext
+from brain.proof_collector import ProofCollector
 from utils.logger import logger
 
 
@@ -20,6 +21,7 @@ def _confirmed_key(result: Dict[str, Any]) -> Tuple[Any, Any]:
 class ValidationEngine:
     def __init__(self):
         self.validators: List[Any] = []
+        self.proof_collector = ProofCollector()
 
     def register(self, validator) -> None:
         self.validators.append(validator)
@@ -99,6 +101,9 @@ class ValidationEngine:
                     if not isinstance(out, dict):
                         continue
 
+                    out = self.proof_collector.attach(out)
+                    self.proof_collector.append_to_state(state, out)
+
                     if validator_id:
                         out.setdefault("validator_id", validator_id)
                     out.setdefault("validator_class", validator_class)
@@ -172,5 +177,27 @@ class StateManager:
             vuln = r.get("vulnerability")
             if isinstance(vuln, str) and vuln not in signals:
                 signals.append(vuln)
+
+        proofs = state.setdefault("proofs", [])
+        if not isinstance(proofs, list):
+            proofs = []
+            state["proofs"] = proofs
+        for r in results:
+            if not isinstance(r, dict):
+                continue
+            proof = r.get("proof")
+            if isinstance(proof, dict) and proof not in proofs:
+                proofs.append(proof)
+
+        confirmed_proofs = state.setdefault("confirmed_proofs", [])
+        if not isinstance(confirmed_proofs, list):
+            confirmed_proofs = []
+            state["confirmed_proofs"] = confirmed_proofs
+        for r in results:
+            if not isinstance(r, dict) or not _is_confirmed(r):
+                continue
+            proof = r.get("proof")
+            if isinstance(proof, dict) and proof not in confirmed_proofs:
+                confirmed_proofs.append(proof)
 
         return new_confirmed

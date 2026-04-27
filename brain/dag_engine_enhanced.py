@@ -22,19 +22,25 @@ from engine.models import ExecutionContext
 from brain.fact_store import FactStore
 from brain.endpoint_normalizer import EndpointNormalizer
 from brain.attack_chain_manager import AttackChainManager, ChainedExploitationNode
+from engine.validation_engine_enhanced import ValidationResultProcessor
 from engine.executor import run_sqlmap, test_xss, run_git_extractor, run_ssh_brute, run_config_reader
 
 from .cve_mapper import CVEMapper
 from .graph_builder import DAGGraph, GraphBuilder, GraphEngineAdapter
 from .kb import ValidatorSpec, get_default_validator_specs
+from validators.access_control import BrokenAccessControlValidator
 from validators.auth import AuthValidator
+from validators.components import OutdatedComponentsValidator
 from validators.crypto import CryptoValidator
 from validators.deserialization import InsecureDeserializationValidator
 from validators.ftp import FTPAnonymousLoginValidator
 from validators.http import MissingSecurityHeadersValidator
+from validators.injection import InjectionValidator
+from validators.insecure_design import InsecureDesignValidator
 from validators.idor import IDORValidator
 from validators.integrity import IntegrityValidator
 from validators.logging import LoggingValidator
+from validators.misconfiguration import SecurityMisconfigurationValidator
 from validators.redis import RedisNoAuthValidator
 from validators.ssrf import SSRFValidator
 
@@ -42,9 +48,14 @@ from validators.ssrf import SSRFValidator
 VALIDATOR_CLASS_MAP = {
     "validators.redis.RedisNoAuthValidator": RedisNoAuthValidator,
     "validators.http.MissingSecurityHeadersValidator": MissingSecurityHeadersValidator,
+    "validators.injection.InjectionValidator": InjectionValidator,
+    "validators.insecure_design.InsecureDesignValidator": InsecureDesignValidator,
+    "validators.access_control.BrokenAccessControlValidator": BrokenAccessControlValidator,
     "validators.crypto.CryptoValidator": CryptoValidator,
     "validators.auth.AuthValidator": AuthValidator,
     "validators.logging.LoggingValidator": LoggingValidator,
+    "validators.misconfiguration.SecurityMisconfigurationValidator": SecurityMisconfigurationValidator,
+    "validators.components.OutdatedComponentsValidator": OutdatedComponentsValidator,
     "validators.ssrf.SSRFValidator": SSRFValidator,
     "validators.ftp.FTPAnonymousLoginValidator": FTPAnonymousLoginValidator,
     "validators.integrity.IntegrityValidator": IntegrityValidator,
@@ -349,6 +360,11 @@ class ConcurrentValidationEngine:
         self.fact_store = self.dag_brain.fact_store
         self._thread_pool = ThreadPoolExecutor(max_workers=self.max_workers)
         self._execution_cache: set[str] = set()
+        self.result_processor = ValidationResultProcessor(
+            self.fact_store,
+            self.dag_brain.endpoint_normalizer,
+            self.dag_brain.attack_chain_manager,
+        )
         self._metrics: Dict[str, Any] = {
             "ready_edges_seen": 0,
             "queued_edges": 0,
@@ -582,12 +598,17 @@ class ConcurrentValidationEngine:
                             rdict = {"raw": str(r)}
 
                         if isinstance(rdict, list):
-                            result.update({"success": any(bool(item.get("success", False)) for item in rdict if isinstance(item, dict)), "result": rdict})
+                            enriched_results = []
+                            for item in rdict:
+                                if isinstance(item, dict):
+                                    enriched_results.append(self.result_processor.process_result(item))
+                            result.update({"success": any(bool(item.get("success", False)) for item in enriched_results if isinstance(item, dict)), "result": enriched_results})
                         else:
-                            result.update({"success": bool(rdict.get("success", False)), "result": rdict})
+                            enriched_result = self.result_processor.process_result(rdict) if isinstance(rdict, dict) else rdict
+                            result.update({"success": bool(enriched_result.get("success", False)) if isinstance(enriched_result, dict) else False, "result": enriched_result})
 
                         loot: Dict[str, Any] = {}
-                        dict_results = rdict if isinstance(rdict, list) else [rdict]
+                        dict_results = enriched_results if isinstance(rdict, list) else [enriched_result]
                         for item in dict_results:
                             if not isinstance(item, dict):
                                 continue

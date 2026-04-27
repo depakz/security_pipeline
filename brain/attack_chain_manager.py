@@ -108,7 +108,17 @@ class AttackChainManager:
         self.chains: Dict[str, AttackChain] = {}
         self.completed_validators: List[str] = []
         self.injection_callbacks: List[Callable[[ChainedExploitationNode], None]] = []
+        self._emitted_node_ids: set[str] = set()
         self._initialize_default_chains()
+
+    def _new_nodes_only(self, nodes: List[ChainedExploitationNode]) -> List[ChainedExploitationNode]:
+        filtered: List[ChainedExploitationNode] = []
+        for node in nodes:
+            if node.node_id in self._emitted_node_ids:
+                continue
+            self._emitted_node_ids.add(node.node_id)
+            filtered.append(node)
+        return filtered
 
     def _initialize_default_chains(self) -> None:
         """Initialize built-in attack chains."""
@@ -306,7 +316,7 @@ class AttackChainManager:
         for chain in self.chains.values():
             if chain.can_trigger(self.completed_validators, self.fact_store):
                 # Get exploitation nodes for this chain
-                exploitation_nodes = chain.get_exploitation_nodes(self.fact_store)
+                exploitation_nodes = self._new_nodes_only(chain.get_exploitation_nodes(self.fact_store))
 
                 # Inject each node via callbacks
                 for node in exploitation_nodes:
@@ -340,7 +350,7 @@ class AttackChainManager:
         for chain in self.chains.values():
             if chain.can_trigger(self.completed_validators, self.fact_store):
                 nodes.extend(chain.get_exploitation_nodes(self.fact_store))
-        return nodes
+        return self._new_nodes_only(nodes)
 
     def get_chain_statistics(self) -> Dict[str, Any]:
         """Get statistics about registered chains."""
