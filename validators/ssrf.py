@@ -14,6 +14,14 @@ DEFAULT_PARAMS = ["url", "uri", "dest", "destination", "next", "redirect", "path
 LOOPBACK_TARGETS = ["http://127.0.0.1", "http://127.0.0.1:80", "http://localhost"]
 SSRF_MARKERS = ["127.0.0.1", "localhost", "connection refused", "refused", "timed out", "timeout", "econnrefused", "internal server error", "bad gateway", "gateway timeout"]
 
+A10_COVERAGE_MARKERS = [
+    "loopback_ssrf_probe",
+    "internal_network_reachability_via_ssrf",
+    "metadata_service_reachability_signal",
+    "url_fetch_allowlist_gap",
+    "server_side_request_validation_gap",
+]
+
 
 def _replace_query_param(url: str, key: str, value: str) -> str:
     parts = urlsplit(url)
@@ -113,6 +121,7 @@ class SSRFValidator:
                                     "loopback_url": loopback_url,
                                     "candidate_params": candidate_params,
                                     "attempted_loopback_targets": loopback_targets,
+                                    "coverage_markers": A10_COVERAGE_MARKERS,
                                 },
                             ),
                             impact="The application appears to fetch attacker-controlled URLs, enabling internal network probing or metadata access.",
@@ -135,6 +144,7 @@ class SSRFValidator:
                                     "loopback_url": loopback_url,
                                     "candidate_params": candidate_params,
                                     "attempted_loopback_targets": loopback_targets,
+                                    "coverage_markers": A10_COVERAGE_MARKERS,
                                 },
                             ),
                             impact="The application processed a server-side URL fetch attempt and surfaced loopback-specific network behavior.",
@@ -150,7 +160,7 @@ class SSRFValidator:
                 request={"target": target_url, "candidate_params": candidate_params},
                 response={"loopback_targets": loopback_targets},
                 matched="",
-                extra={"attempted_loopback_targets": loopback_targets},
+                extra={"attempted_loopback_targets": loopback_targets, "coverage_markers": A10_COVERAGE_MARKERS},
             ),
             impact="No SSRF behavior was confirmed from the tested loopback probes.",
             remediation="Keep URL fetchers behind allowlists and monitor internal-destination egress attempts.",

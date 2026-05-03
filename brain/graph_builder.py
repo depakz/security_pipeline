@@ -278,6 +278,7 @@ class GraphEngineAdapter:
         # mirror edges (simple action placeholder)
         for src, dst in dag.edges:
             edge_id = f"edge_{src}_to_{dst}"
+            action = "edge_action"
             # if target is validator, include spec id in params when available
             params = {}
             target_node = dag.nodes.get(dst)
@@ -285,8 +286,9 @@ class GraphEngineAdapter:
                 spec = target_node.data.get("spec")
                 if spec is not None:
                     params["validator_id"] = getattr(spec, "id", None)
+                action = "run_validator"
 
-            eng.add_action_edge(src, dst, edge_id=edge_id, action="edge_action", params=params)
+            eng.add_action_edge(src, dst, edge_id=edge_id, action=action, params=params)
 
         # Wire chaining rules from findings into runtime engine as action nodes/edges
         findings = state.get("findings", []) if isinstance(state, dict) else []

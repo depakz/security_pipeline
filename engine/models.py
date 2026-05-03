@@ -13,6 +13,9 @@ class ExecutionContext:
     endpoints: List[str] = field(default_factory=list)
     findings: List[Dict[str, Any]] = field(default_factory=list)
     metadata: Dict[str, Any] = field(default_factory=dict)
+    cookie: str = ""
+    headers: Dict[str, Any] = field(default_factory=dict)
+    session_context: Dict[str, Any] = field(default_factory=dict)
 
     @classmethod
     def from_state(cls, state: Dict[str, Any]) -> "ExecutionContext":
@@ -35,7 +38,27 @@ class ExecutionContext:
         if not isinstance(metadata, dict):
             metadata = {}
 
-        return cls(target=target, endpoints=endpoints, findings=findings, metadata=metadata)
+        cookie = state.get("cookie") or ""
+        if not isinstance(cookie, str):
+            cookie = str(cookie)
+
+        headers = state.get("headers") or {}
+        if not isinstance(headers, dict):
+            headers = {}
+
+        session_context = state.get("session_context") or {}
+        if not isinstance(session_context, dict):
+            session_context = {}
+
+        return cls(
+            target=target,
+            endpoints=endpoints,
+            findings=findings,
+            metadata=metadata,
+            cookie=cookie,
+            headers=headers,
+            session_context=session_context,
+        )
 
 
 @dataclass

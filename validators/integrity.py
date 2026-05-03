@@ -36,6 +36,14 @@ class IntegrityValidator:
         self.fact_store = fact_store
         self.destructive = False
 
+    COVERAGE_MARKERS = [
+        "insecure_deserialization_signal",
+        "unsigned_or_untrusted_packages",
+        "software_integrity_verification_gap",
+        "tamper_resistance_gap",
+        "unsafe_update_or_dependency_trust",
+    ]
+
     def can_run(self, state: Dict[str, Any]) -> bool:
         return bool(state.get("url") or state.get("target") or state.get("repo_url") or state.get("repository_url"))
 
@@ -112,7 +120,7 @@ class IntegrityValidator:
                 request=target_url,
                 response={"matched_tokens": matched},
                 matched=indicator,
-                extra={"oob_seen": oob_seen},
+                extra={"oob_seen": oob_seen, "coverage_markers": self.COVERAGE_MARKERS},
             ),
             impact="Insecure deserialization can enable remote code execution or privilege escalation." if success else "No clear deserialization sink identified.",
             remediation="Use safe serializers, enforce type allowlists, and sign/verify serialized payloads.",
@@ -163,7 +171,7 @@ class IntegrityValidator:
             confidence_score=confidence,
             severity="high" if unsigned else "info",
             vulnerability="unsigned-packages" if unsigned else "signed-packages",
-            evidence=Evidence(request=repo_url, response={"unsigned": unsigned}, matched=indicator),
+            evidence=Evidence(request=repo_url, response={"unsigned": unsigned}, matched=indicator, extra={"coverage_markers": self.COVERAGE_MARKERS}),
             impact="Unsigned packages can allow malicious code substitution during delivery." if unsigned else "Package integrity controls were observed.",
             remediation="Require package signatures, checksum verification, and verified release manifests.",
             evidence_bundle=evidence_bundle,

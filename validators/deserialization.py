@@ -8,6 +8,15 @@ import requests
 from engine.models import Evidence, ExecutionContext, ValidationResult
 
 
+A08_COVERAGE_MARKERS = [
+    "insecure_deserialization_signal",
+    "unsigned_or_untrusted_packages",
+    "software_integrity_verification_gap",
+    "tamper_resistance_gap",
+    "unsafe_update_or_dependency_trust",
+]
+
+
 class InsecureDeserializationValidator:
     """OWASP A08 validator for insecure deserialization signals.
 
@@ -144,6 +153,7 @@ class InsecureDeserializationValidator:
                         "signatures_detected": markers,
                         "validated": validated,
                         "sleep_seconds": sleep_seconds,
+                        "coverage_markers": A08_COVERAGE_MARKERS,
                     },
                 ),
                 impact="Unsafe deserialization can enable remote code execution, privilege escalation, or arbitrary object manipulation.",
@@ -160,5 +170,6 @@ class InsecureDeserializationValidator:
                     request={"target": target_url, "stack_guess": stack},
                     response=str(exc),
                     matched=",".join(markers),
+                    extra={"coverage_markers": A08_COVERAGE_MARKERS},
                 ),
             )

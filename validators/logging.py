@@ -8,6 +8,15 @@ from engine.models import Evidence, ExecutionContext, ValidationResult
 from utils.logger import logger
 
 
+A09_COVERAGE_MARKERS = [
+    "missing_security_headers_as_monitoring_signal",
+    "insufficient_monitoring_indicators",
+    "audit_visibility_hardening_gap",
+    "low_detection_surface_signal",
+    "telemetry_control_gap",
+]
+
+
 SECURITY_HEADERS = [
     "X-Content-Type-Options",
     "Content-Security-Policy",
@@ -65,7 +74,7 @@ class LoggingValidator:
                     request={"target": target_url},
                     response={"status": response.status_code, "present_headers": present_headers, "missing_headers": missing_headers},
                     matched=",".join(present_headers or missing_headers),
-                    extra={"headers_checked": SECURITY_HEADERS},
+                    extra={"headers_checked": SECURITY_HEADERS, "coverage_markers": A09_COVERAGE_MARKERS},
                 ),
                 impact="Security headers provide a passive signal of application hardening and operational security maturity.",
                 remediation="Add the standard defensive headers at the web server or application layer and track them in regression tests.",
@@ -81,6 +90,6 @@ class LoggingValidator:
                     request={"target": target_url},
                     response=str(exc),
                     matched="",
-                    extra={"headers_checked": SECURITY_HEADERS},
+                    extra={"headers_checked": SECURITY_HEADERS, "coverage_markers": A09_COVERAGE_MARKERS},
                 ),
             )

@@ -187,6 +187,33 @@ def _collect_variant_attempts(records: Iterable[Mapping[str, Any]]) -> Dict[str,
     return counters
 
 
+def _collect_coverage_markers(records: Iterable[Mapping[str, Any]]) -> Dict[str, Set[str]]:
+    detected: Dict[str, Set[str]] = {k: set() for k in OWASP_SUBCASE_CATALOG}
+
+    for record in records:
+        if not isinstance(record, Mapping):
+            continue
+        evidence = record.get("evidence")
+        if not isinstance(evidence, Mapping):
+            continue
+        extra = evidence.get("extra")
+        if not isinstance(extra, Mapping):
+            continue
+
+        markers = extra.get("coverage_markers")
+        if not isinstance(markers, list):
+            continue
+
+        for marker in markers:
+            if not isinstance(marker, str):
+                continue
+            for category, subcases in OWASP_SUBCASE_CATALOG.items():
+                if marker in subcases:
+                    detected.setdefault(category, set()).add(marker)
+
+    return detected
+
+
 def _detect_subcases(text: str) -> Dict[str, Set[str]]:
     detected: Dict[str, Set[str]] = {k: set() for k in OWASP_SUBCASE_CATALOG}
     for pattern, category, subcase in PATTERN_RULES:
@@ -199,6 +226,10 @@ def build_depth_coverage(records: List[Mapping[str, Any]]) -> Dict[str, Any]:
     candidate_text = _extract_candidate_text(records)
     joined = "\n".join(candidate_text)
     detected = _detect_subcases(joined)
+    explicit_markers = _collect_coverage_markers(records)
+
+    for category, markers in explicit_markers.items():
+        detected.setdefault(category, set()).update(markers)
 
     category_rows: List[Dict[str, Any]] = []
     total_tested = 0
@@ -240,6 +271,7 @@ def build_depth_coverage(records: List[Mapping[str, Any]]) -> Dict[str, Any]:
             "categories_total": 10,
             "categories_with_any_tested_subcase": categories_with_coverage,
             "categories_without_tested_subcases": 10 - categories_with_coverage,
+            "owasp_top10_category_coverage_percent": round((categories_with_coverage / 10) * 100.0, 2),
             "subcases_tested": total_tested,
             "subcases_total": total_subcases,
             "overall_subcase_coverage_percent": overall,

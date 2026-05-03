@@ -1,0 +1,7 @@
+{
+  "target": "http://localhost:3000/",
+  "error": "playwright_unavailable: No module named 'playwright'",
+  "endpoints": [],
+  "visited_urls": [],
+  "page_summaries": []
+}

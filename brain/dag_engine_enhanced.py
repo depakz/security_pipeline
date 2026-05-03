@@ -15,7 +15,7 @@ import importlib
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from time import perf_counter
-from typing import Any, Dict, List, Optional, Callable
+from typing import Any, Dict, List, Optional, Callable, Set
 from urllib.parse import urlsplit
 
 from engine.models import ExecutionContext
@@ -161,6 +161,7 @@ class DAGBrain:
         ordered_nodes = self.graph_builder.topological_sort(graph)
 
         validators: List[Any] = []
+        selected_spec_ids: Set[str] = set()
         for node_id in ordered_nodes:
             node = graph.nodes.get(node_id)
             if not node or node.kind != "validator":
@@ -174,9 +175,26 @@ class DAGBrain:
             if not validator_cls:
                 continue
 
-            validators.append(
-                self._instantiate_validator(validator_cls, spec=spec, context=context)
-            )
+            validators.append(self._instantiate_validator(validator_cls, spec=spec, context=context))
+            selected_spec_ids.add(spec.id)
+
+        for spec in self.validator_specs:
+            if spec.id in selected_spec_ids:
+                continue
+
+            validator_cls = VALIDATOR_CLASS_MAP.get(spec.class_path)
+            if not validator_cls:
+                continue
+
+            try:
+                validator_instance = self._instantiate_validator(validator_cls, spec=spec, context=context)
+                can_run = getattr(validator_instance, "can_run", None)
+                if callable(can_run) and not can_run(state):
+                    continue
+                validators.append(validator_instance)
+                selected_spec_ids.add(spec.id)
+            except Exception:
+                continue
 
         plan = DAGPlan(
             graph=graph,
@@ -417,6 +435,27 @@ class ConcurrentValidationEngine:
         action = edge.action or "action"
         return f"{batch_key}|{action}|{validator_id}|{u}|{v}"
 
+    def _candidate_validation_urls(self, state: Dict[str, Any]) -> List[str]:
+        candidates: List[str] = []
+        raw_sources = []
+        validation_targets = state.get("validation_targets")
+        if isinstance(validation_targets, list) and validation_targets:
+            raw_sources.extend(validation_targets)
+        else:
+            raw_sources.append(state.get("url") or state.get("target"))
+            raw_sources.extend(state.get("endpoints") or [])
+
+        for candidate in raw_sources:
+            if not isinstance(candidate, str):
+                continue
+            candidate = candidate.strip()
+            if not candidate or not candidate.startswith(("http://", "https://")):
+                continue
+            if candidate not in candidates:
+                candidates.append(candidate)
+
+        return candidates[:75] if candidates else [str(state.get("url") or state.get("target") or "")]
+
     async def run_pipeline(self) -> Dict[str, Any]:
         """Run the DAG pipeline using an asyncio queue and worker pool."""
         pipeline_started = perf_counter()
@@ -574,42 +613,55 @@ class ConcurrentValidationEngine:
                     except Exception:
                         inst = cls()
 
-                    try_state = dict(state)
-                    try_state.update(params)
+                    candidate_urls = self._candidate_validation_urls(state)
+                    processed_results: List[Dict[str, Any]] = []
+                    any_can_run = False
 
-                    can_run = True
-                    if hasattr(inst, "can_run"):
-                        try:
-                            can_run = bool(inst.can_run(try_state))
-                        except Exception:
-                            can_run = False
+                    for candidate_url in candidate_urls:
+                        try_state = dict(state)
+                        try_state.update(params)
+                        try_state["url"] = candidate_url
+                        try_state["target"] = candidate_url
 
-                    if not can_run:
-                        result.update({"success": False, "skipped": True})
-                    else:
+                        can_run = True
+                        if hasattr(inst, "can_run"):
+                            try:
+                                can_run = bool(inst.can_run(try_state))
+                            except Exception:
+                                can_run = False
+
+                        if not can_run:
+                            continue
+
+                        any_can_run = True
+
                         r = inst.run(try_state)
                         if isinstance(r, list):
-                            rdict = [item.to_dict() if hasattr(item, "to_dict") else item for item in r]
+                            raw_items = [item.to_dict() if hasattr(item, "to_dict") else item for item in r]
                         elif hasattr(r, "to_dict"):
-                            rdict = r.to_dict()
+                            raw_items = [r.to_dict()]
                         elif isinstance(r, dict):
-                            rdict = r
+                            raw_items = [r]
                         else:
-                            rdict = {"raw": str(r)}
+                            raw_items = [{"raw": str(r), "success": False, "vulnerability": vid or spec.id}]
 
-                        if isinstance(rdict, list):
-                            enriched_results = []
-                            for item in rdict:
-                                if isinstance(item, dict):
-                                    enriched_results.append(self.result_processor.process_result(item))
-                            result.update({"success": any(bool(item.get("success", False)) for item in enriched_results if isinstance(item, dict)), "result": enriched_results})
-                        else:
-                            enriched_result = self.result_processor.process_result(rdict) if isinstance(rdict, dict) else rdict
-                            result.update({"success": bool(enriched_result.get("success", False)) if isinstance(enriched_result, dict) else False, "result": enriched_result})
+                        for item in raw_items:
+                            if not isinstance(item, dict):
+                                continue
+                            processed_results.append(self.result_processor.process_result(item))
+
+                    if not any_can_run:
+                        result.update({"success": False, "skipped": True})
+                    else:
+                        success_flag = any(bool(item.get("success", False)) for item in processed_results if isinstance(item, dict))
+                        result.update({
+                            "success": success_flag,
+                            "result": processed_results if len(processed_results) != 1 else processed_results[0],
+                            "tested_urls": candidate_urls,
+                        })
 
                         loot: Dict[str, Any] = {}
-                        dict_results = enriched_results if isinstance(rdict, list) else [enriched_result]
-                        for item in dict_results:
+                        for item in processed_results:
                             if not isinstance(item, dict):
                                 continue
                             ev = item.get("evidence") or {}

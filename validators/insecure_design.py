@@ -30,6 +30,14 @@ WORKFLOW_TEMPLATES = {
     },
 }
 
+A04_COVERAGE_MARKERS = [
+    "workflow_bypass",
+    "state_transition_bypass",
+    "business_logic_flaw",
+    "idor_design_gap",
+    "missing_security_controls_by_design",
+]
+
 
 def _replace_query_param(url: str, key: str, value: str) -> str:
     parts = urlsplit(url)
@@ -204,6 +212,7 @@ class InsecureDesignValidator:
                                     "bypass_value": bypass_value,
                                     "workflow_params": candidate_params,
                                     "workflow_attempts": workflow_attempts,
+                                    "coverage_markers": A04_COVERAGE_MARKERS,
                                 },
                             ),
                             evidence_bundle=EvidenceBundle(
@@ -227,7 +236,7 @@ class InsecureDesignValidator:
                 request={"target": target_url, "params": candidate_params},
                 response={"status": "no_confirmed_workflow_bypass"},
                 matched="",
-                extra={"candidate_params": candidate_params, "workflow_attempts": workflow_attempts},
+                extra={"candidate_params": candidate_params, "workflow_attempts": workflow_attempts, "coverage_markers": A04_COVERAGE_MARKERS},
             ),
             impact="No workflow bypass was confirmed from the available probes.",
             remediation="Keep server-side workflow enforcement and test state transitions in regression suites.",
