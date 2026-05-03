@@ -9,6 +9,15 @@ from engine.models import Evidence, ExecutionContext, ValidationResult
 from utils.logger import logger
 
 
+A07_COVERAGE_MARKERS = [
+    "missing_login_rate_limit",
+    "insecure_remember_me_cookie_flags",
+    "weak_session_management_signal",
+    "credential_control_weakness",
+    "authentication_flow_hardening_gap",
+]
+
+
 def _looks_like_login_endpoint(url: str, state: Dict[str, Any]) -> bool:
     tokens = ("login", "signin", "sign-in", "auth", "session", "account")
     if any(token in url.lower() for token in tokens):
@@ -127,7 +136,7 @@ class AuthValidator:
                         request={"target": target_url, "payload": payload},
                         response={"login_response_status": get_response.status_code, "findings": findings},
                         matched=",".join(findings),
-                        extra=evidence_extra,
+                        extra={**evidence_extra, "coverage_markers": A07_COVERAGE_MARKERS},
                     ),
                     impact="The login flow does not enforce expected authentication controls, enabling brute-force or session persistence abuse.",
                     remediation="Add account lockout or rate limiting for login attempts and set Secure/HttpOnly on remember-me cookies.",
@@ -142,7 +151,7 @@ class AuthValidator:
                     request={"target": target_url, "payload": payload},
                     response={"login_response_status": get_response.status_code, "attempts": attempt_details},
                     matched="",
-                    extra=evidence_extra,
+                    extra={**evidence_extra, "coverage_markers": A07_COVERAGE_MARKERS},
                 ),
                 impact="No obvious authentication-control weakness was confirmed from the available probe.",
                 remediation="Keep login controls, cookie flags, and lockout telemetry under regression test.",
@@ -158,6 +167,6 @@ class AuthValidator:
                     request={"target": target_url, "payload": payload},
                     response=str(exc),
                     matched="",
-                    extra={"login_like": login_like, "attempts": attempt_details},
+                    extra={"login_like": login_like, "attempts": attempt_details, "coverage_markers": A07_COVERAGE_MARKERS},
                 ),
             )

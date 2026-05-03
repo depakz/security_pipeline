@@ -8,6 +8,15 @@ import requests
 from engine.models import Evidence, ExecutionContext, ValidationResult
 
 
+A04_COVERAGE_MARKERS = [
+    "workflow_bypass",
+    "state_transition_bypass",
+    "business_logic_flaw",
+    "idor_design_gap",
+    "missing_security_controls_by_design",
+]
+
+
 def _levenshtein_distance(a: str, b: str) -> int:
     if a == b:
         return 0
@@ -155,7 +164,7 @@ class IDORValidator:
                                 "status_tampered": resp_b.status_code,
                             },
                             matched=f"param={param}; similarity={sim:.4f}",
-                            extra=candidate,
+                            extra={**candidate, "coverage_markers": A04_COVERAGE_MARKERS},
                         ),
                         impact="An authenticated/unauthenticated user may access another user's data by changing object identifiers.",
                         remediation="Enforce object-level authorization checks on every read/write operation and avoid direct object references without access control.",
@@ -176,6 +185,7 @@ class IDORValidator:
                 request={"target": target_url, "params": candidate_params},
                 response=best_result or {},
                 matched="",
+                extra={"coverage_markers": A04_COVERAGE_MARKERS},
             ),
             impact="No confident IDOR behavior detected with the tested identifier transitions.",
             remediation="Keep object-level authorization checks and add ownership tests in CI for all object-access endpoints.",

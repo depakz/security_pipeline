@@ -12,6 +12,14 @@ from utils.logger import logger
 CVE_REGEX = re.compile(r"CVE-\d{4}-\d{4,7}", re.IGNORECASE)
 VERSION_REGEX = re.compile(r"\b(\d+\.\d+(?:\.\d+)?)\b")
 
+A06_COVERAGE_MARKERS = [
+    "known_cve_indicator_detected",
+    "outdated_component_version_disclosed",
+    "dependency_patch_lag_signal",
+    "vulnerable_server_software_signal",
+    "unsafe_component_inventory_gap",
+]
+
 
 def _collect_text(value: Any, out: List[str]) -> None:
     if isinstance(value, str):
@@ -87,7 +95,7 @@ class OutdatedComponentsValidator:
                         "disclosed_versions": disclosed_versions,
                     },
                     matched=",".join(cves or disclosed_versions),
-                    extra={"cve_count": len(cves), "header_count": len(headers_seen)},
+                    extra={"cve_count": len(cves), "header_count": len(headers_seen), "coverage_markers": A06_COVERAGE_MARKERS},
                 ),
                 impact="Known-vulnerable or stale components can expose publicly documented exploit paths.",
                 remediation="Upgrade affected components, remove vulnerable versions from deployment, and enforce patch SLAs.",
@@ -102,6 +110,7 @@ class OutdatedComponentsValidator:
                 request={"target": target_url},
                 response={"cves": cves, "version_headers": headers_seen},
                 matched="",
+                extra={"coverage_markers": A06_COVERAGE_MARKERS},
             ),
             impact="No strong vulnerable/outdated component indicator was confirmed from available signals.",
             remediation="Continue SBOM/CVE correlation and dependency lifecycle management in CI/CD.",

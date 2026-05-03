@@ -5,6 +5,15 @@ from typing import Optional
 from engine.models import Evidence, ExecutionContext, ValidationResult
 
 
+A09_COVERAGE_MARKERS = [
+    "missing_security_headers_as_monitoring_signal",
+    "insufficient_monitoring_indicators",
+    "audit_visibility_hardening_gap",
+    "low_detection_surface_signal",
+    "telemetry_control_gap",
+]
+
+
 class MissingSecurityHeadersValidator:
     def __init__(self, context: Optional[ExecutionContext] = None):
         self.context = context
@@ -46,6 +55,7 @@ class MissingSecurityHeadersValidator:
                     request=url,
                     response=headers,
                     matched=",".join(missing),
+                    extra={"coverage_markers": A09_COVERAGE_MARKERS},
                 ),
                 impact="Missing headers can increase exposure to clickjacking and some XSS scenarios.",
                 remediation="Add standard security headers (at minimum CSP and X-Frame-Options) at the web server or application layer.",
@@ -60,6 +70,7 @@ class MissingSecurityHeadersValidator:
                 evidence=Evidence(
                     request=url,
                     response=str(e),
+                    extra={"coverage_markers": A09_COVERAGE_MARKERS},
                 ),
             )
 
@@ -72,6 +83,7 @@ class MissingSecurityHeadersValidator:
                 evidence=Evidence(
                     request=url,
                     response=str(e),
+                    extra={"coverage_markers": A09_COVERAGE_MARKERS},
                 ),
             )
 
@@ -84,5 +96,6 @@ class MissingSecurityHeadersValidator:
                 evidence=Evidence(
                     request=url,
                     response=str(e),
+                    extra={"coverage_markers": A09_COVERAGE_MARKERS},
                 ),
             )

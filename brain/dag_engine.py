@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Set
 
 from engine.models import ExecutionContext
 
@@ -104,6 +104,7 @@ class DAGBrain:
         ordered_nodes = self.graph_builder.topological_sort(graph)
 
         validators: List[Any] = []
+        selected_spec_ids: Set[str] = set()
         for node_id in ordered_nodes:
             node = graph.nodes.get(node_id)
             if not node or node.kind != "validator":
@@ -118,6 +119,25 @@ class DAGBrain:
                 continue
 
             validators.append(self._instantiate_validator(validator_cls, spec=spec, context=context))
+            selected_spec_ids.add(spec.id)
+
+        for spec in self.validator_specs:
+            if spec.id in selected_spec_ids:
+                continue
+
+            validator_cls = VALIDATOR_CLASS_MAP.get(spec.class_path)
+            if not validator_cls:
+                continue
+
+            try:
+                validator_instance = self._instantiate_validator(validator_cls, spec=spec, context=context)
+                can_run = getattr(validator_instance, "can_run", None)
+                if callable(can_run) and not can_run(state):
+                    continue
+                validators.append(validator_instance)
+                selected_spec_ids.add(spec.id)
+            except Exception:
+                continue
 
         return DAGPlan(graph=graph, ordered_nodes=ordered_nodes, validators=validators, context=context)
 

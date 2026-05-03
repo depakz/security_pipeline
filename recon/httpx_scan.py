@@ -33,7 +33,13 @@ def run_httpx(target, cookie=None):
             "-u", target,
             "-json",
             "-silent",
-            "-timeout", "10"
+            "-timeout", "10",
+            "-tech-detect",
+            "-title",
+            "-status-code",
+            "-web-server",
+            "-ip",
+            "-tls-probe",
         ]
 
         if cookie:
@@ -77,7 +83,14 @@ def run_httpx(target, cookie=None):
                 "title": r.get("title", ""),
                 "webserver": r.get("webserver", ""),
                 "tech": r.get("tech", []),
-                "ip": r.get("ip", "")
+                "ip": r.get("ip", ""),
+                "content_type": r.get("content_type", ""),
+                "method": r.get("method", ""),
+                "port": r.get("port", ""),
+                "scheme": r.get("scheme", ""),
+                "tls_grab": r.get("tls-grab", {}) or {},
+                "tls": r.get("tls", {}) or {},
+                "favicon": r.get("favicon", ""),
             })
 
         with open(OUTPUT_FILE, "w") as f:
