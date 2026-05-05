@@ -2,6 +2,6 @@
     "findings": [],
     "exit_code": 1,
     "raw_warnings": [
-        "Nuclei exit 2. "
+        "Nuclei exit 1. [\u001b[1;31mFTL\u001b[0m] Could not create runner: could not create input provider: could not parse input file: could not decode openapi 3.0 schema: error unmarshaling JSON: while decoding JSON: json: cannot unmarshal string into Go value of type openapi3.TBis"
     ]
 }

@@ -1,17 +1,3 @@
-[
-    {
-        "url": "http://localhost:3000/",
-        "status_code": 200,
-        "title": "OWASP Juice Shop",
-        "webserver": "",
-        "tech": [],
-        "ip": "",
-        "content_type": "text/html",
-        "method": "GET",
-        "port": "3000",
-        "scheme": "http",
-        "tls_grab": {},
-        "tls": {},
-        "favicon": ""
-    }
-]
+{
+    "error": "Empty HTTPX output"
+}

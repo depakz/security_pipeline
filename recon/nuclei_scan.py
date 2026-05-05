@@ -4,10 +4,26 @@ import shutil
 import threading
 import time
 import tempfile
+import re
+import os
 from pathlib import Path
 from utils.logger import logger
 
 OUTPUT_FILE = "output/nuclei.json"
+
+
+def validate_target(target):
+    """
+    Prevents the Go 'bufio' panic by ensuring targets are 
+    properly formatted before being passed to the scanner.
+    """
+    if not target or not isinstance(target, str):
+        return False
+    # Matches valid URL schemes or CIDR/IP notation for network scans
+    url_pattern = re.compile(
+        r'^(https?://|([0-9]{1,3}\.){3}[0-9]{1,3}(/[0-9]{1,2})?)'
+    )
+    return bool(url_pattern.match(target.strip()))
 
 
 def _stop_process(process):
@@ -98,12 +114,12 @@ def run_nuclei_multi(targets, progress=None, cookie=None):
     for target in targets:
         if isinstance(target, str):
             candidate = target.strip()
-            if candidate and candidate not in cleaned_targets:
+            if candidate and validate_target(candidate) and candidate not in cleaned_targets:
                 cleaned_targets.append(candidate)
 
     if not cleaned_targets:
         with open(OUTPUT_FILE, "w") as f:
-            json.dump({"findings": [], "exit_code": 0, "raw_warnings": ["No valid targets provided"]}, f, indent=4)
+            json.dump({"findings": [], "exit_code": 0, "raw_warnings": ["No valid targets provided after validation"]}, f, indent=4)
         return OUTPUT_FILE
 
     nuclei_bin = _resolve_binary("nuclei")
@@ -116,6 +132,7 @@ def run_nuclei_multi(targets, progress=None, cookie=None):
         progress["detail"] = f" | batching {len(cleaned_targets)} targets"
 
     temp_path = None
+    temp_json_out = None
     process = None
 
     try:
@@ -124,15 +141,22 @@ def run_nuclei_multi(targets, progress=None, cookie=None):
             temp_file.write("\n".join(cleaned_targets))
             temp_file.write("\n")
 
+        with tempfile.NamedTemporaryFile("w", delete=False, prefix="nuclei-out-", suffix=".json") as temp_out_file:
+            temp_json_out = temp_out_file.name
+
         cmd = [
             nuclei_bin,
             "-l", temp_path,
-            "-jsonl",
+            "-tags", "api,dast",
+            "-input-mode", "openapi",
+            "-je", temp_json_out,
+            "-mhe", "100",
+            "-retries", "3",
+            "-timeout", "10",
+            "-c", "5",
+            "-bs", "5",
             "-silent",
             "-no-interactsh",
-            "-c", "100",
-            "-rl", "300",
-            "-max-body-size", "5000",
         ]
 
         if cookie:
@@ -146,7 +170,6 @@ def run_nuclei_multi(targets, progress=None, cookie=None):
             stderr=subprocess.PIPE,
             text=True,
             bufsize=1,
-            preexec_fn=lambda: __import__("resource").setrlimit(__import__("resource").RLIMIT_AS, (2 * 1024 * 1024 * 1024, 2 * 1024 * 1024 * 1024)) if hasattr(__import__("resource"), "RLIMIT_AS") else None,
         )
 
         stderr_lines = []
@@ -187,24 +210,28 @@ def run_nuclei_multi(targets, progress=None, cookie=None):
         stderr_thread.start()
 
         if process.stdout is not None:
-            for line in process.stdout:
-                line = (line or "").strip()
-                if not line:
-                    continue
-                try:
-                    obj = json.loads(line)
-                except json.JSONDecodeError:
-                    continue
-
-                all_normalized.append(_normalize_nuclei_result(obj))
-                results_count["n"] += 1
-                update_progress()
+            for _ in process.stdout:
+                pass
 
         returncode = process.wait()
         stderr_thread.join(timeout=2)
 
         with stderr_lock:
             stderr_text = "\n".join(stderr_lines)
+
+        # Parse NDJSON from temp_json_out
+        if os.path.exists(temp_json_out):
+            with open(temp_json_out, "r") as f:
+                for line in f:
+                    if line.strip():
+                        try:
+                            obj = json.loads(line)
+                            all_normalized.append(_normalize_nuclei_result(obj))
+                        except json.JSONDecodeError:
+                            continue
+
+        results_count["n"] = len(all_normalized)
+        update_progress()
 
         if returncode != 0:
             all_warnings.append(f"Nuclei exit {returncode}. {stderr_text[:500]}")
@@ -223,6 +250,11 @@ def run_nuclei_multi(targets, progress=None, cookie=None):
                 Path(temp_path).unlink(missing_ok=True)
             except Exception:
                 pass
+        if temp_json_out:
+            try:
+                Path(temp_json_out).unlink(missing_ok=True)
+            except Exception:
+                pass
 
     with open(OUTPUT_FILE, "w") as f:
         json.dump({
@@ -235,21 +267,39 @@ def run_nuclei_multi(targets, progress=None, cookie=None):
 
 
 def run_nuclei(target, progress=None, cookie=None):
+    if not validate_target(target):
+        with open(OUTPUT_FILE, "w") as f:
+            json.dump({
+                "target": target,
+                "findings": [],
+                "exit_code": 1,
+                "raw_warnings": ["Invalid or malformed target provided"]
+            }, f, indent=4)
+        return OUTPUT_FILE
+
     process = None
+    temp_json_out = None
     try:
         nuclei_bin = _resolve_binary("nuclei")
         if nuclei_bin is None:
             raise EnvironmentError("nuclei not installed or not in PATH")
 
+        with tempfile.NamedTemporaryFile("w", delete=False, prefix="nuclei-out-", suffix=".json") as temp_out_file:
+            temp_json_out = temp_out_file.name
+
         cmd = [
             nuclei_bin,
             "-u", target,
-            "-jsonl",
+            "-tags", "api,dast",
+            "-input-mode", "openapi",
+            "-je", temp_json_out,
+            "-mhe", "100",
+            "-retries", "3",
+            "-timeout", "10",
+            "-c", "5",
+            "-bs", "5",
             "-silent",
             "-no-interactsh",
-            "-c", "50",
-            "-rl", "100",
-            "-max-body-size", "5000",
         ]
 
         if cookie:
@@ -263,8 +313,7 @@ def run_nuclei(target, progress=None, cookie=None):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
-            bufsize=1,
-            preexec_fn=lambda: __import__("resource").setrlimit(__import__("resource").RLIMIT_AS, (2 * 1024 * 1024 * 1024, 2 * 1024 * 1024 * 1024)) if hasattr(__import__("resource"), "RLIMIT_AS") else None
+            bufsize=1
         )
 
         stderr_lines = []
@@ -329,20 +378,9 @@ def run_nuclei(target, progress=None, cookie=None):
         stderr_thread = threading.Thread(target=read_stderr, daemon=True)
         stderr_thread.start()
 
-        results = []
-        # Stream stdout (JSONL results)
         if process.stdout is not None:
-            for line in process.stdout:
-                line = (line or "").strip()
-                if not line:
-                    continue
-                try:
-                    obj = json.loads(line)
-                except json.JSONDecodeError:
-                    continue
-                results.append(obj)
-                results_count["n"] += 1
-                update_progress()
+            for _ in process.stdout:
+                pass
 
         returncode = process.wait()
         stderr_thread.join(timeout=2)
@@ -351,42 +389,19 @@ def run_nuclei(target, progress=None, cookie=None):
         with stderr_lock:
             stderr_text = "\n".join(stderr_lines)
 
-        # Normalize results regardless of exit code
-        # Nuclei often exits with non-zero on success or when no templates match
         normalized = []
+        if os.path.exists(temp_json_out):
+            with open(temp_json_out, "r") as f:
+                for line in f:
+                    if line.strip():
+                        try:
+                            obj = json.loads(line)
+                            normalized.append(_normalize_nuclei_result(obj))
+                        except json.JSONDecodeError:
+                            continue
 
-        for r in results:
-            info = r.get("info", {}) or {}
-            references = info.get("reference") or info.get("references") or []
-            if isinstance(references, str):
-                references = [references]
-            if not isinstance(references, list):
-                references = []
-
-            normalized.append(
-                {
-                    "template": r.get("template-id", ""),
-                    "name": info.get("name", ""),
-                    "severity": info.get("severity", ""),
-                    "description": info.get("description", ""),
-                    "matched_url": r.get("matched-at", ""),
-                    "type": r.get("type", ""),
-                    "tags": info.get("tags", []) or [],
-                    "references": references,
-                    "classification": info.get("classification", {}) or {},
-                    "matcher-name": r.get("matcher-name", ""),
-                    "curl-command": r.get("curl-command", ""),
-                    "extracted-results": r.get("extracted-results", []) or [],
-                    "timestamp": r.get("timestamp", ""),
-                    "host": r.get("host", ""),
-                    "ip": r.get("ip", ""),
-                    "port": r.get("port", ""),
-                    "request": _truncate(r.get("request", ""), 4000),
-                    "response": _truncate(r.get("response", ""), 4000),
-                    "remediation": info.get("remediation", ""),
-                    "impact": info.get("impact", ""),
-                }
-            )
+        results_count["n"] = len(normalized)
+        update_progress()
 
         logger.info(f"nuclei: completed target {str(target)[:80]} return={returncode} findings={len(normalized)} elapsed={int(time.time()-start_time)}s")
 
@@ -425,3 +440,10 @@ def run_nuclei(target, progress=None, cookie=None):
             }, f, indent=4)
 
         return OUTPUT_FILE
+
+    finally:
+        if temp_json_out:
+            try:
+                Path(temp_json_out).unlink(missing_ok=True)
+            except Exception:
+                pass
