@@ -7,6 +7,8 @@ than generating live exploit payloads.
 
 from __future__ import annotations
 
+import requests
+import logging
 from dataclasses import dataclass, field
 from hashlib import sha256
 from typing import Any, Callable, Dict, List, Optional
@@ -14,6 +16,41 @@ from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
 from engine.models import Evidence, EvidenceBundle, ExecutionContext, ValidationResult
+
+logger = logging.getLogger(__name__)
+
+def verify_connectivity(url):
+    """
+    Checks if the target API is reachable. 
+    Swaps localhost for 127.0.0.1 automatically if needed.
+    """
+    parsed = urlparse(url)
+    attempts = [url]
+    
+    if parsed.hostname == 'localhost':
+        attempts.append(url.replace('localhost', '127.0.0.1'))
+
+    for target in attempts:
+        try:
+            # Short timeout to fail fast if the port is closed
+            response = requests.get(target, timeout=3)
+            if response.status_code < 500:
+                return True, target
+        except requests.exceptions.RequestException:
+            continue
+            
+    return False, url
+
+class BaseValidator:
+    def __init__(self, target_url):
+        self.target_url = target_url
+        self.is_reachable = False
+        
+    def pre_flight(self):
+        self.is_reachable, self.active_url = verify_connectivity(self.target_url)
+        if not self.is_reachable:
+            logger.error(f"CRITICAL: Target {self.target_url} is unreachable.")
+        return self.is_reachable
 
 try:
     from brain.fact_store import FactStore, FactCategory, Fact

@@ -1,8 +1,205 @@
 {
-  "target": "http://localhost:3000/",
-  "generated_at": "2026-05-05T07:44:26.840893Z",
-  "confirmed_count": 1,
+  "target": "http://altoro.testfire.net/",
+  "generated_at": "2026-05-08T15:54:53.827924Z",
+  "confirmed_count": 5,
   "confirmed_vulnerabilities": [
+    {
+      "type": "a06-vulnerable-and-outdated-components",
+      "source_action": "validator",
+      "endpoint": "",
+      "base": "",
+      "params": [],
+      "reason": "Known-vulnerable or stale components can expose publicly documented exploit paths.",
+      "proof": {
+        "request": {
+          "target": "http://altoro.testfire.net/"
+        },
+        "response": {
+          "cves": [],
+          "version_headers": {
+            "Server": "Apache-Coyote/1.1"
+          },
+          "disclosed_versions": [
+            "1.1"
+          ]
+        },
+        "matched": "1.1",
+        "extra": {
+          "cve_count": 0,
+          "header_count": 1,
+          "coverage_markers": [
+            "known_cve_indicator_detected",
+            "outdated_component_version_disclosed",
+            "dependency_patch_lag_signal",
+            "vulnerable_server_software_signal",
+            "unsafe_component_inventory_gap"
+          ]
+        }
+      },
+      "validator_id": "",
+      "validator_class": "",
+      "severity": "high",
+      "confidence": 0.72,
+      "compliance_tags": {
+        "OWASP": "General Security Requirement",
+        "PCI-DSS": "Review Required",
+        "SOC2": "Control Review Required",
+        "NIST": "Control Review Required"
+      },
+      "business_risk": "OWASP: General Security Requirement | PCI-DSS: Review Required | SOC2: Control Review Required | NIST: Control Review Required"
+    },
+    {
+      "type": "missing-security-headers",
+      "source_action": "validator",
+      "endpoint": "",
+      "base": "",
+      "params": [],
+      "reason": "Missing headers can increase exposure to clickjacking and some XSS scenarios.",
+      "proof": {
+        "request": "http://altoro.testfire.net/",
+        "response": {
+          "Server": "Apache-Coyote/1.1",
+          "Set-Cookie": "JSESSIONID=D8601CA79793153C234D1ED10CDB8BCC; Path=/; HttpOnly",
+          "Content-Type": "text/html;charset=ISO-8859-1",
+          "Transfer-Encoding": "chunked",
+          "Date": "Fri, 08 May 2026 15:49:45 GMT",
+          "Connection": "close"
+        },
+        "matched": "CSP,X-Frame-Options",
+        "extra": {
+          "coverage_markers": [
+            "missing_security_headers_as_monitoring_signal",
+            "insufficient_monitoring_indicators",
+            "audit_visibility_hardening_gap",
+            "low_detection_surface_signal",
+            "telemetry_control_gap"
+          ]
+        }
+      },
+      "validator_id": "",
+      "validator_class": "",
+      "severity": "info",
+      "confidence": 0.8,
+      "compliance_tags": {
+        "OWASP": "General Security Requirement",
+        "PCI-DSS": "Review Required",
+        "SOC2": "Control Review Required",
+        "NIST": "Control Review Required"
+      },
+      "business_risk": "OWASP: General Security Requirement | PCI-DSS: Review Required | SOC2: Control Review Required | NIST: Control Review Required"
+    },
+    {
+      "type": "a02-crypto-missing-security-headers",
+      "source_action": "validator",
+      "endpoint": "",
+      "base": "",
+      "params": [],
+      "reason": "Missing 6 security headers: strict-transport-security (HSTS - enforces HTTPS), x-content-type-options (prevents MIME sniffing), x-frame-options (prevents clickjacking). This reduces defense against various attacks.",
+      "proof": {
+        "request": {
+          "url": "http://altoro.testfire.net/"
+        },
+        "response": {
+          "missing_headers": [
+            "strict-transport-security (HSTS - enforces HTTPS)",
+            "x-content-type-options (prevents MIME sniffing)",
+            "x-frame-options (prevents clickjacking)",
+            "x-xss-protection (legacy XSS protection)",
+            "content-security-policy (controls resource loading)",
+            "referrer-policy (controls referrer information)"
+          ]
+        },
+        "matched": "strict-transport-security (HSTS - enforces HTTPS), x-content-type-options (prevents MIME sniffing), x-frame-options (prevents clickjacking)",
+        "extra": {
+          "coverage_markers": [
+            "weak_tls_versions",
+            "plaintext_sensitive_transport",
+            "missing_transport_encryption",
+            "insecure_cipher_or_protocol_policy",
+            "sensitive_data_exposure_in_transit"
+          ]
+        }
+      },
+      "validator_id": "",
+      "validator_class": "",
+      "severity": "medium",
+      "confidence": 0.8,
+      "compliance_tags": {
+        "OWASP": "General Security Requirement",
+        "PCI-DSS": "Review Required",
+        "SOC2": "Control Review Required",
+        "NIST": "Control Review Required"
+      },
+      "business_risk": "OWASP: General Security Requirement | PCI-DSS: Review Required | SOC2: Control Review Required | NIST: Control Review Required"
+    },
+    {
+      "type": "a07-identification-and-authentication-failures",
+      "source_action": "validator",
+      "endpoint": "",
+      "base": "",
+      "params": [],
+      "reason": "The login flow does not enforce expected authentication controls, enabling brute-force or session persistence abuse.",
+      "proof": {
+        "request": {
+          "target": "http://altoro.testfire.net/doLogin",
+          "payload": {
+            "username": "security-pipeline-test",
+            "password": "invalid-password"
+          }
+        },
+        "response": {
+          "login_response_status": 302,
+          "findings": [
+            "missing_rate_limiting"
+          ]
+        },
+        "matched": "missing_rate_limiting",
+        "extra": {
+          "login_like": true,
+          "attempts": [
+            {
+              "attempt": 1,
+              "status": 302,
+              "elapsed_s": 1.869
+            },
+            {
+              "attempt": 2,
+              "status": 302,
+              "elapsed_s": 1.34
+            },
+            {
+              "attempt": 3,
+              "status": 302,
+              "elapsed_s": 0.781
+            },
+            {
+              "attempt": 4,
+              "status": 302,
+              "elapsed_s": 1.071
+            }
+          ],
+          "set_cookie_headers": [],
+          "coverage_markers": [
+            "missing_login_rate_limit",
+            "insecure_remember_me_cookie_flags",
+            "weak_session_management_signal",
+            "credential_control_weakness",
+            "authentication_flow_hardening_gap"
+          ]
+        }
+      },
+      "validator_id": "",
+      "validator_class": "",
+      "severity": "high",
+      "confidence": 0.88,
+      "compliance_tags": {
+        "OWASP": "General Security Requirement",
+        "PCI-DSS": "Review Required",
+        "SOC2": "Control Review Required",
+        "NIST": "Control Review Required"
+      },
+      "business_risk": "OWASP: General Security Requirement | PCI-DSS: Review Required | SOC2: Control Review Required | NIST: Control Review Required"
+    },
     {
       "type": "a10-server-side-request-forgery",
       "source_action": "validator",
@@ -12,14 +209,14 @@
       "reason": "The application processed a server-side URL fetch attempt and surfaced loopback-specific network behavior.",
       "proof": {
         "request": {
-          "baseline_url": "http://localhost:3000/?url=https%3A%2F%2Fexample.com%2F",
-          "probe_url": "http://localhost:3000/?url=http%3A%2F%2F127.0.0.1",
-          "param": "url"
+          "baseline_url": "http://altoro.testfire.net/?target=https%3A%2F%2Fexample.com%2F",
+          "probe_url": "http://altoro.testfire.net/?target=http%3A%2F%2F127.0.0.1%3A80",
+          "param": "target"
         },
-        "response": "HTTPConnectionPool(host='localhost', port=3000): Max retries exceeded with url: /?url=https%3A%2F%2Fexample.com%2F (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=3000): Failed to establish a new connection: [Errno 111] Connection refused\"))",
-        "matched": "HTTPConnectionPool(host='localhost', port=3000): Max retries exceeded with url: /?url=https%3A%2F%2Fexample.com%2F (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=3000): Failed to establish a new connection: [Errno 111] Connection refused\"))",
+        "response": "HTTPConnectionPool(host='altoro.testfire.net', port=80): Read timed out. (read timeout=8)",
+        "matched": "HTTPConnectionPool(host='altoro.testfire.net', port=80): Read timed out. (read timeout=8)",
         "extra": {
-          "loopback_url": "http://127.0.0.1",
+          "loopback_url": "http://127.0.0.1:80",
           "candidate_params": [
             "url",
             "uri",

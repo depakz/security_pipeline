@@ -148,7 +148,6 @@ def run_nuclei_multi(targets, progress=None, cookie=None):
             nuclei_bin,
             "-l", temp_path,
             "-tags", "api,dast",
-            "-input-mode", "openapi",
             "-je", temp_json_out,
             "-mhe", "100",
             "-retries", "3",
@@ -226,7 +225,12 @@ def run_nuclei_multi(targets, progress=None, cookie=None):
                     if line.strip():
                         try:
                             obj = json.loads(line)
-                            all_normalized.append(_normalize_nuclei_result(obj))
+                            if isinstance(obj, list):
+                                for item in obj:
+                                    if isinstance(item, dict):
+                                        all_normalized.append(_normalize_nuclei_result(item))
+                            elif isinstance(obj, dict):
+                                all_normalized.append(_normalize_nuclei_result(obj))
                         except json.JSONDecodeError:
                             continue
 
@@ -291,7 +295,6 @@ def run_nuclei(target, progress=None, cookie=None):
             nuclei_bin,
             "-u", target,
             "-tags", "api,dast",
-            "-input-mode", "openapi",
             "-je", temp_json_out,
             "-mhe", "100",
             "-retries", "3",
@@ -396,7 +399,12 @@ def run_nuclei(target, progress=None, cookie=None):
                     if line.strip():
                         try:
                             obj = json.loads(line)
-                            normalized.append(_normalize_nuclei_result(obj))
+                            if isinstance(obj, list):
+                                for item in obj:
+                                    if isinstance(item, dict):
+                                        normalized.append(_normalize_nuclei_result(item))
+                            elif isinstance(obj, dict):
+                                normalized.append(_normalize_nuclei_result(obj))
                         except json.JSONDecodeError:
                             continue
 

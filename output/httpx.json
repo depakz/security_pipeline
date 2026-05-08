@@ -1,3 +1,90 @@
-{
-    "error": "Empty HTTPX output"
-}
+[
+    {
+        "url": "https://www.google.com/",
+        "status_code": 200,
+        "title": "Google",
+        "webserver": "gws",
+        "tech": [
+            "Google Web Server",
+            "HSTS",
+            "HTTP/3"
+        ],
+        "ip": "",
+        "content_type": "text/html",
+        "method": "GET",
+        "port": "443",
+        "scheme": "https",
+        "tls_grab": {},
+        "tls": {
+            "host": "www.google.com",
+            "port": "443",
+            "probe_status": true,
+            "tls_version": "tls13",
+            "cipher": "TLS_AES_128_GCM_SHA256",
+            "not_before": "2026-04-20T08:37:29Z",
+            "not_after": "2026-07-13T08:37:28Z",
+            "subject_dn": "CN=www.google.com",
+            "subject_cn": "www.google.com",
+            "subject_an": [
+                "www.google.com"
+            ],
+            "issuer_dn": "CN=WE2, O=Google Trust Services, C=US",
+            "issuer_cn": "WE2",
+            "issuer_org": [
+                "Google Trust Services"
+            ],
+            "fingerprint_hash": {
+                "md5": "ba3adbbb491d3fab28ac98fa27219f86",
+                "sha1": "557efecc4ce8564af8a7078b70e82aea43f33cfd",
+                "sha256": "5f47917baf39c71ff0ffbc0eed8be2713f27023516bb0a958a50583c4ef1b671"
+            },
+            "tls_connection": "ctls",
+            "sni": "www.google.com"
+        },
+        "favicon": ""
+    },
+    {
+        "url": "https://www.google.com",
+        "status_code": 200,
+        "title": "Google",
+        "webserver": "gws",
+        "tech": [
+            "Google Web Server",
+            "HSTS",
+            "HTTP/3"
+        ],
+        "ip": "",
+        "content_type": "text/html",
+        "method": "GET",
+        "port": "443",
+        "scheme": "https",
+        "tls_grab": {},
+        "tls": {
+            "host": "www.google.com",
+            "port": "443",
+            "probe_status": true,
+            "tls_version": "tls13",
+            "cipher": "TLS_AES_128_GCM_SHA256",
+            "not_before": "2026-04-20T08:37:29Z",
+            "not_after": "2026-07-13T08:37:28Z",
+            "subject_dn": "CN=www.google.com",
+            "subject_cn": "www.google.com",
+            "subject_an": [
+                "www.google.com"
+            ],
+            "issuer_dn": "CN=WE2, O=Google Trust Services, C=US",
+            "issuer_cn": "WE2",
+            "issuer_org": [
+                "Google Trust Services"
+            ],
+            "fingerprint_hash": {
+                "md5": "ba3adbbb491d3fab28ac98fa27219f86",
+                "sha1": "557efecc4ce8564af8a7078b70e82aea43f33cfd",
+                "sha256": "5f47917baf39c71ff0ffbc0eed8be2713f27023516bb0a958a50583c4ef1b671"
+            },
+            "tls_connection": "ctls",
+            "sni": "www.google.com"
+        },
+        "favicon": ""
+    }
+]
