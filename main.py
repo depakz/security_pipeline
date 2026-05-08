@@ -478,6 +478,14 @@ def main():
     scan_time = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     logger.info(f"Starting penetration testing pipeline for target: {target}")
 
+    from validators.integrity import verify_connectivity
+    is_alive, working_url = verify_connectivity(target)
+    if not is_alive:
+        print(f"[-] Aborting: Could not connect to {target}")
+        sys.exit(1)
+    
+    target = working_url
+
     prior_session = load_session()
     prior_session_context = prior_session.get("session_context") if isinstance(prior_session, dict) else {}
     session_context = capture_session_context(
