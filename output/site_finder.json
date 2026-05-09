@@ -14,7 +14,8 @@
     "http://altoro.testfire.net/crossdomain.xml",
     "http://altoro.testfire.net/dashboard",
     "http://altoro.testfire.net/default.jsp?content=security.htm",
-    "http://altoro.testfire.net/doLogin",
+    "http://altoro.testfire.net/disclaimer.htm?url=http://www.microsoft.com",
+    "http://altoro.testfire.net/disclaimer.htm?url=http://www.netscape.com",
     "http://altoro.testfire.net/doSubscribe",
     "http://altoro.testfire.net/favicon.ico",
     "http://altoro.testfire.net/feed",
@@ -23,22 +24,25 @@
     "http://altoro.testfire.net/health",
     "http://altoro.testfire.net/high_yield_investments.htm",
     "http://altoro.testfire.net/humans.txt",
+    "http://altoro.testfire.net/images/b_cards.jpg",
     "http://altoro.testfire.net/images/b_deposit.jpg",
     "http://altoro.testfire.net/images/b_insurance.jpg",
-    "http://altoro.testfire.net/images/b_main.jpg",
+    "http://altoro.testfire.net/images/b_lending.jpg",
     "http://altoro.testfire.net/images/b_other.jpg",
     "http://altoro.testfire.net/images/gradient.jpg",
     "http://altoro.testfire.net/images/header_pic.jpg",
     "http://altoro.testfire.net/images/home1.jpg",
     "http://altoro.testfire.net/images/home2.jpg",
     "http://altoro.testfire.net/images/home3.jpg",
+    "http://altoro.testfire.net/images/icon_top.gif",
+    "http://altoro.testfire.net/images/inside1.jpg",
+    "http://altoro.testfire.net/images/inside3.jpg",
     "http://altoro.testfire.net/images/inside4.jpg",
+    "http://altoro.testfire.net/images/inside6.jpg",
     "http://altoro.testfire.net/images/inside7.jpg",
     "http://altoro.testfire.net/images/logo.gif",
     "http://altoro.testfire.net/images/p_cards.jpg",
-    "http://altoro.testfire.net/images/p_checking.jpg",
     "http://altoro.testfire.net/images/p_loans.jpg",
-    "http://altoro.testfire.net/images/p_main.jpg",
     "http://altoro.testfire.net/images/pf_lock.gif",
     "http://altoro.testfire.net/index.jsp",
     "http://altoro.testfire.net/index.jsp?content=business.htm",
@@ -52,6 +56,7 @@
     "http://altoro.testfire.net/index.jsp?content=inside_about.htm",
     "http://altoro.testfire.net/index.jsp?content=inside_benefits.htm",
     "http://altoro.testfire.net/index.jsp?content=inside_careers.htm",
+    "http://altoro.testfire.net/index.jsp?content=inside_community.htm",
     "http://altoro.testfire.net/index.jsp?content=inside_contact.htm",
     "http://altoro.testfire.net/index.jsp?content=inside_internships.htm",
     "http://altoro.testfire.net/index.jsp?content=inside_investor.htm",
@@ -76,6 +81,7 @@
     "http://altoro.testfire.net/index.jsp?content=pr/20061109.htm",
     "http://altoro.testfire.net/index.jsp?content=privacy.htm",
     "http://altoro.testfire.net/index.jsp?content=security.htm",
+    "http://altoro.testfire.net/index.jsp?content=security.htm#top",
     "http://altoro.testfire.net/login",
     "http://altoro.testfire.net/login.jsp",
     "http://altoro.testfire.net/manifest.json",
@@ -83,8 +89,8 @@
     "http://altoro.testfire.net/openapi.json",
     "http://altoro.testfire.net/openapi.yaml",
     "http://altoro.testfire.net/phpinfo.php",
+    "http://altoro.testfire.net/pr/communityannualreport.pdf",
     "http://altoro.testfire.net/register",
-    "http://altoro.testfire.net/retirement.htm",
     "http://altoro.testfire.net/robots.txt",
     "http://altoro.testfire.net/rss",
     "http://altoro.testfire.net/search",
@@ -100,6 +106,7 @@
     "http://altoro.testfire.net/status_check.jsp",
     "http://altoro.testfire.net/style.css",
     "http://altoro.testfire.net/subscribe.jsp",
+    "http://altoro.testfire.net/subscribe.swf",
     "http://altoro.testfire.net/survey_questions.jsp",
     "http://altoro.testfire.net/swagger",
     "http://altoro.testfire.net/swagger-ui",
@@ -115,234 +122,36 @@
       "final_url": "http://altoro.testfire.net/",
       "headers": {
         "Server": "Apache-Coyote/1.1",
-        "Set-Cookie": "JSESSIONID=214BC01643EAFD08E30881345051E8B6; Path=/; HttpOnly",
+        "Set-Cookie": "JSESSIONID=A9AAAF5E2CE637A972CBF05BBF7672EF; Path=/; HttpOnly",
         "Content-Type": "text/html;charset=ISO-8859-1",
         "Transfer-Encoding": "chunked",
-        "Date": "Fri, 08 May 2026 15:18:14 GMT"
+        "Date": "Fri, 08 May 2026 18:58:33 GMT"
       },
       "links_discovered": 75
-    },
-    {
-      "url": "http://altoro.testfire.net/login.jsp",
-      "final_url": "http://altoro.testfire.net/login.jsp",
-      "headers": {
-        "Server": "Apache-Coyote/1.1",
-        "Set-Cookie": "JSESSIONID=F6E59146DF7CBEFBEBB95CE2CD67D808; Path=/; HttpOnly",
-        "Content-Type": "text/html;charset=ISO-8859-1",
-        "Transfer-Encoding": "chunked",
-        "Date": "Fri, 08 May 2026 15:18:15 GMT"
-      },
-      "links_discovered": 76
-    },
-    {
-      "url": "http://altoro.testfire.net/default.jsp?content=security.htm",
-      "final_url": "http://altoro.testfire.net/default.jsp?content=security.htm",
-      "headers": {
-        "Server": "Apache-Coyote/1.1",
-        "Set-Cookie": "JSESSIONID=F6964F124BA3DA314FE8F865A4971B81; Path=/; HttpOnly",
-        "Content-Type": "text/html;charset=ISO-8859-1",
-        "Content-Length": "6958",
-        "Date": "Fri, 08 May 2026 15:18:16 GMT"
-      },
-      "links_discovered": 76
-    },
-    {
-      "url": "http://altoro.testfire.net/index.jsp",
-      "final_url": "http://altoro.testfire.net/index.jsp",
-      "headers": {
-        "Server": "Apache-Coyote/1.1",
-        "Set-Cookie": "JSESSIONID=ACF97A5C15B70415C2DD71FA15E84740; Path=/; HttpOnly",
-        "Content-Type": "text/html;charset=ISO-8859-1",
-        "Transfer-Encoding": "chunked",
-        "Date": "Fri, 08 May 2026 15:18:17 GMT"
-      },
-      "links_discovered": 76
-    },
-    {
-      "url": "http://altoro.testfire.net/images/header_pic.jpg",
-      "final_url": "http://altoro.testfire.net/images/header_pic.jpg",
-      "headers": {
-        "Server": "Apache-Coyote/1.1",
-        "Accept-Ranges": "bytes",
-        "ETag": "W/\"16209-1610554444000\"",
-        "Last-Modified": "Wed, 13 Jan 2021 16:14:04 GMT",
-        "Content-Type": "image/jpeg",
-        "Content-Length": "16209",
-        "Date": "Fri, 08 May 2026 15:18:18 GMT"
-      },
-      "links_discovered": 76
-    },
-    {
-      "url": "http://altoro.testfire.net/index.jsp?content=inside_press.htm",
-      "final_url": "http://altoro.testfire.net/index.jsp?content=inside_press.htm",
-      "headers": {
-        "Server": "Apache-Coyote/1.1",
-        "Set-Cookie": "JSESSIONID=8633D58D7DAA98E922B6D332CEBA59B7; Path=/; HttpOnly",
-        "Content-Type": "text/html;charset=ISO-8859-1",
-        "Transfer-Encoding": "chunked",
-        "Date": "Fri, 08 May 2026 15:18:19 GMT"
-      },
-      "links_discovered": 85
-    },
-    {
-      "url": "http://altoro.testfire.net/index.jsp?content=business.htm",
-      "final_url": "http://altoro.testfire.net/index.jsp?content=business.htm",
-      "headers": {
-        "Server": "Apache-Coyote/1.1",
-        "Set-Cookie": "JSESSIONID=8096FC12173E55E0F4D5981719866E41; Path=/; HttpOnly",
-        "Content-Type": "text/html;charset=ISO-8859-1",
-        "Transfer-Encoding": "chunked",
-        "Date": "Fri, 08 May 2026 15:18:21 GMT"
-      },
-      "links_discovered": 86
-    },
-    {
-      "url": "http://altoro.testfire.net/images/home2.jpg",
-      "final_url": "http://altoro.testfire.net/images/home2.jpg",
-      "headers": {
-        "Server": "Apache-Coyote/1.1",
-        "Accept-Ranges": "bytes",
-        "ETag": "W/\"5904-1610554444000\"",
-        "Last-Modified": "Wed, 13 Jan 2021 16:14:04 GMT",
-        "Content-Type": "image/jpeg",
-        "Content-Length": "5904",
-        "Date": "Fri, 08 May 2026 15:18:21 GMT"
-      },
-      "links_discovered": 86
     },
     {
       "url": "http://altoro.testfire.net/subscribe.jsp",
       "final_url": "http://altoro.testfire.net/subscribe.jsp",
       "headers": {
         "Server": "Apache-Coyote/1.1",
-        "Set-Cookie": "JSESSIONID=CC957D58AC48279800C3FEAC279F776B; Path=/; HttpOnly",
+        "Set-Cookie": "JSESSIONID=662487B3E224F347C8BA28322A079F84; Path=/; HttpOnly",
         "Content-Type": "text/html;charset=ISO-8859-1",
         "Transfer-Encoding": "chunked",
-        "Date": "Fri, 08 May 2026 15:18:22 GMT"
+        "Date": "Fri, 08 May 2026 18:58:34 GMT"
       },
-      "links_discovered": 87
-    },
-    {
-      "url": "http://altoro.testfire.net/index.jsp?content=business_retirement.htm",
-      "final_url": "http://altoro.testfire.net/index.jsp?content=business_retirement.htm",
-      "headers": {
-        "Server": "Apache-Coyote/1.1",
-        "Set-Cookie": "JSESSIONID=2DF5579D8ECCD0587EEC651C88C913CE; Path=/; HttpOnly",
-        "Content-Type": "text/html;charset=ISO-8859-1",
-        "Content-Length": "6960",
-        "Date": "Fri, 08 May 2026 15:18:23 GMT"
-      },
-      "links_discovered": 88
-    },
-    {
-      "url": "http://altoro.testfire.net/index.jsp?content=business_deposit.htm",
-      "final_url": "http://altoro.testfire.net/index.jsp?content=business_deposit.htm",
-      "headers": {
-        "Server": "Apache-Coyote/1.1",
-        "Set-Cookie": "JSESSIONID=9EECEB5EB11EEF2AF597615132131BBA; Path=/; HttpOnly",
-        "Content-Type": "text/html;charset=ISO-8859-1",
-        "Content-Length": "7883",
-        "Date": "Fri, 08 May 2026 15:18:24 GMT"
-      },
-      "links_discovered": 90
-    },
-    {
-      "url": "http://altoro.testfire.net/feedback.jsp",
-      "final_url": "http://altoro.testfire.net/feedback.jsp",
-      "headers": {
-        "Server": "Apache-Coyote/1.1",
-        "Set-Cookie": "JSESSIONID=E7BCAC7ACD56AF8174B29285C63A84FC; Path=/; HttpOnly",
-        "Content-Type": "text/html;charset=ISO-8859-1",
-        "Transfer-Encoding": "chunked",
-        "Date": "Fri, 08 May 2026 15:18:26 GMT"
-      },
-      "links_discovered": 91
-    },
-    {
-      "url": "http://altoro.testfire.net/style.css",
-      "final_url": "http://altoro.testfire.net/style.css",
-      "headers": {
-        "Server": "Apache-Coyote/1.1",
-        "Accept-Ranges": "bytes",
-        "ETag": "W/\"1251-1610554444000\"",
-        "Last-Modified": "Wed, 13 Jan 2021 16:14:04 GMT",
-        "Content-Type": "text/css",
-        "Content-Length": "1251",
-        "Date": "Fri, 08 May 2026 15:18:27 GMT"
-      },
-      "links_discovered": 91
-    },
-    {
-      "url": "http://altoro.testfire.net/index.jsp?content=business_insurance.htm",
-      "final_url": "http://altoro.testfire.net/index.jsp?content=business_insurance.htm",
-      "headers": {
-        "Server": "Apache-Coyote/1.1",
-        "Set-Cookie": "JSESSIONID=DB32D5FCD382E7041AA8E2655292D71E; Path=/; HttpOnly",
-        "Content-Type": "text/html;charset=ISO-8859-1",
-        "Content-Length": "7745",
-        "Date": "Fri, 08 May 2026 15:18:27 GMT"
-      },
-      "links_discovered": 93
-    },
-    {
-      "url": "http://altoro.testfire.net/cgi.exe",
-      "final_url": "http://altoro.testfire.net/cgi.exe",
-      "headers": {
-        "Server": "Apache-Coyote/1.1",
-        "Set-Cookie": "JSESSIONID=DD57EF413B8F273BB44C7CA69BF5C0E6; Path=/; HttpOnly",
-        "Content-Type": "text/html;charset=ISO-8859-1",
-        "Content-Length": "6958",
-        "Date": "Fri, 08 May 2026 15:18:28 GMT"
-      },
-      "links_discovered": 93
+      "links_discovered": 76
     },
     {
       "url": "http://altoro.testfire.net/index.jsp?content=business_other.htm",
       "final_url": "http://altoro.testfire.net/index.jsp?content=business_other.htm",
       "headers": {
         "Server": "Apache-Coyote/1.1",
-        "Set-Cookie": "JSESSIONID=FE975166C7B298DD8707A7A2687B4081; Path=/; HttpOnly",
+        "Set-Cookie": "JSESSIONID=3509A3ADF4D0711FFF60E110DEA91FFC; Path=/; HttpOnly",
         "Content-Type": "text/html;charset=ISO-8859-1",
         "Content-Length": "7728",
-        "Date": "Fri, 08 May 2026 15:18:29 GMT"
+        "Date": "Fri, 08 May 2026 18:58:35 GMT"
       },
-      "links_discovered": 94
-    },
-    {
-      "url": "http://altoro.testfire.net/index.jsp?content=personal_checking.htm",
-      "final_url": "http://altoro.testfire.net/index.jsp?content=personal_checking.htm",
-      "headers": {
-        "Server": "Apache-Coyote/1.1",
-        "Set-Cookie": "JSESSIONID=2F1AC278F5969F5A2F911C33734AA782; Path=/; HttpOnly",
-        "Content-Type": "text/html;charset=ISO-8859-1",
-        "Content-Length": "8090",
-        "Date": "Fri, 08 May 2026 15:18:30 GMT"
-      },
-      "links_discovered": 95
-    },
-    {
-      "url": "http://altoro.testfire.net/index.jsp?content=inside_careers.htm",
-      "final_url": "http://altoro.testfire.net/index.jsp?content=inside_careers.htm",
-      "headers": {
-        "Server": "Apache-Coyote/1.1",
-        "Set-Cookie": "JSESSIONID=FC2FABD5CAD949DEB5FE77117201617D; Path=/; HttpOnly",
-        "Content-Type": "text/html;charset=ISO-8859-1",
-        "Transfer-Encoding": "chunked",
-        "Date": "Fri, 08 May 2026 15:18:31 GMT"
-      },
-      "links_discovered": 101
-    },
-    {
-      "url": "http://altoro.testfire.net/index.jsp?content=personal_loans.htm",
-      "final_url": "http://altoro.testfire.net/index.jsp?content=personal_loans.htm",
-      "headers": {
-        "Server": "Apache-Coyote/1.1",
-        "Set-Cookie": "JSESSIONID=3E9540D7712B234EDE682CBB701C77FC; Path=/; HttpOnly",
-        "Content-Type": "text/html;charset=ISO-8859-1",
-        "Content-Length": "7832",
-        "Date": "Fri, 08 May 2026 15:18:32 GMT"
-      },
-      "links_discovered": 102
+      "links_discovered": 77
     },
     {
       "url": "http://altoro.testfire.net/images/home1.jpg",
@@ -354,33 +163,205 @@
         "Last-Modified": "Wed, 13 Jan 2021 16:14:04 GMT",
         "Content-Type": "image/jpeg",
         "Content-Length": "7900",
-        "Date": "Fri, 08 May 2026 15:18:33 GMT"
+        "Date": "Fri, 08 May 2026 18:58:36 GMT"
+      },
+      "links_discovered": 77
+    },
+    {
+      "url": "http://altoro.testfire.net/index.jsp?content=personal_loans.htm",
+      "final_url": "http://altoro.testfire.net/index.jsp?content=personal_loans.htm",
+      "headers": {
+        "Server": "Apache-Coyote/1.1",
+        "Set-Cookie": "JSESSIONID=F1C18C10EC7FB04D34C6CFD7FC338C3B; Path=/; HttpOnly",
+        "Content-Type": "text/html;charset=ISO-8859-1",
+        "Content-Length": "7832",
+        "Date": "Fri, 08 May 2026 18:58:37 GMT"
+      },
+      "links_discovered": 78
+    },
+    {
+      "url": "http://altoro.testfire.net/index.jsp?content=inside_press.htm",
+      "final_url": "http://altoro.testfire.net/index.jsp?content=inside_press.htm",
+      "headers": {
+        "Server": "Apache-Coyote/1.1",
+        "Set-Cookie": "JSESSIONID=79B7B6AD6DF3C1A3D298142C52165AF0; Path=/; HttpOnly",
+        "Content-Type": "text/html;charset=ISO-8859-1",
+        "Transfer-Encoding": "chunked",
+        "Date": "Fri, 08 May 2026 18:58:38 GMT"
+      },
+      "links_discovered": 87
+    },
+    {
+      "url": "http://altoro.testfire.net/index.jsp?content=inside.htm",
+      "final_url": "http://altoro.testfire.net/index.jsp?content=inside.htm",
+      "headers": {
+        "Server": "Apache-Coyote/1.1",
+        "Set-Cookie": "JSESSIONID=A6523B2CB30461394AD2949F59D9D0EB; Path=/; HttpOnly",
+        "Content-Type": "text/html;charset=ISO-8859-1",
+        "Transfer-Encoding": "chunked",
+        "Date": "Fri, 08 May 2026 18:58:39 GMT"
+      },
+      "links_discovered": 90
+    },
+    {
+      "url": "http://altoro.testfire.net/index.jsp?content=privacy.htm",
+      "final_url": "http://altoro.testfire.net/index.jsp?content=privacy.htm",
+      "headers": {
+        "Server": "Apache-Coyote/1.1",
+        "Set-Cookie": "JSESSIONID=16F2AF5ED3C81F139BD09AAC62CDDF47; Path=/; HttpOnly",
+        "Content-Type": "text/html;charset=ISO-8859-1",
+        "Transfer-Encoding": "chunked",
+        "Date": "Fri, 08 May 2026 18:58:40 GMT"
+      },
+      "links_discovered": 90
+    },
+    {
+      "url": "http://altoro.testfire.net/index.jsp?content=security.htm",
+      "final_url": "http://altoro.testfire.net/index.jsp?content=security.htm",
+      "headers": {
+        "Server": "Apache-Coyote/1.1",
+        "Set-Cookie": "JSESSIONID=102278AF0132B6027B9AAF7DF23B64EA; Path=/; HttpOnly",
+        "Content-Type": "text/html;charset=ISO-8859-1",
+        "Transfer-Encoding": "chunked",
+        "Date": "Fri, 08 May 2026 18:58:41 GMT"
+      },
+      "links_discovered": 92
+    },
+    {
+      "url": "http://altoro.testfire.net/index.jsp?content=personal_cards.htm",
+      "final_url": "http://altoro.testfire.net/index.jsp?content=personal_cards.htm",
+      "headers": {
+        "Server": "Apache-Coyote/1.1",
+        "Set-Cookie": "JSESSIONID=52B04BC466002F6E6AB9A7F9B05D1CD4; Path=/; HttpOnly",
+        "Content-Type": "text/html;charset=ISO-8859-1",
+        "Transfer-Encoding": "chunked",
+        "Date": "Fri, 08 May 2026 18:58:42 GMT"
+      },
+      "links_discovered": 93
+    },
+    {
+      "url": "http://altoro.testfire.net/images/pf_lock.gif",
+      "final_url": "http://altoro.testfire.net/images/pf_lock.gif",
+      "headers": {
+        "Server": "Apache-Coyote/1.1",
+        "Accept-Ranges": "bytes",
+        "ETag": "W/\"76-1610554444000\"",
+        "Last-Modified": "Wed, 13 Jan 2021 16:14:04 GMT",
+        "Content-Type": "image/gif",
+        "Content-Length": "76",
+        "Date": "Fri, 08 May 2026 18:58:43 GMT"
+      },
+      "links_discovered": 93
+    },
+    {
+      "url": "http://altoro.testfire.net/feedback.jsp",
+      "final_url": "http://altoro.testfire.net/feedback.jsp",
+      "headers": {
+        "Server": "Apache-Coyote/1.1",
+        "Set-Cookie": "JSESSIONID=E84F10F3979E6257DA2D82ECE4BA7109; Path=/; HttpOnly",
+        "Content-Type": "text/html;charset=ISO-8859-1",
+        "Transfer-Encoding": "chunked",
+        "Date": "Fri, 08 May 2026 18:58:43 GMT"
+      },
+      "links_discovered": 94
+    },
+    {
+      "url": "http://altoro.testfire.net/index.jsp?content=business_lending.htm",
+      "final_url": "http://altoro.testfire.net/index.jsp?content=business_lending.htm",
+      "headers": {
+        "Server": "Apache-Coyote/1.1",
+        "Set-Cookie": "JSESSIONID=B4114774BACF6B0C660838A113BF441B; Path=/; HttpOnly",
+        "Content-Type": "text/html;charset=ISO-8859-1",
+        "Content-Length": "7877",
+        "Date": "Fri, 08 May 2026 18:58:44 GMT"
+      },
+      "links_discovered": 95
+    },
+    {
+      "url": "http://altoro.testfire.net/index.jsp?content=personal_savings.htm",
+      "final_url": "http://altoro.testfire.net/index.jsp?content=personal_savings.htm",
+      "headers": {
+        "Server": "Apache-Coyote/1.1",
+        "Set-Cookie": "JSESSIONID=208D935A6EF11DBD5134B4087EAFBB60; Path=/; HttpOnly",
+        "Content-Type": "text/html;charset=ISO-8859-1",
+        "Content-Length": "6959",
+        "Date": "Fri, 08 May 2026 18:58:45 GMT"
+      },
+      "links_discovered": 95
+    },
+    {
+      "url": "http://altoro.testfire.net/index.jsp?content=inside_investor.htm",
+      "final_url": "http://altoro.testfire.net/index.jsp?content=inside_investor.htm",
+      "headers": {
+        "Server": "Apache-Coyote/1.1",
+        "Set-Cookie": "JSESSIONID=8DD9929BE598C4BCF456ACD84BCF73C0; Path=/; HttpOnly",
+        "Content-Type": "text/html;charset=ISO-8859-1",
+        "Transfer-Encoding": "chunked",
+        "Date": "Fri, 08 May 2026 18:58:46 GMT"
+      },
+      "links_discovered": 96
+    },
+    {
+      "url": "http://altoro.testfire.net/images/header_pic.jpg",
+      "final_url": "http://altoro.testfire.net/images/header_pic.jpg",
+      "headers": {
+        "Server": "Apache-Coyote/1.1",
+        "Accept-Ranges": "bytes",
+        "ETag": "W/\"16209-1610554444000\"",
+        "Last-Modified": "Wed, 13 Jan 2021 16:14:04 GMT",
+        "Content-Type": "image/jpeg",
+        "Content-Length": "16209",
+        "Date": "Fri, 08 May 2026 18:58:47 GMT"
+      },
+      "links_discovered": 96
+    },
+    {
+      "url": "http://altoro.testfire.net/index.jsp?content=inside_careers.htm",
+      "final_url": "http://altoro.testfire.net/index.jsp?content=inside_careers.htm",
+      "headers": {
+        "Server": "Apache-Coyote/1.1",
+        "Set-Cookie": "JSESSIONID=E0B5F716DEC6F6186910E324127EECA5; Path=/; HttpOnly",
+        "Content-Type": "text/html;charset=ISO-8859-1",
+        "Transfer-Encoding": "chunked",
+        "Date": "Fri, 08 May 2026 18:58:48 GMT"
       },
       "links_discovered": 102
     },
     {
-      "url": "http://altoro.testfire.net/status_check.jsp",
-      "final_url": "http://altoro.testfire.net/status_check.jsp",
+      "url": "http://altoro.testfire.net/index.jsp?content=business_insurance.htm",
+      "final_url": "http://altoro.testfire.net/index.jsp?content=business_insurance.htm",
       "headers": {
         "Server": "Apache-Coyote/1.1",
-        "Set-Cookie": "JSESSIONID=9DEE2EED6DF87D5BB8B48CF29BC110F7; Path=/; HttpOnly",
+        "Set-Cookie": "JSESSIONID=5FF0F40F4B1BD73A74707A1B3BBF3CA6; Path=/; HttpOnly",
         "Content-Type": "text/html;charset=ISO-8859-1",
-        "Transfer-Encoding": "chunked",
-        "Date": "Fri, 08 May 2026 15:18:34 GMT"
+        "Content-Length": "7745",
+        "Date": "Fri, 08 May 2026 18:58:49 GMT"
       },
-      "links_discovered": 102
+      "links_discovered": 104
     },
     {
-      "url": "http://altoro.testfire.net/index.jsp?content=personal.htm",
-      "final_url": "http://altoro.testfire.net/index.jsp?content=personal.htm",
+      "url": "http://altoro.testfire.net/index.jsp?content=inside_contact.htm",
+      "final_url": "http://altoro.testfire.net/index.jsp?content=inside_contact.htm",
       "headers": {
         "Server": "Apache-Coyote/1.1",
-        "Set-Cookie": "JSESSIONID=89FF6A8A8843E6B695861D68E93AB009; Path=/; HttpOnly",
+        "Set-Cookie": "JSESSIONID=890FD23129BE97FDD6ADAA8D7E3B9EB9; Path=/; HttpOnly",
         "Content-Type": "text/html;charset=ISO-8859-1",
         "Transfer-Encoding": "chunked",
-        "Date": "Fri, 08 May 2026 15:18:35 GMT"
+        "Date": "Fri, 08 May 2026 18:58:50 GMT"
       },
-      "links_discovered": 103
+      "links_discovered": 108
+    },
+    {
+      "url": "http://altoro.testfire.net/index.jsp",
+      "final_url": "http://altoro.testfire.net/index.jsp",
+      "headers": {
+        "Server": "Apache-Coyote/1.1",
+        "Set-Cookie": "JSESSIONID=48758FE6A071DD3470AEEE1A0835EEC3; Path=/; HttpOnly",
+        "Content-Type": "text/html;charset=ISO-8859-1",
+        "Transfer-Encoding": "chunked",
+        "Date": "Fri, 08 May 2026 18:58:51 GMT"
+      },
+      "links_discovered": 108
     },
     {
       "url": "http://altoro.testfire.net/images/gradient.jpg",
@@ -392,36 +373,58 @@
         "Last-Modified": "Wed, 13 Jan 2021 16:14:04 GMT",
         "Content-Type": "image/jpeg",
         "Content-Length": "894",
-        "Date": "Fri, 08 May 2026 15:18:36 GMT"
+        "Date": "Fri, 08 May 2026 18:58:52 GMT"
       },
-      "links_discovered": 103
+      "links_discovered": 108
     },
     {
-      "url": "http://altoro.testfire.net/index.jsp?content=personal_cards.htm",
-      "final_url": "http://altoro.testfire.net/index.jsp?content=personal_cards.htm",
+      "url": "http://altoro.testfire.net/index.jsp?content=business_cards.htm",
+      "final_url": "http://altoro.testfire.net/index.jsp?content=business_cards.htm",
       "headers": {
         "Server": "Apache-Coyote/1.1",
-        "Set-Cookie": "JSESSIONID=B1F33193AC956C028D480E739E55CD05; Path=/; HttpOnly",
+        "Set-Cookie": "JSESSIONID=964B5D1F9FFA1F14D13DB0A3FEBC7E74; Path=/; HttpOnly",
+        "Content-Type": "text/html;charset=ISO-8859-1",
+        "Content-Length": "8062",
+        "Date": "Fri, 08 May 2026 18:58:53 GMT"
+      },
+      "links_discovered": 109
+    },
+    {
+      "url": "http://altoro.testfire.net/status_check.jsp",
+      "final_url": "http://altoro.testfire.net/status_check.jsp",
+      "headers": {
+        "Server": "Apache-Coyote/1.1",
+        "Set-Cookie": "JSESSIONID=4F0DEAC936CF4A0658A73FD0F4408845; Path=/; HttpOnly",
         "Content-Type": "text/html;charset=ISO-8859-1",
         "Transfer-Encoding": "chunked",
-        "Date": "Fri, 08 May 2026 15:18:37 GMT"
+        "Date": "Fri, 08 May 2026 18:58:54 GMT"
       },
-      "links_discovered": 104
+      "links_discovered": 109
     },
     {
-      "url": "http://altoro.testfire.net/images/logo.gif",
-      "final_url": "http://altoro.testfire.net/images/logo.gif",
+      "url": "http://altoro.testfire.net/index.jsp?content=business_deposit.htm",
+      "final_url": "http://altoro.testfire.net/index.jsp?content=business_deposit.htm",
       "headers": {
         "Server": "Apache-Coyote/1.1",
-        "Accept-Ranges": "bytes",
-        "ETag": "W/\"4989-1610554444000\"",
-        "Last-Modified": "Wed, 13 Jan 2021 16:14:04 GMT",
-        "Content-Type": "image/gif",
-        "Content-Length": "4989",
-        "Date": "Fri, 08 May 2026 15:18:38 GMT"
+        "Set-Cookie": "JSESSIONID=5F3F23267F83205AEF7704CC538E0A4F; Path=/; HttpOnly",
+        "Content-Type": "text/html;charset=ISO-8859-1",
+        "Content-Length": "7883",
+        "Date": "Fri, 08 May 2026 18:58:54 GMT"
       },
-      "links_discovered": 104
+      "links_discovered": 111
+    },
+    {
+      "url": "http://altoro.testfire.net/default.jsp?content=security.htm",
+      "final_url": "http://altoro.testfire.net/default.jsp?content=security.htm",
+      "headers": {
+        "Server": "Apache-Coyote/1.1",
+        "Set-Cookie": "JSESSIONID=5A402575949ECBCA67A1C2947FF85AC9; Path=/; HttpOnly",
+        "Content-Type": "text/html;charset=ISO-8859-1",
+        "Content-Length": "6958",
+        "Date": "Fri, 08 May 2026 18:58:55 GMT"
+      },
+      "links_discovered": 111
     }
   ],
-  "discovered_count": 104
+  "discovered_count": 111
 }

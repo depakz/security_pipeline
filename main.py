@@ -422,6 +422,50 @@ def run_with_progress(label, func, *args, **kwargs):
     print(f"{label} done in {elapsed}s")
     return value
 
+def display_terminal_summary(results):
+    """Prints a human-readable summary of vulnerabilities and proofs to the terminal."""
+    print("\n" + "="*60)
+    print(" SECURITY PIPELINE: VULNERABILITY SUMMARY")
+    print("="*60)
+    
+    if not results:
+        print("[-] No vulnerabilities confirmed.")
+        return
+
+    confirmed_count = 0
+    for res in results:
+        confidence = res.get('confidence', 0)
+        severity = str(res.get('severity', '')).upper()
+        
+        is_high = severity == 'HIGH' or (isinstance(confidence, (int, float)) and confidence >= 0.8)
+        
+        if is_high or res.get('vulnerability_confirmed', True):
+            confirmed_count += 1
+            vuln_type = res.get('type', res.get('vulnerability_type', 'Unknown'))
+            endpoint = res.get('endpoint')
+            if not endpoint:
+                endpoint = res.get('base', 'N/A')
+            proof = res.get('proof', 'No proof provided.')
+            
+            symbol = "[!]" if is_high else "[+]"
+            
+            print(f"\n{symbol} VULNERABILITY: {vuln_type}")
+            print(f"    URL: {endpoint}")
+            print(f"    SEVERITY/CONFIDENCE: {severity} / {confidence}")
+            print(f"    PROOF OF CONCEPT:")
+            
+            if isinstance(proof, dict):
+                proof_str = json.dumps(proof, indent=2)
+            else:
+                proof_str = str(proof)
+            
+            indented_proof = "\n".join("        " + line for line in proof_str.splitlines())
+            print(indented_proof)
+            print("-" * 60)
+
+    print(f"\n[!] Total Confirmed Vulnerabilities: {confirmed_count}")
+    print("="*60 + "\n")
+
 def main():
     parser = argparse.ArgumentParser(
         description="Run the penetration testing pipeline against a target host or URL."
@@ -604,6 +648,12 @@ def main():
         )
         logger.info("Saved final report: %s", final_report)
         logger.info("Saved confirmed vulnerabilities report: %s", confirmed_report)
+        try:
+            with open(confirmed_report, "r") as f:
+                data = json.load(f)
+                display_terminal_summary(data.get("confirmed_vulnerabilities", []))
+        except Exception as e:
+            logger.error(f"Could not print terminal summary: {e}")
         return
 
     # Step 5: Execution
@@ -627,6 +677,12 @@ def main():
     )
     logger.info("Saved final report: %s", final_report)
     logger.info("Saved confirmed vulnerabilities report: %s", confirmed_report)
+    try:
+        with open(confirmed_report, "r") as f:
+            data = json.load(f)
+            display_terminal_summary(data.get("confirmed_vulnerabilities", []))
+    except Exception as e:
+        logger.error(f"Could not print terminal summary: {e}")
 
 if __name__ == "__main__":
     main()
